@@ -15,7 +15,7 @@ Assistente de estudos com IA para estudantes: transforma aulas (fotos do quadro,
 | 🤖 **Agente de estudos** | Recebe pedidos em linguagem natural ("organize minhas aulas por matéria e crie slides da aula de hoje") e decide sozinho quais ferramentas chamar, num loop de *tool use* com o Claude. Cada passo aparece na tela. |
 | 🔎 **Pergunte às suas aulas (RAG)** | Divide anotações, transcrições e textos das fotos em trechos, busca por **palavras (BM25)**, por **significado (embeddings)** ou **híbrida**, e envia os melhores ao LLM, que responde **citando as fontes** `[1]`, `[2]`. |
 | 📊 **Avaliação do RAG** | 30 perguntas com respostas esperadas medem Hit@k e MRR de cada método de busca ([resultados abaixo](#avaliação-do-rag)). |
-| 📷 **Fotos do quadro** | OCR no navegador (Tesseract.js, português e inglês) + resumo. A imagem fica guardada e vira slide. |
+| 📷 **Fotos do quadro** | Até 100 por aula, guardadas no IndexedDB. OCR no navegador (Tesseract.js, português e inglês, com um worker reaproveitado para lotes) + resumo. Dá para selecionar várias e **juntar numa colagem em 1 slide** com o resumo de todas. |
 | 🎤 **Áudio** | Transcrição ao vivo (Web Speech API), gravação e transcrição de arquivos (Whisper). |
 | 🎙️ **Comandos de voz** | "nova aula", "resumo", "slides", "pesquisar …", "renomear para …". |
 | ✨ **Resumo, mapa mental e flashcards** | Com LLM, ou offline por resumo extrativo (frequência de palavras-chave). |

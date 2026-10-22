@@ -8,7 +8,9 @@ import {
   createFolder, createLesson, deleteLesson, deleteFolder, touch,
 } from './core/store.js';
 import { saveFile } from './core/files.js';
+import { uid } from './core/util.js';
 import { showTab } from './tabs.js';
+import { loadImages, lessonImageIds, migrateLesson, imageSrc, putImage } from './capture/images.js';
 
 export function startApp() {
   loadDb();
@@ -47,7 +49,7 @@ const folderById = id => state.db.folders.find(f => f.id === id);
 
 // ----- Aula aberta -----
 
-export function openLesson(id) {
+export async function openLesson(id) {
   if (!findLesson(id)) {
     if (!allLessons().length) createLesson();
     id = allLessons()[0].lesson.id;
@@ -59,7 +61,14 @@ export function openLesson(id) {
   showDates(lesson);
   renderSidebar();
   $('side').classList.remove('open');
-  emit('lesson:open', lesson);
+  // As imagens ficam no IndexedDB: carrega antes de desenhar galeria e slides.
+  try {
+    if (await migrateLesson(lesson, uid)) save();
+    await loadImages(lessonImageIds(lesson));
+  } catch (e) {
+    console.warn('Imagens indisponíveis:', e);
+  }
+  if (state.cur === id) emit('lesson:open', lesson);
 }
 
 const showDates = l => ($('when').textContent = `Criada ${l.created} · Editada ${l.updated}`);
@@ -154,8 +163,12 @@ function toggleFolder(id) {
 
 // ----- Backup -----
 
-function exportBackup() {
-  const data = JSON.stringify({ ...state.db, key: '', okey: '' }); // nunca exporta as chaves
+async function exportBackup() {
+  // As imagens moram no IndexedDB; vão junto no arquivo para o backup ser completo.
+  const ids = allLessons().flatMap(({ lesson }) => lessonImageIds(lesson));
+  await loadImages(ids);
+  const images = Object.fromEntries(ids.map(id => [id, imageSrc(id)]).filter(([, src]) => src));
+  const data = JSON.stringify({ ...state.db, key: '', okey: '', images }); // nunca exporta as chaves
   saveFile(`estudaai-backup-${new Date().toISOString().slice(0, 10)}.json`, new Blob([data], { type: 'application/json' }));
 }
 
@@ -163,10 +176,11 @@ function importBackup(input) {
   const file = input.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = async () => {
     try {
-      const data = JSON.parse(reader.result);
+      const { images = {}, ...data } = JSON.parse(reader.result);
       if (!Array.isArray(data.folders)) throw new Error('arquivo sem pastas');
+      for (const [id, src] of Object.entries(images)) await putImage(id, src);
       state.db = { ...data, key: state.db.key, okey: state.db.okey };
       state.cur = null;
       refresh();

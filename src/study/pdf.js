@@ -5,6 +5,7 @@ import { register } from '../core/actions.js';
 import { currentLesson } from '../core/store.js';
 import { saveFile } from '../core/files.js';
 import { currentSlides } from '../slides/slides.js';
+import { imageSrc } from '../capture/images.js';
 
 // As fontes padrão do jsPDF não têm emojis; removemos o que estiver fora do Latin-1.
 const latin1 = text => text.replace(/[^\x00-\xFF•]/g, '').trim();
@@ -47,10 +48,12 @@ export function lessonPdf(lesson) {
     writeText(doc, lesson.summary, 30);
   }
   for (const image of lesson.images ?? []) {
+    const src = imageSrc(image.id);
+    if (!src) continue;
     doc.addPage();
     doc.setFontSize(14);
     doc.text('Foto do quadro - ' + image.time, 15, 15);
-    const h = addFitted(doc, image.src, 15, 22, 180, 150);
+    const h = addFitted(doc, src, 15, 22, 180, 150);
     doc.setFontSize(11);
     writeText(doc, image.sum, 30 + h);
   }
@@ -73,8 +76,9 @@ export function slidesPdf(slides) {
     doc.text(doc.splitTextToSize(latin1(slide.title), 260), 20, 40);
     doc.setFontSize(16);
     let x = 22, width = 255;
-    if (slide.img) {
-      addFitted(doc, slide.img, 20, 55, 150, 120);
+    const src = slide.imgId && imageSrc(slide.imgId);
+    if (src) {
+      addFitted(doc, src, 20, 55, 150, 120);
       x = 180;
       width = 100;
     }

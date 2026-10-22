@@ -8,7 +8,9 @@ import { currentLesson, save } from '../core/store.js';
 import { tryComplete, extractJson, hasKey } from '../ai/claude.js';
 import { topics, sentences, keywords, toItems, capitalize } from '../text/nlp.js';
 import { clip } from '../core/util.js';
-import { readImage } from '../capture/ocr.js';
+import { uid } from '../core/util.js';
+import { readImage, summarizeBoard, limitFiles } from '../capture/ocr.js';
+import { imageSrc, putImage, collage } from '../capture/images.js';
 import { showTab } from '../tabs.js';
 
 // Estado da apresentação. `deck` é o próprio array salvo em lesson.slides.
@@ -24,17 +26,19 @@ export const currentSlides = () => deck;
 const titleSlide = lesson => ({ title: lesson.title, items: [lesson.created] });
 
 /** Slides a partir das notas (sem IA): um por tópico "# ...", e um por foto do quadro. */
+const imageSlide = image => ({
+  title: '📷 Quadro ' + image.time,
+  items: toItems(image.sum).slice(0, 4),
+  imgId: image.id,
+});
+
 export function slidesFromNotes(lesson) {
   const images = lesson.images ?? [];
   const fromTopics = topics(lesson.notes, lesson.title)
     // as seções "# Quadro 10:42" criadas pelo OCR viram slides com a foto, logo abaixo
     .filter(t => !(images.length && /^quadro \d/i.test(t.title)))
     .map(t => ({ title: t.title, items: t.items.slice(0, 5).map(s => clip(s, 110)) }));
-  const fromImages = images.map(image => ({
-    title: '📷 Quadro ' + image.time,
-    items: toItems(image.sum).slice(0, 4),
-    img: image.src,
-  }));
+  const fromImages = images.map(imageSlide);
   return [titleSlide(lesson), ...fromTopics, ...fromImages];
 }
 
@@ -47,7 +51,7 @@ async function build() {
     '[{"title":"...","items":["...","..."]}], no máximo 5 itens curtos por slide. Aula:\n' + lesson.notes
   ));
   if (Array.isArray(ai) && ai.length) {
-    const images = slidesFromNotes(lesson).filter(s => s.img);
+    const images = slidesFromNotes(lesson).filter(s => s.imgId);
     lesson.slides = [titleSlide(lesson), ...ai, ...images];
   } else {
     lesson.slides = slidesFromNotes(lesson);
@@ -79,8 +83,8 @@ function render() {
   const revealAll = index === 0;
   const list = `<ul>${slide.items.map((item, i) =>
     `<li class="${revealAll || i < step ? 'show' : ''}">${esc(item)}</li>`).join('')}</ul>`;
-  const body = slide.img
-    ? `<div class="slide-img"><img src="${slide.img}" alt="">${list}</div>`
+  const body = slide.imgId
+    ? `<div class="slide-img"><img src="${imageSrc(slide.imgId)}" alt="">${list}</div>`
     : list;
   $('slideStage').innerHTML = `<h2>${esc(slide.title)}</h2>${body}<div class="num">${index + 1}/${deck.length}</div>`;
 }
@@ -174,25 +178,86 @@ function aiBox(text) {
 
 const progress = p => aiBox(`Lendo imagem... ${p}%`);
 
-async function addImages(input) {
-  ensureDeck();
-  for (const file of input.files) {
+/** Lê vários arquivos (OCR + resumo), respeitando o limite de imagens da aula. */
+async function readFiles(input) {
+  const files = limitFiles([...input.files]);
+  input.value = '';
+  const images = [];
+  for (const [i, file] of files.entries()) {
     try {
-      const image = await readImage(file, { onProgress: progress, maxItems: 4 });
-      deck.splice(index + 1, 0, {
-        title: '📷 ' + capitalize(keywords(image.text, 1)[0] ?? 'Imagem ' + image.time),
-        items: image.items.length ? image.items : ['(sem texto na imagem)'],
-        img: image.src,
-        text: image.text,
-      });
-      index++;
-      step = ALL;
-      persist();
+      const tag = files.length > 1 ? ` ${i + 1} de ${files.length}` : '';
+      images.push(await readImage(file, { onProgress: p => aiBox(`Lendo imagem${tag}... ${p}%`), maxItems: 4 }));
     } catch (e) {
       toast('Erro: ' + e.message);
     }
   }
-  input.value = '';
+  return images;
+}
+
+function insertSlide(slide) {
+  ensureDeck();
+  deck.splice(index + 1, 0, slide);
+  index++;
+  step = ALL;
+  persist();
+}
+
+// Palavras que aparecem em quase toda foto de aula e não dizem o assunto.
+const GENERIC = /^(quadro|foto|imagem|aula|exemplo|professor|professora)$/;
+
+const titleFrom = (text, fallback) =>
+  '📷 ' + capitalize(keywords(text, 6).find(w => !GENERIC.test(w)) ?? fallback);
+
+/** Um slide por imagem (imagem ao lado do resumo dela). */
+function imageSlides(images) {
+  showTab('slides');
+  for (const image of images) {
+    const items = image.items ?? toItems(image.sum).slice(0, 5);
+    insertSlide({
+      title: titleFrom(image.text, 'Imagem ' + image.time),
+      items: items.length ? items : ['(sem texto na imagem)'],
+      imgId: image.id,
+      text: image.text,
+    });
+  }
+  aiBox(`✅ ${images.length} slide(s) criado(s)`);
+}
+
+/**
+ * Junta várias imagens num único slide: colagem em grade + um resumo do texto de todas.
+ * A colagem também vai para o PDF dos slides.
+ */
+async function mergeImages(images) {
+  showTab('slides');
+  if (images.length < 2) return images.length ? imageSlides(images) : toast('Escolha pelo menos 2 imagens');
+  aiBox(`Juntando ${images.length} imagens...`);
+  try {
+    const srcs = images.map(i => i.src ?? imageSrc(i.id)).filter(Boolean);
+    const imgId = uid();
+    await putImage(imgId, await collage(srcs));
+    const text = images.map(i => i.text).join('\n\n');
+    aiBox('Resumindo o conteúdo das imagens...');
+    const items = toItems(await summarizeBoard(text, 5)).slice(0, 5);
+    insertSlide({
+      title: titleFrom(text, `${images.length} imagens`),
+      items: items.length ? items : ['(sem texto nas imagens)'],
+      imgId,
+      text,
+    });
+    aiBox(`✅ ${images.length} imagens juntadas em 1 slide` + (hasKey() ? '' : ' (resumo offline: com a chave de IA em ⚙️ fica melhor)'));
+  } catch (e) {
+    aiBox('Erro ao juntar as imagens: ' + e.message);
+  }
+}
+
+async function addImages(input) {
+  const images = await readFiles(input);
+  if (images.length) imageSlides(images);
+}
+
+async function mergeFiles(input) {
+  const images = await readFiles(input);
+  if (images.length) mergeImages(images);
 }
 
 async function imageToSlide(input) {
@@ -203,7 +268,7 @@ async function imageToSlide(input) {
   if (!slide) return toast('Gere ou crie um slide primeiro');
   try {
     const image = await readImage(file, { onProgress: progress, maxItems: 4 });
-    slide.img = image.src;
+    slide.imgId = image.id;
     slide.text = ((slide.text ?? '') + '\n' + image.text).trim();
     if (index > 0 && image.items.length && (await sure('Adicionar o resumo da imagem aos tópicos do slide?'))) {
       slide.items = [...slide.items, ...image.items].slice(0, 6);
@@ -297,6 +362,9 @@ register({
   'slides.add': add,
   'slides.delete': remove,
   'slides.addImages': addImages,
+  'slides.mergeFiles': mergeFiles,
+  'slides.mergeImages': mergeImages,
+  'slides.imageSlides': imageSlides,
   'slides.imageToSlide': imageToSlide,
   'slides.summarize': summarize,
   'slides.explain': explain,

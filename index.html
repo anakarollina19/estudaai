@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>EstudaAI</title>
 <meta name="description" content="Assistente de estudos com IA: resumos, slides, OCR do quadro, agente de IA e busca nas próprias aulas (RAG).">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
 <link rel="stylesheet" href="css/styles.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.0/dist/tesseract.min.js"></script>
@@ -20,7 +23,7 @@
     <input id="aName" placeholder="Nome (só no cadastro)" autocomplete="name">
     <input id="aEmail" type="email" placeholder="E-mail" autocomplete="email">
     <input id="aPass" type="password" placeholder="Senha" autocomplete="current-password">
-    <button type="button" data-action="auth.login">Entrar</button>
+    <button type="button" class="primary" data-action="auth.login">Entrar</button>
     <button type="button" class="ghost" data-action="auth.signup">Criar conta</button>
     <button type="button" class="ghost" data-action="demo.load">✨ Experimentar com aulas de exemplo</button>
   </form>
@@ -51,7 +54,7 @@
       <button class="ghost" data-action="library.deleteLesson">🗑️ Excluir aula</button>
       <button class="mic" id="voiceBtn" data-action="voice.toggle">🎙️ Comandos de voz</button>
     </div>
-    <div class="card row">
+    <div class="gen-bar">
       <b>✨ Gerar:</b>
       <button data-action="summary.make">📝 Resumo</button>
       <button data-action="summary.mindmap">🧠 Mapa mental</button>
@@ -98,8 +101,14 @@
             <label class="file-btn ghost">🖼️ Escolher imagens<input type="file" accept="image/*" multiple hidden data-change="ocr.files"></label>
             <button class="ghost" data-action="ocr.folder">📁 Importar imagens de uma pasta</button>
           </div>
-          <p id="ocrSt" class="hint"></p>
-          <div id="gallery"></div>
+          <p id="ocrSt" class="hint">Até 100 imagens por aula.</p>
+          <div id="galleryTools" class="row hidden" style="margin-bottom:6px">
+            <span id="gallerySel" class="pill">0 selecionadas</span>
+            <button class="ghost" data-action="gallery.selectAll">Selecionar todas</button>
+            <button class="primary" data-action="gallery.merge">🧩 Juntar selecionadas em 1 slide</button>
+            <button data-action="gallery.each">🎞️ 1 slide por imagem</button>
+          </div>
+          <div id="gallery" class="gallery"></div>
         </div>
         <div class="card">
           <b>🎧 Transcrever arquivo de áudio</b>
@@ -123,13 +132,14 @@
     <!-- Slides -->
     <section data-tab="slides">
       <div class="card row">
-        <button data-action="slides.build">🎞️ Gerar slides das notas</button>
+        <button class="primary" data-action="slides.build">🎞️ Gerar slides das notas</button>
         <button class="ghost" data-action="slides.present">⛶ Apresentar</button>
         <button class="ghost" data-action="pdf.slides">📄 Slides em PDF</button>
         <span class="pill">← → navegam · clique revela tópicos</span>
       </div>
       <div class="card row center">
-        <label class="file-btn">🖼️ Adicionar imagem (vira slide com resumo)<input type="file" accept="image/*" multiple hidden data-change="slides.addImages"></label>
+        <label class="file-btn">🖼️ Adicionar imagens (1 slide cada)<input type="file" accept="image/*" multiple hidden data-change="slides.addImages"></label>
+        <label class="file-btn">🧩 Juntar imagens em 1 slide<input type="file" accept="image/*" multiple hidden data-change="slides.mergeFiles"></label>
         <label class="file-btn ghost">📎 Imagem neste slide<input type="file" accept="image/*" hidden data-change="slides.imageToSlide"></label>
         <button data-action="slides.summarize">✨ Resumir este slide</button>
         <button class="ghost" data-action="slides.edit">✏️ Editar</button>
@@ -146,7 +156,7 @@
       <div id="slideEdit" class="card stack hidden" style="margin-top:10px">
         <input id="seTitle" placeholder="Título do slide">
         <textarea id="seItems" rows="6" placeholder="Um tópico por linha"></textarea>
-        <div class="row"><button data-action="slides.saveEdit">Salvar slide</button><button class="ghost" data-action="slides.cancelEdit">Cancelar</button></div>
+        <div class="row"><button class="primary" data-action="slides.saveEdit">Salvar slide</button><button class="ghost" data-action="slides.cancelEdit">Cancelar</button></div>
       </div>
       <div id="slideAI" class="card pre hidden" style="margin-top:10px"></div>
     </section>
@@ -181,7 +191,7 @@
         <div id="agentLog" class="log"></div>
         <div class="row" style="margin-top:10px">
           <input id="agentIn" class="grow" placeholder="Ex.: crie uma pasta Química e uma aula sobre ligações iônicas com resumo" data-enter="agent.send">
-          <button data-action="agent.send" id="agentBtn">Enviar</button>
+          <button class="primary" data-action="agent.send" id="agentBtn">Enviar</button>
           <button class="ghost" data-action="agent.clear">Limpar</button>
         </div>
       </div>
@@ -192,7 +202,7 @@
       <div class="card">
         <b>🔎 Pergunte às suas aulas</b>
         <p class="hint">A resposta é buscada nas suas próprias anotações, transcrições e fotos do quadro, com a fonte de cada trecho. Sem a chave de IA, mostra só os trechos encontrados.</p>
-        <div class="row"><input id="ragQ" class="grow" placeholder="Ex.: o que o professor falou sobre mitose?" data-enter="rag.ask"><button data-action="rag.ask">Perguntar</button></div>
+        <div class="row"><input id="ragQ" class="grow" placeholder="Ex.: o que o professor falou sobre mitose?" data-enter="rag.ask"><button class="primary" data-action="rag.ask">Perguntar</button></div>
         <div class="row" style="margin-top:8px">
           <label for="ragMode" class="hint" style="margin:0">Busca:</label>
           <select id="ragMode" style="width:auto">

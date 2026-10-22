@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EstudaAI · Testes</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 760px; margin: 0 auto; padding: 24px 16px; background: #f5f6fb; color: #1d2140; }
+  ul { list-style: none; padding: 0; }
+  li { padding: 6px 10px; border-radius: 8px; margin: 4px 0; background: #fff; }
+  .ok { color: #16a37a; }
+  .fail { color: #e0563b; }
+  pre { color: #1d2140; white-space: pre-wrap; margin: 6px 0 0; }
+</style>
+</head>
+<body>
+<h1>🧪 Testes do EstudaAI</h1>
+<div id="results">Rodando...</div>
+<!-- elementos que alguns módulos esperam encontrar -->
+<div id="toast" hidden></div>
+<script type="module">
+  import { runAll } from './runner.js';
+  import './nlp.test.js';
+  import './rag.test.js';
+  import './agent.test.js';
+  runAll(document.getElementById('results'));
+</script>
+</body>
+</html>

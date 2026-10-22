@@ -4,575 +4,209 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>EstudaAI</title>
+<meta name="description" content="Assistente de estudos com IA: resumos, slides, OCR do quadro, agente de IA e busca nas próprias aulas (RAG).">
+<link rel="stylesheet" href="css/styles.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.0/dist/tesseract.min.js"></script>
-<style>
-:root{--bg:#f5f6fb;--card:#fff;--ink:#1d2140;--mut:#6b7090;--pri:#5b4cf0;--pri2:#8f7bff;--line:#e3e5f0;--ok:#16a37a;--warn:#e0563b}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11131f;--card:#1b1e2e;--ink:#eceefa;--mut:#9aa0c0;--line:#2c3047}}
-:root[data-theme="dark"]{--bg:#11131f;--card:#1b1e2e;--ink:#eceefa;--mut:#9aa0c0;--line:#2c3047}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
-button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:8px 14px;background:var(--pri);color:#fff}
-button.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
-button:hover{filter:brightness(1.08)}
-input,textarea,select{font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px;width:100%}
-.hidden{display:none!important}
-#auth{min-height:100vh;display:grid;place-items:center;padding:16px;background:linear-gradient(135deg,var(--pri),var(--pri2))}
-.authbox{background:var(--card);padding:28px;border-radius:18px;width:100%;max-width:380px;display:grid;gap:12px;box-shadow:0 20px 60px #0003}
-.authbox h1{margin:0;font-size:28px}
-#app{display:grid;grid-template-columns:270px 1fr;min-height:100vh}
-aside{background:var(--card);border-right:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:10px;overflow:auto;max-height:100vh}
-.logo{font-weight:800;font-size:22px;color:var(--pri)}
-.folder{border-radius:10px;padding:6px 8px}
-.folder>.fh{display:flex;justify-content:space-between;align-items:center;font-weight:600;cursor:pointer}
-.lesson{padding:6px 10px;margin:2px 0 2px 10px;border-radius:8px;cursor:pointer;font-size:14px}
-.lesson small{display:block;color:var(--mut);font-size:11px}
-.lesson.active,.lesson:hover{background:color-mix(in srgb,var(--pri) 14%,transparent)}
-.icon{background:none;color:var(--mut);padding:2px 6px}
-main{padding:18px;overflow:auto;max-height:100vh}
-.top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
-.top input{max-width:420px;font-size:20px;font-weight:700}
-.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.tabs button{background:var(--card);color:var(--ink);border:1px solid var(--line)}
-.tabs button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
-.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-#notes{min-height:340px;resize:vertical;line-height:1.6}
-.split{display:grid;grid-template-columns:1.2fr 1fr;gap:12px}
-iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:12px;background:#000}
-#board{width:100%;height:520px;background:#fff;border-radius:12px;border:1px solid var(--line);touch-action:none}
-.mic{background:var(--warn)}
-.pill{font-size:12px;padding:3px 8px;border-radius:99px;background:var(--line);color:var(--ink)}
-#slideStage{aspect-ratio:16/9;background:linear-gradient(135deg,#2a1f7a,#5b4cf0);color:#fff;border-radius:16px;padding:6%;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
-#slideStage h2{font-size:clamp(20px,3.5vw,40px);margin:0 0 14px}
-#slideStage li{font-size:clamp(14px,2vw,22px);margin:8px 0;opacity:0;transform:translateY(10px);transition:.4s}
-#slideStage li.show{opacity:1;transform:none}
-#slideStage .num{position:absolute;bottom:12px;right:18px;opacity:.7}
-#slideStage:fullscreen{border-radius:0}
-.quiz button{display:block;width:100%;text-align:left;margin:6px 0;background:#ffffff22}
-.mm svg{width:100%;height:auto}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;opacity:0;transition:.3s;pointer-events:none;z-index:9}
-#toast.show{opacity:1}
-.ocrimg{max-width:100%;max-height:260px;border-radius:10px}
-#menuBtn{display:none}
-@media (max-width:820px){
- #app{grid-template-columns:1fr}
- aside{position:fixed;inset:0 25% 0 0;z-index:5;transform:translateX(-100%);transition:.25s}
- aside.open{transform:none;box-shadow:0 0 40px #0005}
- #menuBtn{display:inline-block}
- .split{grid-template-columns:1fr}
- main{padding:16px}
-}
-</style>
+<script type="module" src="src/main.js"></script>
 </head>
 <body>
 
-<!-- ===== CADASTRO / LOGIN ===== -->
+<!-- ===== Login / cadastro ===== -->
 <section id="auth">
- <div class="authbox">
-  <h1>📚 EstudaAI</h1>
-  <p style="margin:0;color:var(--mut)">Suas aulas, resumos e slides em um só lugar.</p>
-  <input id="aName" placeholder="Nome (só no cadastro)">
-  <input id="aEmail" type="email" placeholder="E-mail">
-  <input id="aPass" type="password" placeholder="Senha">
-  <button onclick="auth('login')">Entrar</button>
-  <button class="ghost" onclick="auth('signup')">Criar conta</button>
- </div>
+  <form class="authbox" id="authForm">
+    <h1>📚 EstudaAI</h1>
+    <p class="muted" style="margin:0">Suas aulas, resumos e slides em um só lugar.</p>
+    <input id="aName" placeholder="Nome (só no cadastro)" autocomplete="name">
+    <input id="aEmail" type="email" placeholder="E-mail" autocomplete="email">
+    <input id="aPass" type="password" placeholder="Senha" autocomplete="current-password">
+    <button type="button" data-action="auth.login">Entrar</button>
+    <button type="button" class="ghost" data-action="auth.signup">Criar conta</button>
+    <button type="button" class="ghost" data-action="demo.load">✨ Experimentar com aulas de exemplo</button>
+  </form>
 </section>
 
-<!-- ===== APP ===== -->
+<!-- ===== App ===== -->
 <div id="app" class="hidden">
- <aside id="side">
-  <div class="row" style="justify-content:space-between"><span class="logo">📚 EstudaAI</span><button class="icon" onclick="toggleTheme()" title="Tema">🌓</button></div>
-  <div style="color:var(--mut);font-size:13px" id="hello"></div>
-  <input id="search" placeholder="🔎 Buscar aulas..." oninput="renderSide()">
-  <div class="row"><button onclick="newFolder()">+ Pasta</button><button class="ghost" onclick="newLesson()">+ Aula</button></div>
-  <div id="tree"></div>
-  <div style="margin-top:auto;display:grid;gap:6px">
-   <button class="ghost" onclick="pickDir()" id="dirBtn">📁 Selecionar pasta do computador</button>
-   <button class="ghost" onclick="exportBackup()">⬇️ Backup (.json)</button>
-   <label class="ghost" style="border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center;cursor:pointer">⬆️ Restaurar<input type="file" accept=".json" hidden onchange="importBackup(this)"></label>
-   <button class="ghost" onclick="settings()">⚙️ Chave de IA</button>
-   <button class="ghost" onclick="logout()">Sair</button>
-  </div>
- </aside>
-
- <main>
-  <div class="top">
-   <button id="menuBtn" class="ghost" onclick="side.classList.toggle('open')">☰</button>
-   <input id="title" onchange="renameLesson(this.value)" placeholder="Nome da aula">
-   <span class="pill" id="when"></span>
-   <button class="ghost" onclick="delLesson()">🗑️ Excluir aula</button>
-   <button class="mic" id="voiceBtn" onclick="toggleVoiceCmd()">🎙️ Comandos de voz</button>
-  </div>
-  <div class="card row gen">
-   <b>✨ Gerar:</b>
-   <button onclick="showTab('resumo');makeSummary()">📝 Resumo</button>
-   <button onclick="showTab('resumo');makeMindmap()">🧠 Mapa mental</button>
-   <button onclick="showTab('resumo');makeFlash()">🃏 Flashcards</button>
-   <button onclick="showTab('slides');buildSlides()">🎞️ Slides</button>
-   <button onclick="exportPDF()">📄 PDF</button>
-  </div>
-  <div class="tabs" id="tabs"></div>
-
-  <!-- Anotações -->
-  <section data-tab="notas">
-   <div class="split">
-    <div class="card">
-     <div class="row" style="margin-bottom:8px">
-      <button onclick="toggleDictation()" id="dictBtn">🎤 Ditar / transcrever aula ao vivo</button>
-      <select id="lang" style="width:auto"><option value="pt-BR">Português</option><option value="en-US">English</option><option value="es-ES">Español</option></select>
-      <span class="pill" id="dictState">parado</span>
-     </div>
-     <textarea id="notes" placeholder="Anote aqui... Use '# Título' para criar tópicos (viram slides e mapa mental)." oninput="saveNotes()"></textarea>
+  <aside id="side">
+    <div class="row between"><span class="logo">📚 EstudaAI</span><button class="icon" data-action="theme.toggle" title="Tema claro/escuro">🌓</button></div>
+    <div class="muted" style="font-size:13px" id="hello"></div>
+    <input id="search" placeholder="🔎 Buscar aulas..." data-input="library.render">
+    <div class="row"><button data-action="library.newFolder">+ Pasta</button><button class="ghost" data-action="library.newLesson">+ Aula</button></div>
+    <div id="tree"></div>
+    <div class="side-footer">
+      <button class="ghost" data-action="files.pickDir" id="dirBtn">📁 Selecionar pasta do computador</button>
+      <button class="ghost" data-action="backup.export">⬇️ Backup (.json)</button>
+      <label class="file-btn ghost">⬆️ Restaurar<input type="file" accept=".json" hidden data-change="backup.import"></label>
+      <button class="ghost" data-action="ai.settings">⚙️ Chave de IA</button>
+      <button class="ghost" data-action="auth.logout">Sair</button>
     </div>
-    <div>
-     <div class="card">
-      <b>▶️ YouTube enquanto anota</b>
-      <div class="row" style="margin:8px 0"><input id="ytUrl" placeholder="Cole o link do vídeo"><button onclick="loadYT()">Abrir</button></div>
-      <div id="ytBox"></div>
-     </div>
-     <div class="card">
-      <b>🌐 Tirar dúvida no Google</b>
-      <div class="row" style="margin-top:8px"><input id="gq" placeholder="O que você quer saber?" onkeydown="if(event.key==='Enter')google()"><button onclick="google()">Pesquisar</button></div>
-      <div class="row" style="margin-top:8px"><button class="ghost" onclick="askAI()">🤖 Perguntar à IA</button></div>
-      <div id="aiAns" style="margin-top:8px;white-space:pre-wrap"></div>
-     </div>
+  </aside>
+
+  <main>
+    <div class="top">
+      <button id="menuBtn" class="ghost" data-action="library.toggleMenu">☰</button>
+      <input id="title" data-change="library.rename" placeholder="Nome da aula">
+      <span class="pill" id="when"></span>
+      <button class="ghost" data-action="library.deleteLesson">🗑️ Excluir aula</button>
+      <button class="mic" id="voiceBtn" data-action="voice.toggle">🎙️ Comandos de voz</button>
     </div>
-   </div>
-  </section>
-
-  <!-- Foto do quadro / áudio -->
-  <section data-tab="captura">
-   <div class="split">
-    <div class="card">
-     <b>📷 Fotos do quadro → texto + resumo</b>
-     <p style="color:var(--mut);font-size:13px">Tire fotos ou escolha várias imagens. O texto é extraído e resumido, e a imagem fica guardada na aula para os slides e o PDF.</p>
-     <div class="row">
-      <label class="ghost" style="border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer">📷 Câmera<input type="file" accept="image/*" capture="environment" hidden onchange="ocr(this)"></label>
-      <label class="ghost" style="border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer">🖼️ Escolher imagens<input type="file" accept="image/*" multiple hidden onchange="ocr(this)"></label>
-      <button class="ghost" onclick="importDirImages()">📁 Importar imagens de uma pasta</button>
-     </div>
-     <p id="ocrSt" style="color:var(--mut);font-size:13px"></p>
-     <div id="gallery"></div>
+    <div class="card row">
+      <b>✨ Gerar:</b>
+      <button data-action="summary.make">📝 Resumo</button>
+      <button data-action="summary.mindmap">🧠 Mapa mental</button>
+      <button data-action="summary.flashcards">🃏 Flashcards</button>
+      <button data-action="slides.build">🎞️ Slides</button>
+      <button data-action="pdf.lesson">📄 PDF</button>
     </div>
-    <div class="card">
-     <b>🎧 Transcrever arquivo de áudio</b>
-     <p style="color:var(--mut);font-size:13px">Alta precisão via Whisper (OpenAI) — precisa da chave em ⚙️. Para gravar ao vivo, use 🎤 em Anotações.</p>
-     <input type="file" accept="audio/*,video/*" onchange="transcribe(this)">
-     <div id="trOut" style="margin-top:10px"></div>
-     <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
-     <b>⏺️ Gravar áudio da aula</b>
-     <div class="row" style="margin-top:8px"><button id="recBtn" onclick="toggleRec()">Gravar</button><span id="recInfo" class="pill">—</span></div>
-     <div id="audios"></div>
-    </div>
-   </div>
-  </section>
+    <nav class="tabs" id="tabs"></nav>
 
-  <!-- Resumo & mapa mental -->
-  <section data-tab="resumo">
-   <div class="card">
-    <div class="row"><button onclick="makeSummary()">✨ Gerar resumo</button><button class="ghost" onclick="makeMindmap()">🧠 Mapa mental</button><button class="ghost" onclick="makeFlash()">🃏 Flashcards</button><button class="ghost" onclick="exportPDF()">📄 Baixar PDF</button></div>
-   </div>
-   <div class="card"><b>Resumo</b><div id="summary" style="white-space:pre-wrap;margin-top:8px;color:var(--mut)">Clique em “Gerar resumo”.</div></div>
-   <div class="card mm"><b>Mapa mental</b><div id="mindmap"></div></div>
-   <div class="card"><b>Flashcards</b><div id="flash" class="row" style="margin-top:8px"></div></div>
-  </section>
+    <!-- Anotações -->
+    <section data-tab="notas">
+      <div class="split">
+        <div class="card">
+          <div class="row" style="margin-bottom:8px">
+            <button data-action="dictation.toggle" id="dictBtn">🎤 Ditar / transcrever aula ao vivo</button>
+            <select id="lang" style="width:auto"><option value="pt-BR">Português</option><option value="en-US">English</option><option value="es-ES">Español</option></select>
+            <span class="pill" id="dictState">parado</span>
+          </div>
+          <textarea id="notes" data-input="library.saveNotes" placeholder="Anote aqui... Use '# Título' para criar tópicos (viram slides e mapa mental)."></textarea>
+        </div>
+        <div>
+          <div class="card">
+            <b>▶️ YouTube enquanto anota</b>
+            <div class="row" style="margin:8px 0"><input id="ytUrl" class="grow" placeholder="Cole o link do vídeo" data-enter="web.youtube"><button data-action="web.youtube">Abrir</button></div>
+            <div id="ytBox"></div>
+          </div>
+          <div class="card">
+            <b>🌐 Tirar dúvida</b>
+            <div class="row" style="margin-top:8px"><input id="gq" class="grow" placeholder="O que você quer saber?" data-enter="web.google"><button data-action="web.google">Google</button><button class="ghost" data-action="web.askAI">🤖 Perguntar à IA</button></div>
+            <div id="aiAns" class="pre" style="margin-top:8px"></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-  <!-- Slides -->
-  <section data-tab="slides">
-   <div class="card row"><button onclick="buildSlides()">🎞️ Gerar slides das notas</button><button class="ghost" onclick="present()">⛶ Apresentar</button><button class="ghost" onclick="slidesPDF()">📄 Slides em PDF</button><span class="pill">← → navegam · clique revela tópicos</span></div>
-   <div class="card row" id="slideTools" style="justify-content:center"></div>
-   <div id="slideStage" onclick="nextStep()"><h2>Gere os slides a partir das suas notas</h2></div>
-   <div class="row" style="justify-content:center;margin-top:10px"><button class="ghost" onclick="prevSlide()">◀</button><button class="ghost" onclick="explainSlide()">🤖 Explique este slide</button><button class="ghost" onclick="quizSlide()">❓ Quiz</button><button class="ghost" onclick="nextSlide()">▶</button></div>
-   <div class="card row" id="slideToolsSrc" style="margin-top:10px;justify-content:center">
-    <label style="background:var(--pri);color:#fff;border-radius:10px;padding:8px 14px;cursor:pointer">🖼️ Adicionar imagem (vira slide com resumo)<input type="file" accept="image/*" multiple hidden onchange="addSlideImages(this)"></label>
-    <label class="ghost" style="border:1px solid var(--line);border-radius:10px;padding:8px 14px;cursor:pointer">📎 Imagem neste slide<input type="file" accept="image/*" hidden onchange="imgToSlide(this)"></label>
-    <button onclick="summarizeSlide()">✨ Resumir este slide</button>
-    <button class="ghost" onclick="editSlide()">✏️ Editar</button>
-    <button class="ghost" onclick="addSlide()">➕ Novo slide</button>
-    <button class="ghost" onclick="delSlide()">🗑️ Excluir slide</button>
-   </div>
-   <div id="slideEdit" class="card hidden" style="margin-top:10px;display:grid;gap:8px">
-    <input id="seTitle" placeholder="Título do slide">
-    <textarea id="seItems" rows="6" placeholder="Um tópico por linha"></textarea>
-    <div class="row"><button onclick="saveSlideEdit()">Salvar slide</button><button class="ghost" onclick="$('slideEdit').classList.add('hidden')">Cancelar</button></div>
-   </div>
-   <div id="slideAI" class="card" style="margin-top:10px;white-space:pre-wrap;display:none"></div>
-  </section>
+    <!-- Fotos e áudio -->
+    <section data-tab="captura">
+      <div class="split">
+        <div class="card">
+          <b>📷 Fotos do quadro → texto + resumo</b>
+          <p class="hint">Tire fotos ou escolha várias imagens. O texto é extraído e resumido, e a imagem fica guardada na aula para os slides e o PDF.</p>
+          <div class="row">
+            <label class="file-btn ghost">📷 Câmera<input type="file" accept="image/*" capture="environment" hidden data-change="ocr.files"></label>
+            <label class="file-btn ghost">🖼️ Escolher imagens<input type="file" accept="image/*" multiple hidden data-change="ocr.files"></label>
+            <button class="ghost" data-action="ocr.folder">📁 Importar imagens de uma pasta</button>
+          </div>
+          <p id="ocrSt" class="hint"></p>
+          <div id="gallery"></div>
+        </div>
+        <div class="card">
+          <b>🎧 Transcrever arquivo de áudio</b>
+          <p class="hint">Alta precisão com Whisper (OpenAI), precisa da chave em ⚙️. Para gravar ao vivo, use 🎤 em Anotações.</p>
+          <input type="file" accept="audio/*,video/*" data-change="audio.transcribeFile">
+          <div id="trOut" style="margin-top:10px"></div>
+          <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
+          <b>⏺️ Gravar áudio da aula</b>
+          <div class="row" style="margin-top:8px"><button id="recBtn" data-action="audio.record">Gravar</button><span id="recInfo" class="pill">—</span></div>
+        </div>
+      </div>
+    </section>
 
-  <!-- Agente de estudos -->
-  <section data-tab="agente">
-   <div class="card">
-    <b>🤖 Agente de estudos</b>
-    <p style="color:var(--mut);font-size:13px;margin:4px 0 10px">Peça em linguagem natural. O agente decide quais ferramentas usar (criar pastas e aulas, buscar nas suas aulas, escrever resumos, montar slides, gerar PDF) e mostra cada passo. Precisa da chave do Claude em ⚙️.</p>
-    <div class="row" style="margin-bottom:8px">
-     <button class="ghost" onclick="agentEx(this)">Organize minhas aulas em pastas por matéria</button>
-     <button class="ghost" onclick="agentEx(this)">Faça um resumo da aula atual e crie 5 slides com quiz</button>
-     <button class="ghost" onclick="agentEx(this)">Crie uma aula de revisão juntando tudo que estudei sobre biologia</button>
-    </div>
-    <div id="agentLog" style="display:grid;gap:8px;max-height:55vh;overflow:auto"></div>
-    <div class="row" style="margin-top:10px"><input id="agentIn" placeholder="Ex.: crie uma pasta Química e uma aula sobre ligações iônicas com resumo" onkeydown="if(event.key==='Enter')runAgent()" style="flex:1;width:auto"><button onclick="runAgent()" id="agentBtn">Enviar</button><button class="ghost" onclick="agentMsgs=[];$('agentLog').innerHTML=''">Limpar</button></div>
-   </div>
-  </section>
+    <!-- Resumo e mapa mental -->
+    <section data-tab="resumo">
+      <div class="card"><b>Resumo</b><div id="summary" class="pre muted" style="margin-top:8px">Clique em “📝 Resumo” na barra Gerar.</div></div>
+      <div class="card mm"><b>Mapa mental</b><div id="mindmap"></div></div>
+      <div class="card"><b>Flashcards</b> <span class="hint">clique para ver a resposta</span><div id="flash" class="row" style="margin-top:8px"></div></div>
+    </section>
 
-  <!-- RAG: perguntar às aulas -->
-  <section data-tab="perguntar">
-   <div class="card">
-    <b>🔎 Pergunte às suas aulas</b>
-    <p style="color:var(--mut);font-size:13px;margin:4px 0 10px">A resposta é buscada nas suas próprias anotações, transcrições e fotos do quadro, com a fonte de cada trecho. Sem a chave de IA, mostra só os trechos encontrados.</p>
-    <div class="row"><input id="ragQ" placeholder="Ex.: o que o professor falou sobre mitose?" onkeydown="if(event.key==='Enter')askLessons()" style="flex:1;width:auto"><button onclick="askLessons()">Perguntar</button></div>
-    <div id="ragAns" style="white-space:pre-wrap;margin-top:12px"></div>
-    <div id="ragSrc" style="display:grid;gap:8px;margin-top:10px"></div>
-   </div>
-  </section>
+    <!-- Slides -->
+    <section data-tab="slides">
+      <div class="card row">
+        <button data-action="slides.build">🎞️ Gerar slides das notas</button>
+        <button class="ghost" data-action="slides.present">⛶ Apresentar</button>
+        <button class="ghost" data-action="pdf.slides">📄 Slides em PDF</button>
+        <span class="pill">← → navegam · clique revela tópicos</span>
+      </div>
+      <div class="card row center">
+        <label class="file-btn">🖼️ Adicionar imagem (vira slide com resumo)<input type="file" accept="image/*" multiple hidden data-change="slides.addImages"></label>
+        <label class="file-btn ghost">📎 Imagem neste slide<input type="file" accept="image/*" hidden data-change="slides.imageToSlide"></label>
+        <button data-action="slides.summarize">✨ Resumir este slide</button>
+        <button class="ghost" data-action="slides.edit">✏️ Editar</button>
+        <button class="ghost" data-action="slides.add">➕ Novo slide</button>
+        <button class="ghost" data-action="slides.delete">🗑️ Excluir slide</button>
+      </div>
+      <div id="slideStage" data-action="slides.next"><h2>Gere os slides a partir das suas notas</h2></div>
+      <div class="row center" style="margin-top:10px">
+        <button class="ghost" data-action="slides.prev">◀</button>
+        <button class="ghost" data-action="slides.explain">🤖 Explique este slide</button>
+        <button class="ghost" data-action="slides.quiz">❓ Quiz</button>
+        <button class="ghost" data-action="slides.nextSlide">▶</button>
+      </div>
+      <div id="slideEdit" class="card stack hidden" style="margin-top:10px">
+        <input id="seTitle" placeholder="Título do slide">
+        <textarea id="seItems" rows="6" placeholder="Um tópico por linha"></textarea>
+        <div class="row"><button data-action="slides.saveEdit">Salvar slide</button><button class="ghost" data-action="slides.cancelEdit">Cancelar</button></div>
+      </div>
+      <div id="slideAI" class="card pre hidden" style="margin-top:10px"></div>
+    </section>
 
-  <!-- Quadro branco -->
-  <section data-tab="quadro">
-   <div class="card row">
-    <input type="color" id="pen" value="#1d2140" style="width:50px;padding:2px">
-    <input type="range" id="size" min="1" max="30" value="3" style="width:120px">
-    <button class="ghost" onclick="tool='pen'">✏️ Caneta</button>
-    <button class="ghost" onclick="tool='eraser'">🧽 Borracha</button>
-    <button class="ghost" onclick="tool='text'">🔤 Texto</button>
-    <button class="ghost" onclick="tool='rect'">▭ Caixa</button>
-    <button class="ghost" onclick="undo()">↶ Desfazer</button>
-    <button class="ghost" onclick="clearBoard()">🗑️ Limpar</button>
-    <button class="ghost" onclick="saveBoardPNG()">🖼️ Salvar PNG</button>
-   </div>
-   <canvas id="board"></canvas>
-  </section>
- </main>
+    <!-- Quadro branco -->
+    <section data-tab="quadro">
+      <div class="card row">
+        <input type="color" id="pen" value="#1d2140" style="width:50px;padding:2px" aria-label="Cor">
+        <input type="range" id="size" min="1" max="30" value="3" style="width:120px" aria-label="Espessura">
+        <button class="ghost" data-action="board.tool" data-arg="pen">✏️ Caneta</button>
+        <button class="ghost" data-action="board.tool" data-arg="eraser">🧽 Borracha</button>
+        <button class="ghost" data-action="board.tool" data-arg="text">🔤 Texto</button>
+        <button class="ghost" data-action="board.tool" data-arg="rect">▭ Caixa</button>
+        <button class="ghost" data-action="board.undo">↶ Desfazer</button>
+        <button class="ghost" data-action="board.clear">🗑️ Limpar</button>
+        <button class="ghost" data-action="board.png">🖼️ Salvar PNG</button>
+      </div>
+      <canvas id="board"></canvas>
+    </section>
+
+    <!-- Agente de estudos -->
+    <section data-tab="agente">
+      <div class="card">
+        <b>🤖 Agente de estudos</b>
+        <p class="hint">Peça em linguagem natural. O agente decide quais ferramentas usar (criar pastas e aulas, buscar nas suas aulas, escrever resumos, montar slides, gerar PDF) e mostra cada passo. Precisa da chave do Claude em ⚙️.</p>
+        <button class="ghost" data-action="agent.demo" style="margin-bottom:8px">▶️ Ver uma demonstração (sem chave)</button>
+        <div class="row" style="margin-bottom:8px">
+          <button class="ghost" data-action="agent.example">Organize minhas aulas em pastas por matéria</button>
+          <button class="ghost" data-action="agent.example">Faça um resumo da aula atual e crie 5 slides</button>
+          <button class="ghost" data-action="agent.example">Crie uma aula de revisão juntando tudo que estudei sobre biologia</button>
+        </div>
+        <div id="agentLog" class="log"></div>
+        <div class="row" style="margin-top:10px">
+          <input id="agentIn" class="grow" placeholder="Ex.: crie uma pasta Química e uma aula sobre ligações iônicas com resumo" data-enter="agent.send">
+          <button data-action="agent.send" id="agentBtn">Enviar</button>
+          <button class="ghost" data-action="agent.clear">Limpar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RAG: perguntar às aulas -->
+    <section data-tab="perguntar">
+      <div class="card">
+        <b>🔎 Pergunte às suas aulas</b>
+        <p class="hint">A resposta é buscada nas suas próprias anotações, transcrições e fotos do quadro, com a fonte de cada trecho. Sem a chave de IA, mostra só os trechos encontrados.</p>
+        <div class="row"><input id="ragQ" class="grow" placeholder="Ex.: o que o professor falou sobre mitose?" data-enter="rag.ask"><button data-action="rag.ask">Perguntar</button></div>
+        <div id="ragAns" class="pre" style="margin-top:12px"></div>
+        <div id="ragSrc" class="stack" style="margin-top:10px"></div>
+      </div>
+    </section>
+  </main>
 </div>
-<div id="toast"></div>
-<div id="dlg" class="hidden" style="position:fixed;inset:0;background:#0007;display:grid;place-items:center;z-index:20;padding:16px">
- <div class="card" style="width:100%;max-width:420px;display:grid;gap:10px;margin:0">
-  <div id="dlgMsg" style="white-space:pre-wrap;font-weight:600"></div>
-  <input id="dlgIn">
-  <div class="row" style="justify-content:flex-end"><button class="ghost" id="dlgNo">Cancelar</button><button id="dlgOk">OK</button></div>
- </div>
+
+<div id="toast" role="status"></div>
+<div id="dlg" class="hidden" role="dialog" aria-modal="true">
+  <div class="card">
+    <div id="dlgMsg"></div>
+    <input id="dlgIn">
+    <div class="row" style="justify-content:flex-end"><button class="ghost" id="dlgNo">Cancelar</button><button id="dlgOk">OK</button></div>
+  </div>
 </div>
-
-<script>
-// ================== DADOS ==================
-const $=id=>document.getElementById(id);
-let users=JSON.parse(localStorage.users||'{}'), me=localStorage.me||null, db, cur=null;
-const nowStr=()=>new Date().toLocaleString('pt-BR');
-const uid=()=>Math.random().toString(36).slice(2,9);
-function toast(t){$('toast').textContent=t;$('toast').classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').classList.remove('show'),2200)}
-// janela própria (o navegador pode bloquear confirm/prompt)
-function dialog(msg,def,input){return new Promise(ok=>{$('dlgMsg').textContent=msg;$('dlgIn').classList.toggle('hidden',!input);$('dlgIn').value=def||'';$('dlg').classList.remove('hidden');if(input)setTimeout(()=>$('dlgIn').select(),30);
- const done=v=>{$('dlg').classList.add('hidden');$('dlgOk').onclick=$('dlgNo').onclick=$('dlgIn').onkeydown=null;ok(v)};
- $('dlgOk').onclick=()=>done(input?$('dlgIn').value:true);$('dlgNo').onclick=()=>done(input?null:false);$('dlgIn').onkeydown=e=>{if(e.key==='Enter')$('dlgOk').click();if(e.key==='Escape')$('dlgNo').click()}})}
-const ask=(m,d='')=>dialog(m,d,true),sure=m=>dialog(m,'',false);
-async function hash(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
-
-async function auth(mode){
- const e=$('aEmail').value.trim().toLowerCase(),p=$('aPass').value,n=$('aName').value.trim();
- if(!e||p.length<4)return toast('Informe e-mail e senha (mín. 4)');
- const h=await hash(e+p);
- if(mode==='signup'){if(users[e])return toast('Conta já existe');users[e]={name:n||e.split('@')[0],h};localStorage.users=JSON.stringify(users);toast('Conta criada!')}
- else if(!users[e]||users[e].h!==h)return toast('E-mail ou senha incorretos');
- me=e;localStorage.me=e;start();
-}
-function logout(){localStorage.removeItem('me');location.reload()}
-function save(){try{localStorage['db_'+me]=JSON.stringify(db)}catch(e){toast('⚠️ Armazenamento cheio: faça um Backup e remova imagens antigas')}}
-function start(){
- db=JSON.parse(localStorage['db_'+me]||'null')||{folders:[{id:uid(),name:'Geral',open:true,lessons:[]}],key:'',okey:''};
- if(!db.folders[0].lessons.length&&db.folders.length===1)newLesson(true);
- $('auth').classList.add('hidden');$('app').classList.remove('hidden');
- $('hello').textContent='Olá, '+users[me].name+' 👋';
- cur=cur||db.folders[0].lessons[0]?.id;renderSide();openLesson(cur);initBoard();
-}
-const allLessons=()=>db.folders.flatMap(f=>f.lessons.map(l=>({...l,f})));
-const L=()=>{for(const f of db.folders){const l=f.lessons.find(x=>x.id===cur);if(l)return l}};
-
-// ================== PASTAS / AULAS ==================
-async function newFolder(){const n=await ask('Nome da pasta:','Matéria '+(db.folders.length+1));if(!n)return;db.folders.push({id:uid(),name:n,open:true,lessons:[]});save();renderSide()}
-async function newLesson(silent){
- let f=db.folders[0];
- if(!silent&&db.folders.length>1){const names=db.folders.map((x,i)=>i+1+'. '+x.name).join('\n');const a=await ask('Em qual pasta? (digite o número)\n'+names,'1');if(a===null)return;const i=parseInt(a)-1;if(db.folders[i])f=db.folders[i]}
- const d=new Date();const l={id:uid(),title:'Aula de '+d.toLocaleDateString('pt-BR'),created:nowStr(),updated:nowStr(),notes:'',board:null,slides:[]};
- f.lessons.unshift(l);cur=l.id;save();if(!silent){renderSide();openLesson(l.id)}
-}
-function renderSide(){
- const q=$('search').value?.toLowerCase()||'';
- $('tree').innerHTML=db.folders.map((f,fi)=>`<div class="folder"><div class="fh" onclick="db.folders[${fi}].open=!db.folders[${fi}].open;save();renderSide()"><span>${f.open?'📂':'📁'} ${esc(f.name)}</span><span><button class="icon" onclick="event.stopPropagation();renFolder(${fi})">✏️</button><button class="icon" onclick="event.stopPropagation();delFolder(${fi})">🗑️</button></span></div>
- ${f.open||q?f.lessons.filter(l=>!q||(l.title+l.notes).toLowerCase().includes(q)).map(l=>`<div class="lesson ${l.id===cur?'active':''}" onclick="openLesson('${l.id}')">${esc(l.title)}<small>🕒 ${l.created}</small></div>`).join(''):''}</div>`).join('');
-}
-async function renFolder(i){const n=await ask('Renomear pasta:',db.folders[i].name);if(n){db.folders[i].name=n;save();renderSide()}}
-async function delLesson(){const l=L();if(!l||!await sure('Excluir a aula "'+l.title+'"?'))return;db.folders.forEach(f=>f.lessons=f.lessons.filter(x=>x.id!==l.id));save();cur=allLessons()[0]?.id;renderSide();if(cur)openLesson(cur);else newLesson()}
-async function delFolder(i){if(db.folders.length===1)return toast('Precisa ter ao menos uma pasta');if(await sure('Excluir a pasta "'+db.folders[i].name+'" e todas as aulas dela?')){db.folders.splice(i,1);save();cur=allLessons()[0]?.id;renderSide();openLesson(cur)}}
-function renameLesson(v){const l=L();if(l){l.title=v||'Sem título';save();renderSide();toast('Aula renomeada')}}
-function openLesson(id){
- cur=id;const l=L();if(!l){newLesson();return}
- $('title').value=l.title;$('notes').value=l.notes;$('when').textContent='Criada '+l.created+' · Editada '+l.updated;
- slides=l.slides||[];si=0;step=0;renderSlide();loadBoard(l.board);renderSide();side.classList.remove('open');renderGallery();
-}
-let st;function saveNotes(){const l=L();l.notes=$('notes').value;l.updated=nowStr();clearTimeout(st);st=setTimeout(()=>{save();$('when').textContent='Criada '+l.created+' · Editada '+l.updated},400)}
-function appendNotes(t){$('notes').value+=(($('notes').value&&!$('notes').value.endsWith('\n'))?'\n':'')+t;saveNotes()}
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-// ================== ABAS ==================
-const TABS={notas:'📝 Anotações',captura:'📷 Foto & Áudio',resumo:'✨ Resumo & Mapa',slides:'🎞️ Slides',quadro:'🖍️ Quadro branco',agente:'🤖 Agente',perguntar:'🔎 Pergunte às aulas'};
-function showTab(t){document.querySelectorAll('[data-tab]').forEach(s=>s.classList.toggle('hidden',s.dataset.tab!==t));$('tabs').innerHTML=Object.entries(TABS).map(([k,v])=>`<button class="${k===t?'on':''}" onclick="showTab('${k}')">${v}</button>`).join('');if(t==='quadro')sizeBoard()}
-$('slideTools').append(...$('slideToolsSrc').childNodes);$('slideToolsSrc').remove();
-showTab('notas');
-
-// ================== IA (Claude) ==================
-async function settings(){
- const k=await ask('Chave da API Anthropic (Claude) para resumos, slides e dúvidas com IA.\nFica salva só neste dispositivo. Deixe vazio para usar o modo offline.',db.key||'');if(k!==null)db.key=k.trim();
- const o=await ask('(Opcional) Chave OpenAI para transcrição Whisper de arquivos de áudio:',db.okey||'');if(o!==null)db.okey=o.trim();save();toast('Configurações salvas');
-}
-async function claude(prompt){
- if(!db.key)return null;
- const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':db.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-  body:JSON.stringify({model:'claude-sonnet-5-5',max_tokens:2000,messages:[{role:'user',content:prompt}]})});
- const j=await r.json();if(j.error)throw new Error(j.error.message);return j.content.map(c=>c.text||'').join('');
-}
-
-// ================== RESUMO (IA ou offline) ==================
-const STOP=new Set('a o as os de da do das dos e é em um uma para por com que no na nos nas se ao como mais mas foi são ser tem the of and to in is it isso esse essa este esta também entre sobre muito pelo pela já ou quando'.split(' '));
-function sentences(t){return t.replace(/^#+.*$/gm,'').replace(/([^.!?\s])\s*\n+/g,'$1. ').replace(/\n+/g,' ').split(/(?<=[.!?])\s+/).map(s=>s.trim()).filter(s=>s.length>25)}
-function keywords(t,n=10){const c={};t.toLowerCase().match(/[a-zà-ú0-9]{4,}/g)?.forEach(w=>{if(!STOP.has(w))c[w]=(c[w]||0)+1});return Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,n).map(x=>x[0])}
-function offlineSummary(t){const kw=keywords(t,15),ss=sentences(t);const sc=ss.map((s,i)=>({s,i,v:kw.reduce((a,k)=>a+(s.toLowerCase().includes(k)?1:0),0)}));
- return sc.sort((a,b)=>b.v-a.v).slice(0,Math.max(3,Math.ceil(ss.length*.3))).sort((a,b)=>a.i-b.i).map(x=>'• '+x.s).join('\n')+'\n\n🔑 Palavras-chave: '+kw.slice(0,8).join(', ')}
-async function makeSummary(){
- const t=$('notes').value;if(t.length<40)return toast('Escreva/transcreva mais conteúdo primeiro');
- $('summary').textContent='Gerando...';
- try{const r=await claude('Você é um tutor para estudantes. Faça um resumo didático em português desta aula, com tópicos, conceitos-chave em destaque e 3 perguntas de revisão no final. Texto:\n\n'+t);$('summary').textContent=r||offlineSummary(t)+'\n\n(modo offline — adicione a chave de IA em ⚙️ para resumos melhores)'}
- catch(e){$('summary').textContent=offlineSummary(t)+'\n\n(IA indisponível: '+e.message+')'}
- L().summary=$('summary').textContent;save();
-}
-function topics(){const t=$('notes').value,parts=[];let c=null;
- t.split('\n').forEach(line=>{const m=line.match(/^#+\s*(.+)/);if(m){c={title:m[1],items:[]};parts.push(c)}else if(line.trim()){if(!c){c={title:$('title').value,items:[]};parts.push(c)}c.items.push(line.replace(/^[-*•]\s*/,'').trim())}});
- if(parts.length===1&&parts[0].items.length>6){const ss=sentences(t);parts.length=0;for(let i=0;i<ss.length;i+=4)parts.push({title:keywords(ss.slice(i,i+4).join(' '),1)[0]?.replace(/^./,c=>c.toUpperCase())||'Tópico',items:ss.slice(i,i+4)})}
- return parts}
-function makeMindmap(){
- const tp=topics();if(!tp.length)return toast('Sem conteúdo');
- const W=900,H=Math.max(420,tp.length*90),cx=W/2,cy=H/2,R=Math.min(W,H)/2.8,col=['#5b4cf0','#16a37a','#e0563b','#f0a020','#1f8ce0','#c03ab0'];
- let s=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="system-ui">`;
- tp.forEach((p,i)=>{const a=i/tp.length*2*Math.PI-Math.PI/2,x=cx+Math.cos(a)*R,y=cy+Math.sin(a)*R*0.8,c=col[i%col.length];
-  s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${c}" stroke-width="3"/>`;
-  p.items.slice(0,3).forEach((it,j)=>{const b=a+(j-1)*0.35,x2=x+Math.cos(b)*120,y2=y+Math.sin(b)*70;s+=`<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" stroke="${c}" opacity=".5"/><text x="${x2}" y="${y2}" font-size="11" text-anchor="middle" fill="currentColor">${esc(it.slice(0,28))}${it.length>28?'…':''}</text>`});
-  s+=`<rect x="${x-75}" y="${y-18}" width="150" height="36" rx="18" fill="${c}"/><text x="${x}" y="${y+5}" font-size="13" fill="#fff" text-anchor="middle" font-weight="700">${esc(p.title.slice(0,20))}</text>`});
- s+=`<rect x="${cx-95}" y="${cy-24}" width="190" height="48" rx="24" fill="#1d2140"/><text x="${cx}" y="${cy+6}" font-size="15" fill="#fff" text-anchor="middle" font-weight="800">${esc($('title').value.slice(0,24))}</text></svg>`;
- $('mindmap').innerHTML=s;
-}
-function makeFlash(){const ss=sentences($('notes').value).slice(0,12);if(!ss.length)return toast('Sem conteúdo');
- $('flash').innerHTML=ss.map(s=>{const k=keywords(s,1)[0]||'';const q=s.replace(new RegExp(k,'i'),'_____');return `<div class="card" style="width:220px;cursor:pointer;margin:0" onclick="this.querySelector('.a').classList.toggle('hidden')"><div>${esc(q)}</div><b class="a hidden" style="color:var(--pri)">→ ${esc(k)}</b></div>`}).join('')}
-
-// ================== PDF ==================
-function pdfText(doc,text,y){const lines=doc.splitTextToSize(text,180);lines.forEach(l=>{if(y>280){doc.addPage();y=20}doc.text(l,15,y);y+=6});return y}
-function exportPDF(){const{jsPDF}=window.jspdf,d=new jsPDF();d.setFontSize(18);d.text($('title').value,15,20);d.setFontSize(10);d.text(L().created,15,27);d.setFontSize(12);
- let y=pdfText(d,$('notes').value,38);if($('summary').textContent.length>30&&!$('summary').textContent.startsWith('Clique')){d.addPage();d.setFontSize(16);d.text('Resumo',15,20);d.setFontSize(12);pdfText(d,$('summary').textContent.replace(/[^\x00-\xFF•]/g,''),30)}
- (L().images||[]).forEach(x=>{d.addPage();d.setFontSize(14);d.text('Foto do quadro - '+x.time,15,15);const p=d.getImageProperties(x.src),k=Math.min(180/p.width,150/p.height);d.addImage(x.src,'JPEG',15,22,p.width*k,p.height*k);d.setFontSize(11);pdfText(d,x.sum.replace(/[^\x00-\xFF•]/g,''),30+p.height*k)});
- if(L().board){d.addPage();d.text('Quadro branco',15,15);d.addImage(L().board,'PNG',15,22,180,110)}
- saveFile($('title').value+'.pdf',d.output('blob'))}
-
-// ================== SLIDES INTERATIVOS ==================
-let slides=[],si=0,step=0;
-async function buildSlides(){
- toast('Gerando slides...');let tp=null;
- try{const r=await claude('Transforme esta aula em 6 a 10 slides didáticos. Responda SOMENTE JSON: [{"title":"...","items":["...","..."]}], máx. 5 itens curtos por slide. Aula:\n'+$('notes').value);if(r)tp=JSON.parse(r.slice(r.indexOf('['),r.lastIndexOf(']')+1))}catch(e){}
- const ims=L().images||[];
- tp=(tp||topics().map(p=>({title:p.title,items:p.items.slice(0,5).map(s=>s.length>110?s.slice(0,107)+'…':s)}))).filter(s=>!(ims.length&&/^quadro \d/i.test(s.title)));
- const imgSlides=ims.map(x=>({title:'📷 Quadro '+x.time,items:x.sum.split('\n').map(s=>s.replace(/^[-*•]\s*/,'').trim()).filter(Boolean).slice(0,4),img:x.src}));
- slides=[{title:$('title').value,items:[L().created]},...tp,...imgSlides];L().slides=slides;save();si=0;step=0;renderSlide();
-}
-function renderSlide(){const s=slides[si];if(!s){$('slideStage').innerHTML='<h2>Gere os slides a partir das suas notas</h2>';return}
- const ul=`<ul>${s.items.map((t,i)=>`<li class="${i<step||si===0?'show':''}">${esc(t)}</li>`).join('')}</ul>`;
- $('slideStage').innerHTML=`<h2>${esc(s.title)}</h2>${s.img?`<div style="display:grid;grid-template-columns:1.3fr 1fr;gap:4%;align-items:center"><img src="${s.img}" style="width:100%;max-height:60vh;object-fit:contain;border-radius:12px;background:#fff">${ul}</div>`:ul}<div class="num">${si+1}/${slides.length}</div>`;$('slideAI').style.display='none'}
-function keepSlides(){L().slides=slides;save();renderSlide()}
-async function readImage(f){const src=await shrink(f);$('slideAI').style.display='block';
- const r=await Tesseract.recognize(src,'por+eng',{logger:m=>{if(m.status==='recognizing text')$('slideAI').textContent='Lendo imagem... '+Math.round(m.progress*100)+'%'}});
- const text=r.data.text.trim();let sum='';try{sum=await claude('Resuma em até 4 tópicos curtos, em português, este texto de uma imagem de aula (corrija erros de leitura). Um tópico por linha:\n'+text)||''}catch(e){}
- if(!sum)sum=sentences(text).slice(0,4).map(s=>'• '+s).join('\n')||keywords(text,6).join(', ');
- const time=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});(L().images=L().images||[]).push({id:uid(),src,text,sum,time,name:f.name||'imagem'});renderGallery();
- $('slideAI').textContent='✅ Imagem lida e resumida';return{src,text,items:sum.split('\n').map(s=>s.replace(/^[-*•\d.)\s]+/,'').trim()).filter(Boolean).slice(0,5),time}}
-async function addSlideImages(inp){if(!slides.length)slides=[{title:$('title').value,items:[L().created]}];
- for(const f of inp.files){try{const x=await readImage(f);slides.splice(si+1,0,{title:'📷 '+(keywords(x.text,1)[0]?.replace(/^./,c=>c.toUpperCase())||'Imagem '+x.time),items:x.items.length?x.items:['(sem texto na imagem)'],img:x.src,text:x.text});si++;step=99;keepSlides()}catch(e){toast('Erro: '+e.message)}}inp.value=''}
-async function imgToSlide(inp){const f=inp.files[0];inp.value='';if(!f)return;if(!slides[si])return toast('Gere ou crie um slide primeiro');
- try{const x=await readImage(f);const s=slides[si];s.img=x.src;s.text=(s.text||'')+'\n'+x.text;if(si>0&&x.items.length&&await sure('Adicionar o resumo da imagem aos tópicos do slide?'))s.items=[...s.items,...x.items].slice(0,6);step=99;keepSlides()}catch(e){toast('Erro: '+e.message)}}
-async function summarizeSlide(){const s=slides[si];if(!s)return toast('Gere ou crie um slide primeiro');const src=[s.title,...s.items,s.text||''].join('\n');
- $('slideAI').style.display='block';$('slideAI').textContent='Resumindo...';let items=null;
- try{const r=await claude('Reescreva este slide de aula como no máximo 4 tópicos curtos e didáticos, em português. Um tópico por linha, sem numeração:\n'+src);if(r)items=r.split('\n').map(x=>x.replace(/^[-*•\d.)\s]+/,'').trim()).filter(Boolean).slice(0,4)}catch(e){}
- if(!items){const ss=[...new Set(sentences(src))];items=(ss.length?ss:s.items).slice(0,4).map(x=>x.length>90?x.slice(0,87)+'…':x)}
- s.items=items;step=99;keepSlides();$('slideAI').style.display='block';$('slideAI').textContent='✅ Slide resumido'+(db.key?'':' (modo offline — com a chave de IA em ⚙️ o resumo fica melhor)')}
-function editSlide(){const s=slides[si];if(!s)return addSlide();$('seTitle').value=s.title;$('seItems').value=s.items.join('\n');$('slideEdit').classList.remove('hidden')}
-function saveSlideEdit(){const s=slides[si];s.title=$('seTitle').value||'Slide';s.items=$('seItems').value.split('\n').map(x=>x.trim()).filter(Boolean);$('slideEdit').classList.add('hidden');step=99;keepSlides()}
-function addSlide(){slides.splice(si+1,0,{title:'Novo slide',items:['Escreva aqui']});if(slides.length>1)si++;step=99;keepSlides();editSlide()}
-async function delSlide(){if(!slides[si])return toast('Não há slide para excluir');if(!await sure('Excluir o slide "'+slides[si].title+'"?'))return;slides.splice(si,1);si=Math.max(0,si-1);keepSlides()}
-function nextStep(){const s=slides[si];if(!s)return;if(step<s.items.length&&si>0){step++;renderSlide()}else nextSlide()}
-function nextSlide(){if(si<slides.length-1){si++;step=0;renderSlide()}}
-function prevSlide(){if(si>0){si--;step=99;renderSlide()}}
-function present(){$('slideStage').requestFullscreen?.()}
-document.addEventListener('keydown',e=>{if(document.activeElement.tagName.match(/INPUT|TEXTAREA/))return;if(e.key==='ArrowRight'||e.key===' ')nextStep();if(e.key==='ArrowLeft')prevSlide()});
-async function explainSlide(){const s=slides[si];if(!s)return;const b=$('slideAI');b.style.display='block';b.textContent='Pensando...';
- try{b.textContent=await claude('Explique de forma simples, com um exemplo do dia a dia, para um estudante: '+s.title+' — '+s.items.join('; '))||'Adicione sua chave de IA em ⚙️ para explicações. Enquanto isso: '+s.items.join(' ')}catch(e){b.textContent='Erro: '+e.message}}
-async function quizSlide(){const s=slides[si];if(!s)return;const b=$('slideAI');b.style.display='block';b.textContent='Criando quiz...';let q;
- try{const r=await claude('Crie 1 pergunta de múltipla escolha sobre: '+s.title+' — '+s.items.join('; ')+'. Responda SOMENTE JSON {"q":"","opts":["","","",""],"ok":0}');if(r)q=JSON.parse(r.slice(r.indexOf('{'),r.lastIndexOf('}')+1))}catch(e){}
- if(!q){const all=slides.flatMap(x=>x.items).filter(x=>!s.items.includes(x));const right=s.items[0]||s.title;const opts=[right,...all.sort(()=>Math.random()-.5).slice(0,3)].sort(()=>Math.random()-.5);q={q:'Qual afirmação pertence ao tópico "'+s.title+'"?',opts,ok:opts.indexOf(right)}}
- b.innerHTML='<b>'+esc(q.q)+'</b><div class="quiz">'+q.opts.map((o,i)=>`<button style="background:var(--line);color:var(--ink)" onclick="this.style.background='${i===q.ok?'var(--ok)':'var(--warn)'}';this.style.color='#fff'">${esc(o)}</button>`).join('')+'</div>'}
-function slidesPDF(){if(!slides.length)return toast('Gere os slides antes');const{jsPDF}=window.jspdf,d=new jsPDF({orientation:'landscape'});
- slides.forEach((s,i)=>{if(i)d.addPage();d.setFillColor(91,76,240);d.rect(0,0,297,210,'F');d.setTextColor(255);d.setFontSize(28);d.text(d.splitTextToSize(s.title.replace(/[^\x00-\xFF]/g,'').trim(),260),20,40);d.setFontSize(16);let y=70,w=255,x=22;
-  if(s.img){const p=d.getImageProperties(s.img),k=Math.min(150/p.width,120/p.height);d.addImage(s.img,'JPEG',20,55,p.width*k,p.height*k);x=180;w=100}
-  s.items.forEach(t=>{d.splitTextToSize('• '+t,w).forEach(l=>{d.text(l,x,y);y+=9})})});saveFile($('title').value+' - slides.pdf',d.output('blob'))}
-
-// ================== GOOGLE / YOUTUBE / IA DÚVIDAS ==================
-function google(){const q=$('gq').value.trim();if(!q)return;window.open('https://www.google.com/search?q='+encodeURIComponent(q),'google','width=520,height=800,left='+(screen.width-540))}
-async function askAI(){const q=$('gq').value.trim();if(!q)return toast('Digite a dúvida');$('aiAns').textContent='Pensando...';
- try{$('aiAns').textContent=await claude('Sou estudante. Contexto da minha aula:\n'+$('notes').value.slice(0,4000)+'\n\nMinha dúvida: '+q+'\nResponda de forma clara e didática.')||'Configure a chave de IA em ⚙️ ou use o botão Pesquisar (Google).'}catch(e){$('aiAns').textContent='Erro: '+e.message}}
-function loadYT(){const u=$('ytUrl').value,m=u.match(/(?:v=|youtu\.be\/|shorts\/|embed\/)([\w-]{11})/);if(!m)return toast('Link do YouTube inválido');$('ytBox').innerHTML=`<iframe src="https://www.youtube.com/embed/${m[1]}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`}
-
-// ================== DITADO / TRANSCRIÇÃO AO VIVO ==================
-const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let dict=null,dictOn=false;
-function toggleDictation(){if(!SR)return toast('Use Chrome ou Edge para ditado por voz');
- if(dictOn){dictOn=false;dict.stop();return}
- dict=new SR();dict.lang=$('lang').value;dict.continuous=true;dict.interimResults=true;
- dict.onresult=e=>{let fin='',tmp='';for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];r.isFinal?fin+=r[0].transcript:tmp+=r[0].transcript}if(fin)appendNotes(fin.trim().replace(/^./,c=>c.toUpperCase())+'.');$('dictState').textContent=tmp?'… '+tmp.slice(-40):'ouvindo'};
- dict.onend=()=>{if(dictOn)dict.start();else{$('dictState').textContent='parado';$('dictBtn').textContent='🎤 Ditar / transcrever aula ao vivo'}};
- dictOn=true;dict.start();$('dictBtn').textContent='⏹️ Parar ditado';$('dictState').textContent='ouvindo'}
-
-// ================== COMANDOS DE VOZ ==================
-let vc=null,vcOn=false;
-const CMDS=[[/nova aula/,()=>newLesson()],[/nova pasta/,()=>newFolder()],[/resumo|resumir/,()=>{showTab('resumo');makeSummary()}],[/mapa mental/,()=>{showTab('resumo');makeMindmap()}],[/slide/,()=>{showTab('slides');buildSlides()}],[/pdf/,()=>exportPDF()],[/quadro/,()=>showTab('quadro')],[/anota|notas/,()=>showTab('notas')],[/foto|câmera|camera/,()=>showTab('captura')],[/ditar|ditado/,()=>{showTab('notas');toggleDictation()}],[/próximo|avançar/,()=>nextSlide()],[/voltar|anterior/,()=>prevSlide()],[/(pesquisar|google|pesquise) (.+)/,m=>{$('gq').value=m[2];google()}],[/renomear (?:aula )?(?:para )?(.+)/,m=>{$('title').value=m[1];renameLesson(m[1])}]];
-function toggleVoiceCmd(){if(!SR)return toast('Use Chrome ou Edge para comandos de voz');
- if(vcOn){vcOn=false;vc.stop();$('voiceBtn').textContent='🎙️ Comandos de voz';return}
- vc=new SR();vc.lang='pt-BR';vc.continuous=true;
- vc.onresult=e=>{const t=e.results[e.results.length-1][0].transcript.toLowerCase().trim();for(const[re,fn]of CMDS){const m=t.match(re);if(m){toast('🎙️ '+t);fn(m);return}}toast('Não entendi: '+t)};
- vc.onend=()=>vcOn&&vc.start();vcOn=true;vc.start();$('voiceBtn').textContent='🔴 Ouvindo comandos';
- toast('Diga: "nova aula", "resumo", "slides", "pesquisar ...", "renomear para ..."')}
-
-// ================== FOTOS DO QUADRO (OCR + resumo, imagem guardada) ==================
-function shrink(f,max=1280){return new Promise((ok,err)=>{const i=new Image();i.onload=()=>{const k=Math.min(1,max/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);URL.revokeObjectURL(i.src);ok(c.toDataURL('image/jpeg',.75))};i.onerror=err;i.src=URL.createObjectURL(f)})}
-async function ocr(inp){await processImages([...inp.files]);inp.value=''}
-async function processImages(files){
- const l=L();l.images=l.images||[];
- for(const [n,f] of files.entries()){
-  const tag=files.length>1?` (${n+1}/${files.length})`:'';
-  try{const src=await shrink(f);
-   const r=await Tesseract.recognize(src,'por+eng',{logger:m=>{if(m.status==='recognizing text')$('ocrSt').textContent='Lendo texto'+tag+'... '+Math.round(m.progress*100)+'%'}});
-   const text=r.data.text.trim(),time=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-   let sum='';try{sum=await claude('Resuma em até 3 tópicos curtos, em português, o conteúdo deste texto extraído de uma foto de quadro de aula (corrija erros de leitura):\n'+text)||''}catch(e){}
-   if(!sum)sum=sentences(text).slice(0,3).map(s=>'• '+s).join('\n')||keywords(text,6).join(', ');
-   l.images.push({id:uid(),src,text,sum,time,name:f.name||'foto'});
-   appendNotes('\n# Quadro '+time+'\n'+text);save();renderGallery()}
-  catch(e){toast('Erro na imagem '+(f.name||'')+': '+e.message)}}
- $('ocrSt').textContent='✅ '+files.length+' imagem(ns) lida(s), resumida(s) e guardada(s) na aula';
-}
-function renderGallery(){const im=L()?.images||[];$('gallery').innerHTML=im.map((x,i)=>`<div class="card" style="margin:10px 0 0"><img class="ocrimg" src="${x.src}"><div class="row" style="justify-content:space-between;margin-top:6px"><b>🕒 ${x.time} · ${esc(x.name)}</b><span><button class="icon" onclick="this.closest('.card').querySelector('.ot').classList.toggle('hidden')">📄 Texto</button><button class="icon" onclick="delImage(${i})">🗑️</button></span></div><div style="white-space:pre-wrap;font-size:14px">${esc(x.sum)}</div><div class="ot hidden" style="white-space:pre-wrap;font-size:13px;color:var(--mut);margin-top:6px">${esc(x.text)}</div></div>`).join('')}
-async function delImage(i){if(await sure('Remover esta imagem da aula?')){L().images.splice(i,1);save();renderGallery()}}
-
-// ================== PASTA DO COMPUTADOR ==================
-let dir=null;
-async function pickDir(){if(!window.showDirectoryPicker)return toast('Seu navegador não permite escolher pasta (use Chrome/Edge no computador). Os arquivos vão para Downloads.');
- try{dir=await showDirectoryPicker({mode:'readwrite'});$('dirBtn').textContent='📁 Salvando em: '+dir.name;toast('PDFs, slides, áudios e quadros serão salvos em "'+dir.name+'"')}catch(e){}}
-async function saveFile(name,blob){name=name.replace(/[\\/:*?"<>|]/g,'-');
- if(dir){try{const fh=await dir.getFileHandle(name,{create:true}),w=await fh.createWritable();await w.write(blob);await w.close();toast('💾 Salvo em '+dir.name+'/'+name);return}catch(e){toast('Sem permissão na pasta, baixando...')}}
- const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click()}
-async function importDirImages(){if(!window.showDirectoryPicker)return toast('Use "Escolher imagens" neste navegador');
- try{const d=await showDirectoryPicker(),fs=[];for await(const h of d.values())if(h.kind==='file'&&/\.(jpe?g|png|webp|bmp|heic)$/i.test(h.name))fs.push(await h.getFile());
-  if(!fs.length)return toast('Nenhuma imagem nessa pasta');fs.sort((a,b)=>a.lastModified-b.lastModified);await processImages(fs)}catch(e){}}
-
-// ================== ÁUDIO: GRAVAR + WHISPER ==================
-let rec=null,chunks=[],recT;
-async function toggleRec(){if(rec&&rec.state==='recording'){rec.stop();return}
- try{const s=await navigator.mediaDevices.getUserMedia({audio:true});rec=new MediaRecorder(s);chunks=[];rec.ondataavailable=e=>chunks.push(e.data);
-  rec.onstop=async()=>{s.getTracks().forEach(t=>t.stop());clearInterval(recT);const b=new Blob(chunks,{type:'audio/webm'});saveFile($('title').value+' - '+new Date().toLocaleTimeString('pt-BR')+'.webm',b);
-   $('recBtn').textContent='Gravar';$('recInfo').textContent='salvo no dispositivo';if(db.okey&&await sure('Transcrever esta gravação com Whisper?'))whisper(new File([b],'aula.webm'))};
-  rec.start();const t0=Date.now();recT=setInterval(()=>$('recInfo').textContent='⏺ '+Math.floor((Date.now()-t0)/1000)+'s',500);$('recBtn').textContent='⏹️ Parar'}catch(e){toast('Microfone bloqueado')}}
-function renderAudios(){}
-function transcribe(inp){const f=inp.files[0];if(f)whisper(f)}
-async function whisper(f){if(!db.okey){$('trOut').textContent='Adicione a chave OpenAI em ⚙️ para transcrição de arquivo. Alternativa: toque o áudio perto do microfone e use 🎤 Ditar.';return}
- $('trOut').textContent='Transcrevendo '+f.name+'...';const fd=new FormData();fd.append('file',f);fd.append('model','whisper-1');fd.append('language',$('lang').value.slice(0,2));
- try{const r=await fetch('https://api.openai.com/v1/audio/transcriptions',{method:'POST',headers:{Authorization:'Bearer '+db.okey},body:fd});const j=await r.json();if(j.error)throw new Error(j.error.message);
-  appendNotes('\n# Transcrição: '+f.name+'\n'+j.text);$('trOut').textContent='✅ Transcrição adicionada às notas'}catch(e){$('trOut').textContent='Erro: '+e.message}}
-
-// ================== QUADRO BRANCO ==================
-let cv,cx,tool='pen',drawing=false,hist=[],sx,sy,snap;
-function initBoard(){cv=$('board');cx=cv.getContext('2d');
- cv.onpointerdown=e=>{const p=pos(e);hist.push(cv.toDataURL());if(hist.length>30)hist.shift();
-  if(tool==='text'){ask('Texto para o quadro:').then(t=>{if(t){cx.fillStyle=$('pen').value;cx.font=($('size').value*4+10)+'px system-ui';cx.fillText(t,p.x,p.y);saveBoard()}});return}
-  drawing=true;sx=p.x;sy=p.y;snap=cx.getImageData(0,0,cv.width,cv.height);cx.beginPath();cx.moveTo(p.x,p.y)};
- cv.onpointermove=e=>{if(!drawing)return;const p=pos(e);cx.lineCap='round';cx.lineWidth=tool==='eraser'?$('size').value*5:$('size').value;cx.strokeStyle=tool==='eraser'?'#fff':$('pen').value;
-  if(tool==='rect'){cx.putImageData(snap,0,0);cx.strokeRect(sx,sy,p.x-sx,p.y-sy)}else{cx.lineTo(p.x,p.y);cx.stroke()}};
- cv.onpointerup=cv.onpointerleave=()=>{if(drawing){drawing=false;saveBoard()}};}
-function pos(e){const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height}}
-function sizeBoard(){if(!cv)return;const img=L()?.board;cv.width=cv.clientWidth*devicePixelRatio;cv.height=cv.clientHeight*devicePixelRatio;cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);if(img)loadBoard(img)}
-function loadBoard(d){if(!cx)return;cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);if(d){const i=new Image();i.onload=()=>cx.drawImage(i,0,0,cv.width,cv.height);i.src=d}}
-function saveBoard(){L().board=cv.toDataURL('image/png');save()}
-function undo(){const d=hist.pop();if(d)loadBoard(d),setTimeout(saveBoard,50)}
-function clearBoard(){hist.push(cv.toDataURL());loadBoard(null);saveBoard()}
-function saveBoardPNG(){cv.toBlob(b=>saveFile($('title').value+' - quadro.png',b))}
-
-// ================== BACKUP / TEMA ==================
-function exportBackup(){saveFile('estudaai-backup-'+new Date().toISOString().slice(0,10)+'.json',new Blob([JSON.stringify({...db,key:'',okey:''})],{type:'application/json'}))}
-function importBackup(i){const r=new FileReader();r.onload=()=>{const d=JSON.parse(r.result);d.key=db.key;d.okey=db.okey;db=d;save();cur=allLessons()[0]?.id;renderSide();openLesson(cur);toast('Backup restaurado')};r.readAsText(i.files[0])}
-function toggleTheme(){const r=document.documentElement,d=r.dataset.theme==='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);r.dataset.theme=d?'light':'dark'}
-
-// ================== RAG: busca nas aulas (BM25 local + Claude) ==================
-const norm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
-const toks=s=>(norm(s).match(/[a-z0-9]{3,}/g)||[]).filter(w=>!STOP.has(w));
-function ragChunks(){const out=[];
- for(const f of db.folders)for(const l of f.lessons){
-  const parts=(l.notes||'').split(/\n(?=#)|\n\s*\n/).map(x=>x.trim()).filter(x=>x.length>20);
-  for(const p of parts)for(let i=0;i<p.length;i+=600)out.push({lid:l.id,title:l.title,folder:f.name,kind:'notas',text:p.slice(i,i+700)});
-  (l.images||[]).forEach(im=>out.push({lid:l.id,title:l.title,folder:f.name,kind:'foto '+im.time,text:im.text}))}
- return out}
-function ragSearch(q,k=5){const cs=ragChunks(),docs=cs.map(c=>toks(c.text+' '+c.title)),N=docs.length||1,avg=docs.reduce((a,d)=>a+d.length,0)/N,df={};
- docs.forEach(d=>new Set(d).forEach(w=>df[w]=(df[w]||0)+1));const qt=[...new Set(toks(q))];
- return cs.map((c,i)=>{const tf={};docs[i].forEach(w=>tf[w]=(tf[w]||0)+1);
-  const s=qt.reduce((a,w)=>{if(!tf[w])return a;const idf=Math.log(1+(N-df[w]+.5)/(df[w]+.5));return a+idf*tf[w]*2.2/(tf[w]+1.2*(.25+.75*docs[i].length/avg))},0);return{...c,score:s}})
-  .filter(c=>c.score>0).sort((a,b)=>b.score-a.score).slice(0,k)}
-async function askLessons(){const q=$('ragQ').value.trim();if(!q)return toast('Digite uma pergunta');
- const hits=ragSearch(q);$('ragSrc').innerHTML=hits.map((h,i)=>`<div class="card" style="margin:0;cursor:pointer" onclick="openLesson('${h.lid}');showTab('notas')"><b>[${i+1}] ${esc(h.title)}</b> <span class="pill">${esc(h.folder)} · ${esc(h.kind)}</span><div style="font-size:13px;color:var(--mut);margin-top:4px">${esc(h.text.slice(0,300))}${h.text.length>300?'…':''}</div></div>`).join('');
- if(!hits.length){$('ragAns').textContent='Não encontrei nada sobre isso nas suas aulas. Tente outras palavras ou pesquise no Google.';return}
- $('ragAns').textContent=db.key?'Pensando...':'📚 Trechos mais relevantes das suas aulas (adicione a chave de IA em ⚙️ para receber uma resposta escrita):';
- if(!db.key)return;
- try{$('ragAns').textContent=await claude('Responda à pergunta do estudante usando SOMENTE as fontes abaixo, tiradas das aulas dele. Cite as fontes como [1], [2]. Se as fontes não tiverem a resposta, diga isso claramente.\n\n'+hits.map((h,i)=>`[${i+1}] (${h.title} - ${h.kind})\n${h.text}`).join('\n\n')+'\n\nPergunta: '+q)}catch(e){$('ragAns').textContent='Erro: '+e.message}}
-
-// ================== AGENTE DE ESTUDOS (Claude + ferramentas) ==================
-const findLesson=id=>{for(const f of db.folders){const l=f.lessons.find(x=>x.id===id);if(l)return{l,f}}};
-const folderByName=n=>db.folders.find(f=>norm(f.name)===norm(n||''));
-const AGENT_TOOLS=[
- {name:'listar_aulas',description:'Lista todas as pastas e aulas do estudante, com id, título, data e tamanho das notas.',input_schema:{type:'object',properties:{}},run:()=>db.folders.map(f=>({pasta:f.name,aulas:f.lessons.map(l=>({id:l.id,titulo:l.title,criada:l.created,caracteres:(l.notes||'').length,fotos:(l.images||[]).length,atual:l.id===cur}))}))},
- {name:'ler_aula',description:'Lê as anotações completas de uma aula (inclui transcrições e textos de fotos).',input_schema:{type:'object',properties:{id:{type:'string'}},required:['id']},run:({id})=>{const x=findLesson(id);if(!x)return'Aula não encontrada';return{titulo:x.l.title,pasta:x.f.name,notas:(x.l.notes||'').slice(0,12000),fotos:(x.l.images||[]).map(i=>i.text)}}},
- {name:'buscar_nas_aulas',description:'Busca trechos relevantes em todas as aulas do estudante (RAG). Use para responder perguntas sobre o que foi estudado.',input_schema:{type:'object',properties:{consulta:{type:'string'}},required:['consulta']},run:({consulta})=>ragSearch(consulta,6).map(h=>({aula_id:h.lid,aula:h.title,fonte:h.kind,trecho:h.text}))},
- {name:'criar_pasta',description:'Cria uma pasta (matéria). Se já existir, não duplica.',input_schema:{type:'object',properties:{nome:{type:'string'}},required:['nome']},run:({nome})=>{let f=folderByName(nome);if(!f){f={id:uid(),name:nome,open:true,lessons:[]};db.folders.push(f)}return'Pasta pronta: '+f.name}},
- {name:'criar_aula',description:'Cria uma aula nova, opcionalmente dentro de uma pasta e já com anotações em Markdown (use "# Tópico" para tópicos).',input_schema:{type:'object',properties:{titulo:{type:'string'},pasta:{type:'string'},notas:{type:'string'}},required:['titulo']},run:({titulo,pasta,notas})=>{let f=folderByName(pasta)||db.folders[0];if(pasta&&!folderByName(pasta)){f={id:uid(),name:pasta,open:true,lessons:[]};db.folders.push(f)}const l={id:uid(),title:titulo,created:nowStr(),updated:nowStr(),notes:notas||'',board:null,slides:[]};f.lessons.unshift(l);cur=l.id;return{id:l.id,pasta:f.name}}},
- {name:'escrever_notas',description:'Adiciona ou substitui as anotações de uma aula.',input_schema:{type:'object',properties:{id:{type:'string'},texto:{type:'string'},modo:{type:'string',enum:['adicionar','substituir']}},required:['id','texto']},run:({id,texto,modo})=>{const x=findLesson(id);if(!x)return'Aula não encontrada';x.l.notes=modo==='substituir'?texto:(x.l.notes?x.l.notes+'\n\n':'')+texto;x.l.updated=nowStr();return'Notas salvas'}},
- {name:'renomear_aula',description:'Renomeia uma aula.',input_schema:{type:'object',properties:{id:{type:'string'},titulo:{type:'string'}},required:['id','titulo']},run:({id,titulo})=>{const x=findLesson(id);if(!x)return'Aula não encontrada';x.l.title=titulo;return'Renomeada'}},
- {name:'mover_aula',description:'Move uma aula para outra pasta (cria a pasta se não existir).',input_schema:{type:'object',properties:{id:{type:'string'},pasta:{type:'string'}},required:['id','pasta']},run:({id,pasta})=>{const x=findLesson(id);if(!x)return'Aula não encontrada';let f=folderByName(pasta);if(!f){f={id:uid(),name:pasta,open:true,lessons:[]};db.folders.push(f)}x.f.lessons=x.f.lessons.filter(l=>l.id!==id);f.lessons.unshift(x.l);return'Movida para '+f.name}},
- {name:'criar_slides',description:'Cria os slides de uma aula. Cada slide tem título, até 5 tópicos curtos e, opcionalmente, um quiz.',input_schema:{type:'object',properties:{id:{type:'string'},slides:{type:'array',items:{type:'object',properties:{title:{type:'string'},items:{type:'array',items:{type:'string'}}},required:['title','items']}}},required:['id','slides']},run:({id,slides:s})=>{const x=findLesson(id);if(!x)return'Aula não encontrada';x.l.slides=[{title:x.l.title,items:[x.l.created]},...s];return s.length+' slides criados'}},
- {name:'gerar_pdf',description:'Baixa o PDF de uma aula (notas, resumo e fotos).',input_schema:{type:'object',properties:{id:{type:'string'}},required:['id']},run:({id})=>{openLesson(id);exportPDF();return'PDF gerado'}},
- {name:'pesquisar_google',description:'Abre uma pesquisa no Google para o estudante ver. Você não recebe o resultado.',input_schema:{type:'object',properties:{consulta:{type:'string'}},required:['consulta']},run:({consulta})=>{$('gq').value=consulta;google();return'Pesquisa aberta para o estudante'}}
-];
-let agentMsgs=[];
-function agentLine(html,cls){const d=document.createElement('div');d.className='card';d.style.margin='0';if(cls==='me')d.style.background='color-mix(in srgb,var(--pri) 12%,var(--card))';if(cls==='tool'){d.style.fontSize='13px';d.style.color='var(--mut)'}d.innerHTML=html;$('agentLog').append(d);d.scrollIntoView({block:'end'});return d}
-function agentEx(b){$('agentIn').value=b.textContent;runAgent()}
-async function runAgent(){
- const q=$('agentIn').value.trim();if(!q)return;if(!db.key)return toast('O agente precisa da chave do Claude: clique em ⚙️ Chave de IA');
- $('agentIn').value='';$('agentBtn').disabled=true;agentLine('<b>Você:</b> '+esc(q),'me');
- agentMsgs.push({role:'user',content:q});
- const system='Você é o agente de estudos do app EstudaAI. Ajude o estudante a organizar e estudar as aulas dele usando as ferramentas. Aula aberta agora: '+cur+' ('+(L()?.title||'')+'). Antes de mexer em aulas, use listar_aulas ou buscar_nas_aulas. Escreva notas em Markdown com "# Tópico". Responda em português, curto e claro, dizendo o que você fez.';
- try{for(let step=0;step<10;step++){
-  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':db.key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-   body:JSON.stringify({model:'claude-sonnet-5-5',max_tokens:4000,system,tools:AGENT_TOOLS.map(({run,...t})=>t),messages:agentMsgs})});
-  const j=await r.json();if(j.error)throw new Error(j.error.message);
-  agentMsgs.push({role:'assistant',content:j.content});
-  j.content.filter(c=>c.type==='text'&&c.text.trim()).forEach(c=>agentLine('<b>🤖 Agente:</b> '+esc(c.text).replace(/\n/g,'<br>')));
-  const calls=j.content.filter(c=>c.type==='tool_use');if(!calls.length)break;
-  const results=[];
-  for(const c of calls){const t=AGENT_TOOLS.find(x=>x.name===c.name);let out;
-   try{out=t?await t.run(c.input||{}):'Ferramenta desconhecida'}catch(e){out='Erro: '+e.message}
-   agentLine('🔧 <b>'+c.name+'</b> '+esc(JSON.stringify(c.input).slice(0,160)),'tool');
-   results.push({type:'tool_result',tool_use_id:c.id,content:JSON.stringify(out).slice(0,15000)})}
-  agentMsgs.push({role:'user',content:results});save();renderSide()}
- }catch(e){agentLine('⚠️ '+esc(e.message));agentMsgs=[]}
- $('agentBtn').disabled=false;if(L())openLesson(cur)}
-
-if(me&&users[me])start();
-</script>
 </body>
 </html>

@@ -1,0 +1,27 @@
+name: Testes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar Playwright (Chromium)
+        run: |
+          npm install --no-save playwright@1.47.2
+          npx playwright install --with-deps chromium
+
+      - name: Servir o site
+        run: python3 -m http.server 8080 &
+
+      - name: Rodar testes no navegador
+        run: node tests/ci.mjs http://localhost:8080/tests/

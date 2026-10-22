@@ -5,13 +5,30 @@ import { register, run } from '../core/actions.js';
 import { state } from '../core/store.js';
 import { complete, hasKey } from '../ai/claude.js';
 import { clip } from '../core/util.js';
-import { searchLessons, ragPrompt } from './search.js';
+import { buildChunks, bm25, ragPrompt } from './search.js';
+import { loadEmbedder, semanticSearch, hybridSearch } from './semantic.js';
+
+/** Busca no modo escolhido. Os modos com significado carregam o modelo de embeddings na primeira vez. */
+async function retrieve(question) {
+  const chunks = buildChunks(state.db.folders);
+  const mode = $('ragMode').value;
+  if (mode === 'bm25') return bm25(question, chunks, 5);
+  $('ragAns').textContent = 'Carregando o modelo de significado...';
+  try {
+    await loadEmbedder(p => ($('ragAns').textContent = `Baixando o modelo de significado... ${p}%`));
+    return await (mode === 'semantic' ? semanticSearch : hybridSearch)(question, chunks, 5);
+  } catch (e) {
+    toast('Busca por significado indisponível, usando busca por palavras');
+    console.warn(e);
+    return bm25(question, chunks, 5);
+  }
+}
 
 async function askLessons() {
   const question = $('ragQ').value.trim();
   if (!question) return toast('Digite uma pergunta');
 
-  const hits = searchLessons(state.db.folders, question, 5);
+  const hits = await retrieve(question);
   $('ragSrc').innerHTML = hits.map((h, i) => `
     <div class="card flat source" data-action="rag.openSource" data-arg="${h.lessonId}">
       <b>[${i + 1}] ${esc(h.lesson)}</b> <span class="pill">${esc(h.folder)} · ${esc(h.source)}</span>

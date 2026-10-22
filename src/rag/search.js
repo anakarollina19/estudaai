@@ -62,6 +62,26 @@ export function bm25(query, chunks, k = 5, { k1 = 1.2, b = 0.75 } = {}) {
 
 export const searchLessons = (folders, query, k) => bm25(query, buildChunks(folders), k);
 
+/** Identifica um trecho de forma estável (mesma aula, fonte e começo do texto). */
+export const chunkKey = c => `${c.lessonId}|${c.source}|${c.text.slice(0, 80)}`;
+
+/**
+ * Reciprocal Rank Fusion: score = soma de 1 / (c + posição) em cada ranking.
+ * Combina rankings de escalas diferentes (BM25 e cosseno) sem precisar normalizar os scores.
+ */
+export function fuseRankings(rankings, k = 5, c = 60) {
+  const fused = new Map();
+  for (const ranking of rankings) {
+    ranking.forEach((chunk, position) => {
+      const key = chunkKey(chunk);
+      const entry = fused.get(key) ?? { ...chunk, score: 0 };
+      entry.score += 1 / (c + position + 1);
+      fused.set(key, entry);
+    });
+  }
+  return [...fused.values()].sort((a, b) => b.score - a.score).slice(0, k);
+}
+
 /** Prompt de geração: só pode usar as fontes numeradas e deve citá-las. */
 export function ragPrompt(question, hits) {
   const sources = hits.map((h, i) => `[${i + 1}] (${h.lesson} - ${h.source})\n${h.text}`).join('\n\n');

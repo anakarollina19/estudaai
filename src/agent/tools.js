@@ -40,7 +40,7 @@ export const TOOLS = [
   },
   {
     name: 'buscar_nas_aulas',
-    description: 'Busca trechos relevantes em todas as aulas do estudante (RAG). Use para responder perguntas sobre o que foi estudado.',
+    description: 'Busca trechos relevantes em todas as aulas do estudante (RAG, por palavras). Use para responder perguntas sobre o que foi estudado; prefira palavras que provavelmente aparecem nas notas.',
     input_schema: object({ consulta: string }, ['consulta']),
     run: ({ consulta }) => searchLessons(state.db.folders, consulta, 6)
       .map(h => ({ aula_id: h.lessonId, aula: h.lesson, fonte: h.source, trecho: h.text })),

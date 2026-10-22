@@ -193,6 +193,15 @@
         <b>🔎 Pergunte às suas aulas</b>
         <p class="hint">A resposta é buscada nas suas próprias anotações, transcrições e fotos do quadro, com a fonte de cada trecho. Sem a chave de IA, mostra só os trechos encontrados.</p>
         <div class="row"><input id="ragQ" class="grow" placeholder="Ex.: o que o professor falou sobre mitose?" data-enter="rag.ask"><button data-action="rag.ask">Perguntar</button></div>
+        <div class="row" style="margin-top:8px">
+          <label for="ragMode" class="hint" style="margin:0">Busca:</label>
+          <select id="ragMode" style="width:auto">
+            <option value="bm25">Por palavras (rápida)</option>
+            <option value="semantic">Por significado (baixa um modelo de ~120 MB na 1ª vez)</option>
+            <option value="hybrid">Híbrida: palavras + significado</option>
+          </select>
+          <a class="hint" style="margin:0" href="eval/" target="_blank" rel="noopener">📊 ver a avaliação</a>
+        </div>
         <div id="ragAns" class="pre" style="margin-top:12px"></div>
         <div id="ragSrc" class="stack" style="margin-top:10px"></div>
       </div>

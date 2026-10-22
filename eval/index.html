@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avaliação do RAG · EstudaAI</title>
+<style>
+  :root { --bg: #f5f6fb; --card: #fff; --ink: #1d2140; --mut: #6b7090; --pri: #5b4cf0; --line: #e3e5f0; --ok: #16a37a; --warn: #e0563b; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #11131f; --card: #1b1e2e; --ink: #eceefa; --mut: #9aa0c0; --line: #2c3047; color-scheme: dark; } }
+  body { font-family: system-ui, sans-serif; background: var(--bg); color: var(--ink); max-width: 980px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { margin: 0 0 4px; }
+  .muted { color: var(--mut); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin: 14px 0; }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 13px; color: var(--mut); font-weight: 600; }
+  td.num { text-align: right; }
+  .best { font-weight: 700; color: var(--ok); }
+  .rank { display: inline-block; min-width: 28px; text-align: center; border-radius: 99px; padding: 1px 8px; font-size: 13px; }
+  .r1 { background: color-mix(in srgb, var(--ok) 22%, transparent); }
+  .r3 { background: color-mix(in srgb, #f0a020 25%, transparent); }
+  .rx { background: color-mix(in srgb, var(--warn) 22%, transparent); }
+  button { font: inherit; cursor: pointer; border: 0; border-radius: 10px; padding: 9px 16px; background: var(--pri); color: #fff; }
+  button:disabled { opacity: .6; cursor: wait; }
+  .bar { height: 10px; border-radius: 99px; background: var(--pri); }
+</style>
+</head>
+<body>
+<h1>📊 Avaliação do RAG</h1>
+<p class="muted">Quão bem cada método de busca encontra o trecho certo das aulas? 30 perguntas sobre 8 aulas: 16 literais (mesmas palavras da aula) e 14 paráfrases (mesma ideia, outras palavras).</p>
+
+<div class="card">
+  <b>Como ler</b>
+  <ul class="muted" style="margin:8px 0 0">
+    <li><b>Hit@k</b>: em quantas perguntas o trecho certo apareceu entre os <i>k</i> primeiros resultados.</li>
+    <li><b>MRR</b> (Mean Reciprocal Rank): média de 1/posição. Vale 1 se o certo sempre vem em 1º, 0,5 se vem em 2º.</li>
+    <li>O RAG manda os <b>5</b> primeiros trechos para a IA, então <b>Hit@5</b> é a chance de a IA receber a resposta.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <button id="runSemantic">🧠 Rodar também embeddings e busca híbrida</button>
+  <span id="status" class="muted" style="margin-left:8px">BM25 já foi avaliado. Embeddings baixam um modelo de ~120 MB na primeira vez.</span>
+</div>
+
+<div class="card scroll"><b>Resultados</b><table id="summary"></table></div>
+<div class="card scroll"><b>Pergunta por pergunta</b> <span class="muted">(posição do trecho certo; — = não apareceu no top 5)</span><table id="detail"></table></div>
+
+<script type="module">
+  import { FOLDERS, QUESTIONS } from './dataset.js';
+  import { evaluate } from './metrics.js';
+  import { buildChunks, bm25 } from '../src/rag/search.js';
+  import { loadEmbedder, semanticSearch, hybridSearch } from '../src/rag/semantic.js';
+
+  const chunks = buildChunks(FOLDERS);
+  const results = {};
+  const METHODS = { bm25: 'BM25 (palavras)', semantic: 'Embeddings (significado)', hybrid: 'Híbrida (RRF)' };
+  const pct = x => (x * 100).toFixed(0) + '%';
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  function render() {
+    const methods = Object.keys(results);
+    const metric = (group, key) => {
+      const values = methods.map(m => results[m][group][key]);
+      const best = Math.max(...values);
+      return methods.map((m, i) => `<td class="num ${methods.length > 1 && values[i] === best ? 'best' : ''}">${key === 'mrr' ? values[i].toFixed(2) : pct(values[i])}</td>`).join('');
+    };
+    const rows = [['all', 'Todas (30)'], ['literal', 'Literais (16)'], ['parafrase', 'Paráfrases (14)']];
+    document.getElementById('summary').innerHTML =
+      `<tr><th>Perguntas</th><th>Métrica</th>${methods.map(m => `<th class="num">${METHODS[m]}</th>`).join('')}</tr>` +
+      rows.flatMap(([group, label]) => ['hit1', 'hit3', 'hit5', 'mrr'].map((key, j) =>
+        `<tr>${j === 0 ? `<td rowspan="4"><b>${label}</b></td>` : ''}<td>${{ hit1: 'Hit@1', hit3: 'Hit@3', hit5: 'Hit@5', mrr: 'MRR' }[key]}</td>${metric(group, key)}</tr>`)).join('');
+
+    const badge = r => `<span class="rank ${r === 1 ? 'r1' : r && r <= 3 ? 'r3' : 'rx'}">${r ?? '—'}</span>`;
+    document.getElementById('detail').innerHTML =
+      `<tr><th>Pergunta</th><th>Tipo</th>${methods.map(m => `<th>${METHODS[m]}</th>`).join('')}</tr>` +
+      QUESTIONS.map((q, i) => `<tr><td>${esc(q.question)}</td><td class="muted">${q.kind}</td>${methods.map(m => `<td>${badge(results[m].rows[i].rank)}</td>`).join('')}</tr>`).join('');
+    window.evalResults = Object.fromEntries(methods.map(m => [m, { all: results[m].all, literal: results[m].literal, parafrase: results[m].parafrase }]));
+  }
+
+  results.bm25 = await evaluate(QUESTIONS, q => bm25(q, chunks, 5));
+  render();
+
+  const button = document.getElementById('runSemantic');
+  const status = document.getElementById('status');
+  button.onclick = async () => {
+    button.disabled = true;
+    try {
+      status.textContent = 'Baixando o modelo...';
+      await loadEmbedder(p => (status.textContent = `Baixando o modelo... ${p}%`));
+      status.textContent = 'Calculando embeddings...';
+      results.semantic = await evaluate(QUESTIONS, q => semanticSearch(q, chunks, 5));
+      results.hybrid = await evaluate(QUESTIONS, q => hybridSearch(q, chunks, 5));
+      render();
+      status.textContent = '✅ Pronto';
+    } catch (e) {
+      status.textContent = 'Erro: ' + e.message;
+      button.disabled = false;
+    }
+  };
+</script>
+</body>
+</html>

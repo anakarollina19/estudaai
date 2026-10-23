@@ -93,6 +93,8 @@ aside { background: var(--side); border-right: 1px solid var(--line); padding: 1
 .lesson { padding: 7px 10px; margin: 1px 0 1px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; border-left: 3px solid transparent; }
 .lesson small { display: block; color: var(--mut); font-size: 11.5px; }
 .lesson:hover { background: color-mix(in srgb, var(--ink) 5%, transparent); }
+.lesson .edit { float: right; opacity: 0; }
+.lesson:hover .edit, .lesson.active .edit { opacity: 1; }
 .lesson.active { background: var(--card); border-left-color: var(--pri); }
 main { padding: 22px 28px; overflow: auto; max-height: 100vh; }
 .top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
@@ -172,6 +174,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
   .split, .slide-img { grid-template-columns: 1fr; }
   main { padding: 16px; }
   .folder > .fh .icon { opacity: 1; }
+  .lesson .edit { opacity: 1; }
   .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .tabs button { white-space: nowrap; }
   .top #when { display: none; }

@@ -40,6 +40,7 @@ export function renderSidebar() {
       </div>
       ${folder.open || query ? folder.lessons.filter(matches).map(l => `
         <div class="lesson ${l.id === state.cur ? 'active' : ''}" data-action="library.open" data-arg="${l.id}">
+          <button class="icon edit" data-action="library.editLesson" data-arg="${l.id}" title="Editar nome e data">✏️</button>
           ${esc(l.title)}<small>${l.date ? '📅 ' + brDate(l.date) : '🕒 ' + esc(l.created)}</small>
         </div>`).join('') : ''}
     </div>`).join('');
@@ -132,26 +133,58 @@ async function newLesson() {
   }
   const title = await ask('Nome da aula:', 'Aula de ' + brDate(isoToday()));
   if (title === null) return;
-  let date;
-  for (let typed = brDate(isoToday()); ;) {
-    typed = await ask('Data da aula (dd/mm/aaaa). Deixe vazio para não colocar data:', typed);
-    if (typed === null) return;
-    if (!typed.trim()) break;
-    if ((date = parseBrDate(typed))) break;
-    toast('Data inválida. Use o formato dd/mm/aaaa');
-  }
+  const date = await askDate(brDate(isoToday()));
+  if (date === null) return;
   const { lesson } = createLesson({ folder, title: title.trim() });
   if (date) lesson.date = date;
   save();
   openLesson(lesson.id);
 }
 
-function renameLesson() {
+// O nome muda na barra lateral enquanto a pessoa digita; ao sair do campo, grava.
+function liveRename() {
   const lesson = currentLesson();
   lesson.title = $('title').value.trim() || 'Sem título';
-  save();
   renderSidebar();
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(save, 400);
+}
+
+function renameLesson() {
+  liveRename();
+  $('title').value = currentLesson().title;
+  save();
   toast('Aula renomeada');
+}
+
+/** Pede uma data dd/mm/aaaa. Devolve AAAA-MM-DD, '' (sem data) ou null (cancelou). */
+async function askDate(current) {
+  for (let typed = current; ;) {
+    typed = await ask('Data da aula (dd/mm/aaaa). Deixe vazio para não colocar data:', typed);
+    if (typed === null) return null;
+    if (!typed.trim()) return '';
+    const date = parseBrDate(typed);
+    if (date) return date;
+    toast('Data inválida. Use o formato dd/mm/aaaa');
+  }
+}
+
+/** ✏️ na barra lateral: edita nome e data de qualquer aula. */
+async function editLesson(id) {
+  const lesson = findLesson(id)?.lesson;
+  if (!lesson) return;
+  const title = await ask('Nome da aula:', lesson.title);
+  if (title === null) return;
+  lesson.title = title.trim() || 'Sem título';
+  const date = await askDate(lesson.date ? brDate(lesson.date) : '');
+  if (date !== null) lesson.date = date || undefined;
+  save();
+  if (id === state.cur) {
+    $('title').value = lesson.title;
+    $('lessonDate').value = lesson.date ?? '';
+  }
+  renderSidebar();
+  toast('Aula atualizada');
 }
 
 function setLessonDate() {
@@ -231,6 +264,9 @@ register({
   'library.newFolder': newFolder,
   'library.newLesson': newLesson,
   'library.rename': renameLesson,
+  'library.liveRename': liveRename,
+  'library.editLesson': editLesson,
+  'library.blurTitle': () => $('title').blur(),
   'library.setDate': setLessonDate,
   'library.deleteLesson': removeLesson,
   'library.renameFolder': renameFolder,

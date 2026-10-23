@@ -182,3 +182,12 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* Várias anotações por aula */
+.pages { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.pages .page { background: none; color: var(--mut); border: 1px solid var(--line); border-radius: 99px; padding: 5px 12px; font-size: 13.5px; }
+.pages .page.on { color: var(--ink); border-color: var(--pri); font-weight: 700; }
+.pages .page.off { text-decoration: line-through; opacity: .7; }
+.page-tools { margin-bottom: 8px; gap: 6px; }
+.page-tools label { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+.page-tools input { width: auto; margin: 0; }

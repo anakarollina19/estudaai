@@ -74,12 +74,18 @@
             <select id="lang" style="width:auto"><option value="pt-BR">Português</option><option value="en-US">English</option><option value="es-ES">Español</option></select>
             <span class="pill" id="dictState">parado</span>
           </div>
+          <div class="pages" id="pages"></div>
+          <div class="row page-tools">
+            <label class="pill"><input type="checkbox" id="pageUse" data-change="page.toggleUse"> usar no resumo, mapa e slides</label>
+            <button class="icon" data-action="page.rename" title="Renomear anotação">✏️ Renomear</button>
+            <button class="icon" data-action="page.delete" title="Excluir anotação">🗑️ Excluir</button>
+          </div>
           <textarea id="notes" data-input="library.saveNotes" placeholder="Anote aqui... Use '# Título' para criar tópicos (viram slides e mapa mental)."></textarea>
         </div>
         <div>
           <div class="card">
             <b>▶️ YouTube enquanto anota</b>
-            <div class="row" style="margin:8px 0"><input id="ytUrl" class="grow" placeholder="Cole o link do vídeo" data-enter="web.youtube"><button data-action="web.youtube">Abrir</button></div>
+            <div class="row" style="margin:8px 0"><input id="ytUrl" class="grow" placeholder="Cole o link ou pesquise um vídeo" data-enter="web.youtube"><button data-action="web.youtube">Abrir</button><button class="ghost" data-action="web.youtubeSearch" title="Buscar no YouTube">🔎 Buscar</button></div>
             <div id="ytBox"></div>
           </div>
           <div class="card">

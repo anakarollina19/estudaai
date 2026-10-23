@@ -14,7 +14,7 @@ const PLACEHOLDER = 'Clique em “📝 Resumo” na barra Gerar.';
 async function makeSummary() {
   showTab('resumo');
   const lesson = currentLesson();
-  const notes = $('notes').value;
+  const notes = currentLesson().notes;
   if (notes.length < 40) return toast('Escreva ou transcreva mais conteúdo primeiro');
 
   $('summary').textContent = 'Gerando...';
@@ -77,7 +77,7 @@ export function mindmapSvg(title, parts) {
 
 function makeMindmap() {
   showTab('resumo');
-  const parts = topics($('notes').value, $('title').value);
+  const parts = topics(currentLesson().notes, $('title').value);
   if (!parts.length) return toast('Escreva algo nas anotações da aula para gerar o mapa mental');
   $('mindmap').innerHTML = mindmapSvg($('title').value, parts);
 }
@@ -92,7 +92,7 @@ export function flashcards(notes, max = 12) {
 
 function makeFlashcards() {
   showTab('resumo');
-  const cards = flashcards($('notes').value);
+  const cards = flashcards(currentLesson().notes);
   if (!cards.length) return toast('Sem conteúdo nas notas');
   $('flash').innerHTML = cards.map(c => `
     <div class="card flashcard" data-action="flash.flip">

@@ -6,6 +6,7 @@ import { register } from './core/actions.js';
 import {
   state, save, loadDb, allLessons, findLesson, currentLesson,
   createFolder, createLesson, deleteLesson, deleteFolder, touch,
+  ensurePages, syncNotes, addPage,
 } from './core/store.js';
 import { saveFile } from './core/files.js';
 import { uid } from './core/util.js';
@@ -71,7 +72,9 @@ export async function openLesson(id) {
   const lesson = currentLesson();
   $('title').value = lesson.title;
   $('lessonDate').value = lesson.date ?? '';
-  $('notes').value = lesson.notes;
+  ensurePages(lesson);
+  syncNotes(lesson);
+  openPage(lesson.pages[0].id);
   showDates(lesson);
   renderSidebar();
   $('side').classList.remove('open');
@@ -87,10 +90,76 @@ export async function openLesson(id) {
 
 const showDates = l => ($('when').textContent = `Criada ${l.created} · Editada ${l.updated}`);
 
+// ----- Várias anotações por aula -----
+
+let curPage = null;
+const currentPage = () => {
+  const pages = ensurePages(currentLesson());
+  return pages.find(p => p.id === curPage) ?? pages[0];
+};
+
+function renderPages() {
+  const lesson = currentLesson();
+  const page = currentPage();
+  $('pages').innerHTML = lesson.pages.map(p => `
+    <button class="page ${p.id === page.id ? 'on' : ''} ${p.use === false ? 'off' : ''}"
+      data-action="page.open" data-arg="${p.id}" title="${p.use === false ? 'Fora do resumo, mapa e slides' : 'Usada no resumo, mapa e slides'}">${esc(p.title)}</button>`).join('') +
+    `<button class="ghost" data-action="page.add">+ Anotação</button>`;
+  $('pageUse').checked = page.use !== false;
+}
+
+function openPage(id) {
+  curPage = id;
+  $('notes').value = currentPage().text;
+  renderPages();
+}
+
+async function newPage() {
+  const lesson = currentLesson();
+  const title = await ask('Nome da anotação:', 'Anotação ' + (ensurePages(lesson).length + 1));
+  if (title === null) return;
+  const page = addPage(lesson, title.trim() || 'Anotação');
+  touch(lesson);
+  save();
+  openPage(page.id);
+  $('notes').focus();
+}
+
+async function renamePage() {
+  const page = currentPage();
+  const title = await ask('Nome da anotação:', page.title);
+  if (title === null) return;
+  page.title = title.trim() || page.title;
+  syncNotes(currentLesson());
+  save();
+  renderPages();
+}
+
+async function removePage() {
+  const lesson = currentLesson();
+  const page = currentPage();
+  if (lesson.pages.length === 1) return toast('A aula precisa de pelo menos uma anotação');
+  if (!(await sure(`Excluir a anotação "${page.title}"?`))) return;
+  lesson.pages = lesson.pages.filter(p => p !== page);
+  syncNotes(lesson);
+  touch(lesson);
+  save();
+  openPage(lesson.pages[0].id);
+}
+
+function togglePageUse() {
+  currentPage().use = $('pageUse').checked;
+  syncNotes(currentLesson());
+  save();
+  renderPages();
+  toast($('pageUse').checked ? 'Anotação usada no resumo, mapa e slides' : 'Anotação fora do resumo, mapa e slides');
+}
+
 let saveTimer;
 function saveNotes() {
   const lesson = currentLesson();
-  lesson.notes = $('notes').value;
+  currentPage().text = $('notes').value;
+  syncNotes(lesson);
   touch(lesson);
   clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
@@ -274,6 +343,11 @@ register({
   'library.toggleFolder': toggleFolder,
   'library.toggleMenu': () => $('side').classList.toggle('open'),
   'library.saveNotes': saveNotes,
+  'page.open': openPage,
+  'page.add': newPage,
+  'page.rename': renamePage,
+  'page.delete': removePage,
+  'page.toggleUse': togglePageUse,
   'backup.export': exportBackup,
   'backup.import': importBackup,
 });

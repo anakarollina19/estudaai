@@ -85,6 +85,11 @@ function toggleDictation() {
 // Cada comando aponta para uma ação registrada, a mesma que os botões usam.
 
 export const VOICE_COMMANDS = [
+  // Comandos com texto livre vêm primeiro, para "vídeo sobre slides" não cair em /slide/.
+  [/(?:youtube|vídeo|video) (?:de |sobre )?(.+)/, m => { $('ytUrl').value = m[1]; run('web.youtubeSearch'); }],
+  [/(?:pesquisar|pesquise|google) (.+)/, m => { $('gq').value = m[1]; run('web.google'); }],
+  [/renomear (?:aula )?(?:para )?(.+)/, m => { $('title').value = m[1]; run('library.rename'); }],
+  [/nova anotação/, () => run('page.add')],
   [/nova aula/, () => run('library.newLesson')],
   [/nova pasta/, () => run('library.newFolder')],
   [/resumo|resumir/, () => run('summary.make')],
@@ -99,8 +104,6 @@ export const VOICE_COMMANDS = [
   [/ditar|ditado/, () => { run('tab.show', 'notas'); toggleDictation(); }],
   [/próximo|avançar/, () => run('slides.nextSlide')],
   [/voltar|anterior/, () => run('slides.prev')],
-  [/(?:pesquisar|pesquise|google) (.+)/, m => { $('gq').value = m[1]; run('web.google'); }],
-  [/renomear (?:aula )?(?:para )?(.+)/, m => { $('title').value = m[1]; run('library.rename'); }],
 ];
 
 /** Encontra o comando para uma frase falada. Devolve a função já ligada ao resultado, ou null. */
@@ -139,7 +142,7 @@ function toggleVoiceCommands() {
   });
   if (!listening) return;
   $('voiceBtn').textContent = '🔴 Ouvindo comandos';
-  toast('Diga: "nova aula", "resumo", "slides", "pesquisar ...", "renomear para ..."');
+  toast('Diga: "nova aula", "resumo", "slides", "pesquisar ...", "vídeo sobre ...", "renomear para ..."');
 }
 
 register({

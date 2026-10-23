@@ -91,6 +91,36 @@ export function createLesson({ title, folder, notes = '' } = {}) {
   return { lesson, folder: target };
 }
 
+// ----- Anotações da aula -----
+// Uma aula pode ter várias anotações (lesson.pages). Os módulos (resumo, mapa, slides,
+// PDF, busca, agente) leem lesson.notes, que é a junção das anotações marcadas "usar".
+
+/** Garante que a aula tenha lesson.pages (aulas antigas só tinham lesson.notes). */
+export function ensurePages(lesson) {
+  if (!Array.isArray(lesson.pages) || !lesson.pages.length) {
+    lesson.pages = [{ id: uid(), title: 'Anotação 1', text: lesson.notes ?? '', use: true }];
+  }
+  return lesson.pages;
+}
+
+/** Recalcula lesson.notes a partir das anotações marcadas para uso. */
+export function syncNotes(lesson) {
+  const used = ensurePages(lesson).filter(p => p.use !== false && p.text.trim());
+  // Com uma só anotação, o texto vai como está. Com várias, cada uma vira um tópico
+  // ("# Título"), a menos que já comece com seus próprios tópicos.
+  lesson.notes = used.length === 1 ? used[0].text : used
+    .map(p => (/^\s*#/.test(p.text) ? p.text : `# ${p.title}\n${p.text}`).trim())
+    .join('\n\n');
+  return lesson.notes;
+}
+
+export function addPage(lesson, title, text = '') {
+  const page = { id: uid(), title, text, use: true };
+  ensurePages(lesson).push(page);
+  syncNotes(lesson);
+  return page;
+}
+
 export function touch(lesson) {
   lesson.updated = nowStr();
 }

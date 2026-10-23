@@ -2,7 +2,7 @@
 // (name, description, input_schema em JSON Schema) e a função `run` executada no app.
 
 import {
-  state, findLesson, createFolder, createLesson, moveLesson, touch,
+  state, findLesson, createFolder, createLesson, moveLesson, touch, ensurePages, syncNotes,
 } from '../core/store.js';
 import { searchLessons } from '../rag/search.js';
 
@@ -67,7 +67,13 @@ export const TOOLS = [
     run: ({ id, texto, modo = 'adicionar' }) => {
       const lesson = findLesson(id)?.lesson;
       if (!lesson) return NOT_FOUND;
-      lesson.notes = modo === 'substituir' || !lesson.notes ? texto : lesson.notes + '\n\n' + texto;
+      const pages = ensurePages(lesson);
+      if (modo === 'substituir') lesson.pages = [{ ...pages[0], text: texto, use: true }];
+      else {
+        const last = pages[pages.length - 1];
+        last.text = last.text ? last.text + '\n\n' + texto : texto;
+      }
+      syncNotes(lesson);
       touch(lesson);
       return 'Notas salvas';
     },

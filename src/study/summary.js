@@ -32,29 +32,53 @@ const COLORS = ['#5b4cf0', '#16a37a', '#e0563b', '#f0a020', '#1f8ce0', '#c03ab0'
 
 /** Desenha o mapa mental em SVG: aula no centro, tópicos ao redor e até 3 ideias por tópico. */
 export function mindmapSvg(title, parts) {
-  const W = 900, H = Math.max(420, parts.length * 90), cx = W / 2, cy = H / 2, R = Math.min(W, H) / 2.8;
-  let svg = `<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" font-family="system-ui">`;
+  parts = parts.slice(0, 8);
+  const W = 1000, H = 560, cx = W / 2, cy = H / 2, rx = 300, ry = 190, CHAR = 6.2;
+  const box = { x1: cx - 100, y1: cy - 30, x2: cx + 100, y2: cy + 30 };
+  const grow = (x1, y1, x2, y2) => {
+    box.x1 = Math.min(box.x1, x1); box.y1 = Math.min(box.y1, y1);
+    box.x2 = Math.max(box.x2, x2); box.y2 = Math.max(box.y2, y2);
+  };
+  let lines = '', nodes = '';
   parts.forEach((part, i) => {
     const angle = (i / parts.length) * 2 * Math.PI - Math.PI / 2;
-    const x = cx + Math.cos(angle) * R, y = cy + Math.sin(angle) * R * 0.8, color = COLORS[i % COLORS.length];
-    svg += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${color}" stroke-width="3"/>`;
-    part.items.slice(0, 3).forEach((item, j) => {
-      const a = angle + (j - 1) * 0.35, x2 = x + Math.cos(a) * 120, y2 = y + Math.sin(a) * 70;
-      svg += `<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" stroke="${color}" opacity=".5"/>` +
-        `<text x="${x2}" y="${y2}" font-size="11" text-anchor="middle" fill="currentColor">${esc(clip(item, 30))}</text>`;
+    const cos = Math.cos(angle), sin = Math.sin(angle);
+    const x = cx + cos * rx, y = cy + sin * ry, color = COLORS[i % COLORS.length];
+    lines += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="${color}" stroke-width="3"/>`;
+    const items = part.items.slice(0, 3).map(item => clip(item, 34));
+    // Ideias empilhadas para fora do tópico: à direita, à esquerda, acima ou abaixo.
+    const side = Math.abs(cos) > 0.35 ? (cos > 0 ? 'right' : 'left') : (sin > 0 ? 'below' : 'above');
+    items.forEach((item, j) => {
+      const width = item.length * CHAR;
+      let tx, ty, anchor;
+      if (side === 'right' || side === 'left') {
+        const dir = side === 'right' ? 1 : -1;
+        tx = x + dir * 92; ty = y + (j - (items.length - 1) / 2) * 18 + 4;
+        anchor = dir > 0 ? 'start' : 'end';
+        grow(dir > 0 ? tx : tx - width, ty - 12, dir > 0 ? tx + width : tx, ty + 4);
+      } else {
+        const dir = side === 'below' ? 1 : -1;
+        tx = x; ty = y + dir * (36 + j * 18) + (dir > 0 ? 8 : 0);
+        anchor = 'middle';
+        grow(tx - width / 2, ty - 12, tx + width / 2, ty + 4);
+      }
+      if (anchor !== 'middle') lines += `<line x1="${x}" y1="${y}" x2="${tx - (anchor === 'start' ? 4 : -4)}" y2="${ty - 4}" stroke="${color}" opacity=".35"/>`;
+      nodes += `<text x="${tx}" y="${ty}" font-size="12" text-anchor="${anchor}" fill="currentColor">${esc(item)}</text>`;
     });
-    svg += `<rect x="${x - 75}" y="${y - 18}" width="150" height="36" rx="18" fill="${color}"/>` +
+    grow(x - 80, y - 20, x + 80, y + 20);
+    nodes += `<rect x="${x - 78}" y="${y - 18}" width="156" height="36" rx="18" fill="${color}"/>` +
       `<text x="${x}" y="${y + 5}" font-size="13" fill="#fff" text-anchor="middle" font-weight="700">${esc(clip(part.title, 20))}</text>`;
   });
-  svg += `<rect x="${cx - 95}" y="${cy - 24}" width="190" height="48" rx="24" fill="#1d2140"/>` +
-    `<text x="${cx}" y="${cy + 6}" font-size="15" fill="#fff" text-anchor="middle" font-weight="800">${esc(clip(title, 24))}</text></svg>`;
-  return svg;
+  nodes += `<rect x="${cx - 100}" y="${cy - 24}" width="200" height="48" rx="24" fill="#1d2140"/>` +
+    `<text x="${cx}" y="${cy + 6}" font-size="15" fill="#fff" text-anchor="middle" font-weight="800">${esc(clip(title, 24))}</text>`;
+  const pad = 16, vx = box.x1 - pad, vy = box.y1 - pad, vw = box.x2 - box.x1 + 2 * pad, vh = box.y2 - box.y1 + 2 * pad;
+  return `<svg viewBox="${vx} ${vy} ${vw} ${vh}" width="${vw}" height="${vh}" xmlns="http://www.w3.org/2000/svg" font-family="system-ui">${lines}${nodes}</svg>`;
 }
 
 function makeMindmap() {
   showTab('resumo');
   const parts = topics($('notes').value, $('title').value);
-  if (!parts.length) return toast('Sem conteúdo nas notas');
+  if (!parts.length) return toast('Escreva algo nas anotações da aula para gerar o mapa mental');
   $('mindmap').innerHTML = mindmapSvg($('title').value, parts);
 }
 

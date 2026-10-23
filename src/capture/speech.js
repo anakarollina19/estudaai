@@ -6,15 +6,40 @@ import { appendNotes } from '../library.js';
 
 const Recognition = window.SpeechRecognition ?? window.webkitSpeechRecognition;
 
+const SPEECH_ERRORS = {
+  'not-allowed': 'Microfone bloqueado. Permita o microfone no ícone 🔒 da barra de endereço.',
+  'service-not-allowed': 'Microfone bloqueado. Permita o microfone no ícone 🔒 da barra de endereço.',
+  'audio-capture': 'Nenhum microfone encontrado.',
+  'network': 'O reconhecimento de voz precisa de internet.',
+  'language-not-supported': 'Idioma não suportado pelo reconhecimento de voz.',
+};
+
 /** Cria um reconhecedor que se reinicia sozinho enquanto `isOn()` for verdadeiro. */
-function listener({ lang, interim, onResult, isOn, onStop }) {
+function listener({ lang, interim, onResult, isOn, onStop, onFatal }) {
   const rec = new Recognition();
   rec.lang = lang;
   rec.continuous = true;
   rec.interimResults = interim;
   rec.onresult = onResult;
-  rec.onend = () => (isOn() ? rec.start() : onStop?.());
-  rec.start();
+  let fatal = false;
+  rec.onerror = e => {
+    // "no-speech" e "aborted" são normais (silêncio, parada): o onend reinicia.
+    if (!SPEECH_ERRORS[e.error]) return;
+    fatal = true;
+    toast(SPEECH_ERRORS[e.error]);
+    onFatal?.();
+  };
+  rec.onend = () => {
+    if (!fatal && isOn()) {
+      try { rec.start(); } catch { onFatal?.(); }
+    } else onStop?.();
+  };
+  try {
+    rec.start();
+  } catch {
+    toast('Não foi possível iniciar o microfone neste navegador.');
+    onFatal?.();
+  }
   return rec;
 }
 
@@ -35,6 +60,7 @@ function toggleDictation() {
     lang: $('lang').value,
     interim: true,
     isOn: () => dictating,
+    onFatal: () => (dictating = false),
     onResult: e => {
       let final = '', partial = '';
       for (let i = e.resultIndex; i < e.results.length; i++) {
@@ -50,6 +76,7 @@ function toggleDictation() {
       $('dictBtn').textContent = '🎤 Ditar / transcrever aula ao vivo';
     },
   });
+  if (!dictating) return;
   $('dictBtn').textContent = '⏹️ Parar ditado';
   $('dictState').textContent = 'ouvindo';
 }
@@ -101,13 +128,16 @@ function toggleVoiceCommands() {
     lang: 'pt-BR',
     interim: false,
     isOn: () => listening,
+    onFatal: () => (listening = false),
+    onStop: () => ($('voiceBtn').textContent = '🎙️ Comandos de voz'),
     onResult: e => {
-      const phrase = e.results[e.results.length - 1][0].transcript.toLowerCase().trim();
+      const phrase = e.results[e.resultIndex][0].transcript.toLowerCase().trim().replace(/[.!?]$/, '');
       const command = matchCommand(phrase);
       toast(command ? '🎙️ ' + phrase : 'Não entendi: ' + phrase);
       command?.();
     },
   });
+  if (!listening) return;
   $('voiceBtn').textContent = '🔴 Ouvindo comandos';
   toast('Diga: "nova aula", "resumo", "slides", "pesquisar ...", "renomear para ..."');
 }

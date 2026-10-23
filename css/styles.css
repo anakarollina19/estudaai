@@ -97,6 +97,7 @@ aside { background: var(--side); border-right: 1px solid var(--line); padding: 1
 main { padding: 22px 28px; overflow: auto; max-height: 100vh; }
 .top { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; }
 .top input#title { max-width: 440px; font-size: 21px; font-weight: 700; background: transparent; border-color: transparent; padding-left: 4px; }
+.top input#lessonDate { width: auto; }
 .top input#title:hover, .top input#title:focus { border-color: var(--line); background: var(--card); }
 .gen-bar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 14px; }
 .gen-bar b { color: var(--mut); font-size: 13.5px; margin-right: 4px; }
@@ -121,7 +122,7 @@ iframe { width: 100%; aspect-ratio: 16/9; border: 0; border-radius: 10px; backgr
 .thumb.selected { border-color: var(--pri); background: var(--pri-soft); }
 .pick { position: relative; display: block; cursor: pointer; }
 .pick input { position: absolute; top: 8px; left: 8px; width: 20px; height: 20px; accent-color: var(--pri); }
-.mm svg { width: 100%; height: auto; }
+.mm svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
 .flashcard { width: 220px; cursor: pointer; margin: 0; box-shadow: none; }
 .flashcard b { color: var(--pri-ink); }
 hr { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }

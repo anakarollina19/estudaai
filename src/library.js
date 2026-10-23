@@ -40,9 +40,21 @@ export function renderSidebar() {
       </div>
       ${folder.open || query ? folder.lessons.filter(matches).map(l => `
         <div class="lesson ${l.id === state.cur ? 'active' : ''}" data-action="library.open" data-arg="${l.id}">
-          ${esc(l.title)}<small>🕒 ${esc(l.created)}</small>
+          ${esc(l.title)}<small>${l.date ? '📅 ' + brDate(l.date) : '🕒 ' + esc(l.created)}</small>
         </div>`).join('') : ''}
     </div>`).join('');
+}
+
+// Data da aula guardada como AAAA-MM-DD (o formato do <input type="date">).
+const isoToday = () => new Date().toLocaleDateString('sv');
+const brDate = iso => iso.split('-').reverse().join('/');
+function parseBrDate(text) {
+  const m = text.trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!m) return null;
+  const [, d, mo, y] = m.map(Number);
+  const date = new Date(y, mo - 1, d);
+  if (date.getMonth() !== mo - 1 || date.getDate() !== d) return null;
+  return `${y}-${String(mo).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
 }
 
 const folderById = id => state.db.folders.find(f => f.id === id);
@@ -57,6 +69,7 @@ export async function openLesson(id) {
   state.cur = id;
   const lesson = currentLesson();
   $('title').value = lesson.title;
+  $('lessonDate').value = lesson.date ?? '';
   $('notes').value = lesson.notes;
   showDates(lesson);
   renderSidebar();
@@ -117,7 +130,18 @@ async function newLesson() {
     if (answer === null) return;
     folder = state.db.folders[parseInt(answer, 10) - 1]?.name;
   }
-  const { lesson } = createLesson({ folder });
+  const title = await ask('Nome da aula:', 'Aula de ' + brDate(isoToday()));
+  if (title === null) return;
+  let date;
+  for (let typed = brDate(isoToday()); ;) {
+    typed = await ask('Data da aula (dd/mm/aaaa). Deixe vazio para não colocar data:', typed);
+    if (typed === null) return;
+    if (!typed.trim()) break;
+    if ((date = parseBrDate(typed))) break;
+    toast('Data inválida. Use o formato dd/mm/aaaa');
+  }
+  const { lesson } = createLesson({ folder, title: title.trim() });
+  if (date) lesson.date = date;
   save();
   openLesson(lesson.id);
 }
@@ -128,6 +152,14 @@ function renameLesson() {
   save();
   renderSidebar();
   toast('Aula renomeada');
+}
+
+function setLessonDate() {
+  const lesson = currentLesson();
+  lesson.date = $('lessonDate').value || undefined;
+  save();
+  renderSidebar();
+  toast(lesson.date ? 'Data da aula: ' + brDate(lesson.date) : 'Data removida');
 }
 
 async function removeLesson() {
@@ -199,6 +231,7 @@ register({
   'library.newFolder': newFolder,
   'library.newLesson': newLesson,
   'library.rename': renameLesson,
+  'library.setDate': setLessonDate,
   'library.deleteLesson': removeLesson,
   'library.renameFolder': renameFolder,
   'library.deleteFolder': removeFolder,

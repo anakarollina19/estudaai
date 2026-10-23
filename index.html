@@ -49,7 +49,8 @@
   <main>
     <div class="top">
       <button id="menuBtn" class="ghost" data-action="library.toggleMenu">☰</button>
-      <input id="title" data-change="library.rename" placeholder="Nome da aula">
+      <input id="title" data-change="library.rename" placeholder="Nome da aula" title="Clique para editar o nome da aula">
+      <input id="lessonDate" type="date" data-change="library.setDate" title="Data da aula">
       <span class="pill" id="when"></span>
       <button class="ghost" data-action="library.deleteLesson">🗑️ Excluir aula</button>
       <button class="mic" id="voiceBtn" data-action="voice.toggle">🎙️ Comandos de voz</button>

@@ -2,11 +2,30 @@
 
 [![Testes](https://github.com/anakarollina19/estudaai/actions/workflows/tests.yml/badge.svg)](https://github.com/anakarollina19/estudaai/actions/workflows/tests.yml)
 
-Assistente de estudos com IA para estudantes: transforma aulas (fotos do quadro, áudio, anotações e vídeos) em resumos, mapas mentais, flashcards, slides interativos e PDFs. Inclui um **agente de IA com ferramentas** e **busca nas próprias aulas (RAG)**.
+Assistente de estudos com IA que roda **direto no navegador**: sem etapa de build, sem framework e com plano B offline para quase tudo.
 
-> Projeto de portfólio que mostra **LLMs**, **AI Agents (tool use)** e **RAG** aplicados a um problema real, num app web modular, sem etapa de build, com testes automatizados.
+Transforme aulas (anotações, fotos do quadro, áudio e vídeos) em **resumos, mapas mentais, flashcards, slides e PDFs**, converse com um **agente de IA que usa ferramentas** e pergunte às suas próprias aulas com **RAG**, recebendo as fontes de cada resposta.
 
-**▶️ App online:** https://anakarollina19.github.io/estudaai/ — clique em **“✨ Experimentar com aulas de exemplo”** e, na aba **🤖 Agente**, em **“▶️ Ver uma demonstração”** para ver o agente trabalhando sem precisar de chave.
+- 📝 **Várias anotações por aula**, cada uma vira um tópico do resumo, mapa e slides
+- 🤖 **Agente com tool use** (Claude) que organiza aulas, cria revisões e gera slides
+- 🔎 **RAG nas suas aulas** com BM25, embeddings no navegador ou busca híbrida, com avaliação
+- ☁️ **Contas na nuvem** (Supabase) com painel de admin, ou tudo local no aparelho
+
+**▶️ App online:** https://anakarollina19.github.io/estudaai/ (clique em **“✨ Experimentar com aulas de exemplo”**; na aba **🤖 Agente**, **“▶️ Ver uma demonstração”** mostra o agente trabalhando sem precisar de chave)
+
+![Demonstração da interface](docs/demo.gif)
+
+## Sumário
+
+- [Funcionalidades](#funcionalidades)
+- [Arquitetura](#arquitetura)
+- [Avaliação do RAG](#avaliação-do-rag)
+- [Estrutura do projeto](#estrutura-do-projeto)
+- [Como rodar](#como-rodar)
+- [Contas na nuvem e admin](#contas-na-nuvem-e-admin)
+- [Testes](#testes)
+- [Tecnologias](#tecnologias)
+- [Limitações e próximos passos](#limitações-e-próximos-passos)
 
 ## Funcionalidades
 
@@ -17,11 +36,13 @@ Assistente de estudos com IA para estudantes: transforma aulas (fotos do quadro,
 | 📊 **Avaliação do RAG** | 30 perguntas com respostas esperadas medem Hit@k e MRR de cada método de busca ([resultados abaixo](#avaliação-do-rag)). |
 | 📷 **Fotos do quadro** | Até 100 por aula, guardadas no IndexedDB. OCR no navegador (Tesseract.js, português e inglês, com um worker reaproveitado para lotes) + resumo. Dá para selecionar várias e **juntar numa colagem em 1 slide** com o resumo de todas. |
 | 🎤 **Áudio** | Transcrição ao vivo (Web Speech API), gravação e transcrição de arquivos (Whisper). |
-| 🎙️ **Comandos de voz** | "nova aula", "resumo", "slides", "pesquisar …", "renomear para …". |
+| 🎙️ **Comandos de voz** | "nova aula", "nova anotação", "resumo", "slides", "pesquisar …", "vídeo sobre …", "renomear para …". Avisa quando o microfone está bloqueado. |
 | ✨ **Resumo, mapa mental e flashcards** | Com LLM, ou offline por resumo extrativo (frequência de palavras-chave). |
 | 🎞️ **Slides interativos** | Tópicos revelados um a um, tela cheia, imagens, "explique este slide", quiz e PDF. |
-| 🗂️ **Organização** | Login, pastas, aulas com data e hora, renomear, mover, excluir, busca, backup e salvar numa pasta do computador. |
-| 🖍️ **Quadro branco**, ▶️ **YouTube** e 🌐 **Google** ao lado das notas. |
+| 📝 **Anotações** | Várias anotações por aula (abas), cada uma marcada para entrar ou não no resumo, mapa, slides e PDF. |
+| 🗂️ **Organização** | Pastas, aulas com nome e data editáveis (no título ou pelo ✏️ da barra lateral), mover, excluir, busca, backup e salvar numa pasta do computador. |
+| 👤 **Contas** | Login com "Lembrar de mim" e senha salva pelo navegador. Com Supabase: aulas sincronizadas entre aparelhos, "Esqueci a senha" e painel 🛡️ Admin para bloquear ou excluir contas. |
+| 🖍️ **Quadro branco**, ▶️ **YouTube** (abre um link ou pesquisa vídeos) e 🌐 **Google** ao lado das notas. |
 
 ## Arquitetura
 
@@ -85,7 +106,7 @@ Métricas: **Hit@k** é a fração das perguntas em que o trecho certo veio entr
 
 Para reproduzir, rode o servidor e abra http://localhost:8080/eval/. Um teste automatizado trava o BM25 em pelo menos 80% de Hit@5, para nenhuma mudança piorar a busca sem ninguém perceber.
 
-## Estrutura
+## Estrutura do projeto
 
 ```
 index.html            marcação (sem JavaScript inline)
@@ -101,11 +122,16 @@ src/
   study/              resumo, mapa mental, flashcards, PDF
   slides/slides.js    slides interativos
   library.js          pastas, aulas, notas e backup
+  cloud/              Supabase: login, sincronização e painel de admin
   board.js  web.js  tabs.js  auth.js  demo.js
+supabase/setup.sql    tabelas, RLS e funções de admin
+docs/demo.gif         demonstração do README
+scripts/
+  record_demo.py      grava o docs/demo.gif (Playwright)
+  serve.ps1           servidor local para Windows
 eval/                 conjunto de avaliação, métricas e página de resultados
 tests/                31 testes (texto, RAG, avaliação, store e agente) + runner do CI
 .github/workflows/    testes automáticos a cada push
-scripts/serve.ps1     servidor local para Windows
 ```
 
 ## Como rodar
@@ -119,7 +145,26 @@ powershell -ExecutionPolicy Bypass -File scripts/serve.ps1
 python -m http.server 8080
 ```
 
-Abra http://localhost:8080. Para os recursos de IA, clique em **⚙️ Chave de IA** e cole uma chave da [API do Claude](https://console.anthropic.com/) (e, para transcrever arquivos de áudio, uma da OpenAI). As chaves ficam só no seu navegador.
+Abra http://localhost:8080. Para os recursos de IA, clique em **⚙️ Chave de IA** e cole uma chave da [API do Claude](https://console.anthropic.com/) (e, para transcrever arquivos de áudio, uma da OpenAI). O app testa a chave na hora e diz o motivo se ela não funcionar. As chaves ficam só no seu navegador.
+
+### Gravar o GIF da demonstração
+
+```bash
+pip install playwright pillow && python -m playwright install chromium
+python -m http.server 8080            # em outro terminal
+python scripts/record_demo.py         # gera docs/demo.gif
+```
+
+## Contas na nuvem e admin
+
+Sem configuração, as contas e aulas ficam só no navegador de cada aparelho. Para ter login de verdade, aulas sincronizadas e painel de admin:
+
+1. Crie um projeto grátis em [supabase.com](https://supabase.com).
+2. No **SQL Editor**, rode [`supabase/setup.sql`](supabase/setup.sql) (tabelas, regras de acesso por linha e funções de admin).
+3. Copie a **Project URL** e a **anon key** (Project Settings → API) para [`src/cloud/config.js`](src/cloud/config.js).
+4. Crie sua conta no app e torne-se admin: `update public.profiles set is_admin = true where email = 'seu-email';`
+
+As permissões são checadas no banco (Row Level Security e funções `admin_*`), não só na interface. A chave de IA nunca vai para a nuvem; fotos e quadro branco continuam no aparelho.
 
 ## Testes
 
@@ -133,10 +178,11 @@ Com o servidor rodando, abra http://localhost:8080/tests/. São 31 testes sem de
 No GitHub, o workflow [`tests.yml`](.github/workflows/tests.yml) roda os mesmos testes num Chrome sem janela (Playwright) a cada push.
 
 ## Tecnologias
-JavaScript (ES modules) · Claude API (tool use) · Transformers.js (embeddings) · Tesseract.js · jsPDF · Web Speech API · MediaRecorder · File System Access API · Canvas · Playwright + GitHub Actions
+JavaScript (ES modules) · Claude API (tool use) · Supabase (Auth + Postgres) · Transformers.js (embeddings) · Tesseract.js · jsPDF · Web Speech API · MediaRecorder · File System Access API · Canvas · Playwright + GitHub Actions
 
 ## Limitações e próximos passos
 - **Backend em Python (FastAPI)** para guardar a chave da API no servidor e rodar o agente e o RAG lá.
 - **Conjunto de avaliação maior** (com perguntas reais de estudantes) e avaliação também das respostas geradas, não só da recuperação.
 - **Guardar os embeddings** das aulas em IndexedDB, para não recalcular a cada busca.
-- Os dados ficam no navegador (`localStorage`, ~5 MB). Próximo passo: sincronizar na nuvem (Supabase ou Firebase) e guardar imagens no IndexedDB.
+- Fotos e quadro branco ainda ficam só no aparelho; próximo passo é guardá-los no Supabase Storage.
+- Sem nuvem configurada, os dados ficam no navegador (`localStorage`, ~5 MB).

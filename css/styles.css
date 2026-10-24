@@ -196,6 +196,7 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
 #adminPanel { position: fixed; inset: 0; background: rgb(20 20 25 / .45); display: grid; place-items: center; z-index: 15; padding: 16px; }
 #adminPanel > .card { width: 100%; max-width: 720px; max-height: 85vh; overflow: auto; display: grid; gap: 12px; margin: 0; }
 .admin-user { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 10px 0; border-top: 1px solid var(--line); }
+.admin-user > .grow { flex: 1 1 260px; }
 .admin-user.blocked { opacity: .65; }
 .admin-user .muted { font-size: 13px; }
 button.danger { color: #d0443a; }

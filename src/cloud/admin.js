@@ -10,6 +10,7 @@ const api = () => import('./supabase.js');
 const fmt = d => (d ? new Date(d).toLocaleString('pt-BR') : '—');
 
 async function openAdmin() {
+  $('side').classList.remove('open');
   $('adminPanel').classList.remove('hidden');
   await renderUsers();
 }

@@ -13,6 +13,28 @@ import { cloudEnabled } from './cloud/config.js';
 
 const cloud = () => import('./cloud/supabase.js');
 
+const remember = () => $('aRemember').checked;
+
+/** Guarda quem está logado: para sempre com "Lembrar de mim", ou só nesta aba do navegador. */
+function keepSession(email) {
+  localStorage.removeItem('me');
+  sessionStorage.removeItem('me');
+  (remember() ? localStorage : sessionStorage).setItem('me', email);
+  localStorage.setItem('remember', remember() ? '1' : '0');
+  if (remember()) localStorage.setItem('lastEmail', email);
+  else localStorage.removeItem('lastEmail');
+}
+
+// Preenche o e-mail lembrado e a opção escolhida da última vez.
+$('aRemember').checked = localStorage.getItem('remember') !== '0';
+$('aEmail').value = localStorage.getItem('lastEmail') ?? '';
+
+// Entrar é um <form> de verdade: o navegador oferece salvar a senha e o Enter funciona.
+$('authForm').addEventListener('submit', e => {
+  e.preventDefault();
+  authenticate('login');
+});
+
 async function authenticate(mode) {
   const email = $('aEmail').value.trim().toLowerCase();
   const password = $('aPass').value;
@@ -30,7 +52,7 @@ async function authenticate(mode) {
     return toast('E-mail ou senha incorretos');
   }
   state.me = email;
-  localStorage.setItem('me', email);
+  keepSession(email);
   startApp();
 }
 
@@ -68,7 +90,7 @@ async function enterCloud() {
   state.users[email] = { name: profile.name ?? email.split('@')[0], h: '', cloud: true, admin: profile.is_admin };
   saveUsers();
   state.me = email;
-  localStorage.setItem('me', email);
+  keepSession(email);
 
   // A nuvem é a fonte da verdade; a chave de IA continua a deste aparelho.
   const local = JSON.parse(localStorage.getItem('db_' + email) ?? 'null');
@@ -126,11 +148,11 @@ export async function resumeSession() {
 async function logout() {
   if (cloudEnabled() && state.users[state.me]?.cloud) await (await cloud()).signOut();
   localStorage.removeItem('me');
+  sessionStorage.removeItem('me');
   location.reload();
 }
 
 register({
-  'auth.login': () => authenticate('login'),
   'auth.signup': () => authenticate('signup'),
   'auth.forgot': forgotPassword,
   'auth.logout': logout,

@@ -6,11 +6,27 @@ import { SUPABASE_URL, SUPABASE_ANON_KEY } from './config.js';
 
 const SDK = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm';
 
+// Com "Lembrar de mim" desmarcado, a sessão do Supabase vai para o sessionStorage
+// e some ao fechar o navegador.
+const box = () => (localStorage.getItem('remember') === '0' ? sessionStorage : localStorage);
+const sessionStore = {
+  getItem: k => localStorage.getItem(k) ?? sessionStorage.getItem(k),
+  setItem: (k, v) => {
+    localStorage.removeItem(k);
+    sessionStorage.removeItem(k);
+    box().setItem(k, v);
+  },
+  removeItem: k => {
+    localStorage.removeItem(k);
+    sessionStorage.removeItem(k);
+  },
+};
+
 let client = null;
 export async function sb() {
   if (!client) {
     const { createClient } = await import(SDK);
-    client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { auth: { storage: sessionStore } });
   }
   return client;
 }

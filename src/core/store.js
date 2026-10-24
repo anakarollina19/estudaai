@@ -15,7 +15,8 @@ function read(key, fallback) {
 
 export const state = {
   users: read('users', {}),
-  me: localStorage.getItem('me'),
+  // "Lembrar de mim" grava a sessão no localStorage; sem ele, só até fechar o navegador.
+  me: localStorage.getItem('me') ?? sessionStorage.getItem('me'),
   db: null,   // { folders: [...], key, okey }
   cur: null,  // id da aula aberta
 };

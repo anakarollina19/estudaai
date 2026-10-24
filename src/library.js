@@ -11,6 +11,7 @@ import {
 import { saveFile } from './core/files.js';
 import { uid } from './core/util.js';
 import { showTab } from './tabs.js';
+import { award } from './study/xp.js';
 import { loadImages, lessonImageIds, migrateLesson, imageSrc, putImage } from './capture/images.js';
 
 export function startApp() {
@@ -121,6 +122,7 @@ async function newPage() {
   const page = addPage(lesson, title.trim() || 'Anotação');
   touch(lesson);
   save();
+  award(3, 'pela nova anotação 📝');
   openPage(page.id);
   $('notes').focus();
 }

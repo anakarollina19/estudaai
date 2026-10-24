@@ -62,9 +62,14 @@ def main(executable_path: str | None = None):
         page.wait_for_timeout(500)
         snap(3500)
         page.locator('[data-action="summary.flashcards"]').click()
-        page.locator("#flash").scroll_into_view_if_needed()
-        page.locator(".flashcard").first.click()
-        snap(2500)
+        page.wait_for_timeout(700)
+        page.locator(".fc").scroll_into_view_if_needed()
+        snap(1500)
+        page.locator(".fc").click()  # vira o cartão em 3D
+        page.wait_for_timeout(700)
+        snap(1800)
+        page.locator('[data-action="flash.rate"][data-arg="1"]').click()  # "Sabia!" dá XP
+        snap(1500)
 
         # 3. Slides interativos
         page.locator('.gen-bar [data-action="slides.build"]').click()

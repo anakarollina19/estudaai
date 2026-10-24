@@ -8,6 +8,7 @@ import { tryComplete, hasKey } from '../ai/claude.js';
 import { offlineSummary, topics, sentences, keywords } from '../text/nlp.js';
 import { clip } from '../core/util.js';
 import { showTab } from '../tabs.js';
+import { award, confetti } from './xp.js';
 
 const PLACEHOLDER = 'Clique em “📝 Resumo” na barra Gerar.';
 
@@ -26,9 +27,10 @@ async function makeSummary() {
   lesson.summary = ai ?? offlineSummary(notes) + note;
   $('summary').textContent = lesson.summary;
   save();
+  award(10, 'pelo resumo 📝');
 }
 
-const COLORS = ['#7c4dff', '#ff5fa2', '#19b37d', '#ffb020', '#2bb6ff', '#ff6b57'];
+const COLORS = ['#8a78e0', '#e48fb5', '#5bb894', '#e8b45a', '#6fa8dc', '#e58d7a'];
 
 /** Desenha o mapa mental em SVG: aula no centro, tópicos ao redor e até 3 ideias por tópico. */
 export function mindmapSvg(title, parts) {
@@ -80,6 +82,7 @@ function makeMindmap() {
   const parts = topics(currentLesson().notes, $('title').value);
   if (!parts.length) return toast('Escreva algo nas anotações da aula para gerar o mapa mental');
   $('mindmap').innerHTML = mindmapSvg($('title').value, parts);
+  award(5, 'pelo mapa mental 🧠');
 }
 
 /** Flashcards de lacuna: a palavra-chave de cada frase vira a resposta. */
@@ -90,14 +93,67 @@ export function flashcards(notes, max = 12) {
   });
 }
 
+// ----- Modo estudo dos flashcards: um cartão por vez, vira em 3D, "sabia" ou "ainda não" -----
+
+let study = null; // { cards, i, known, again }
+
 function makeFlashcards() {
   showTab('resumo');
   const cards = flashcards(currentLesson().notes);
   if (!cards.length) return toast('Sem conteúdo nas notas');
-  $('flash').innerHTML = cards.map(c => `
-    <div class="card flashcard" data-action="flash.flip">
-      <div>${esc(c.question)}</div><b class="hidden">→ ${esc(c.answer)}</b>
-    </div>`).join('');
+  study = { cards, i: 0, known: 0, again: [] };
+  renderCard();
+  $('flash').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function renderCard() {
+  const { cards, i, known } = study;
+  if (i >= cards.length) return renderResult();
+  const c = cards[i];
+  $('flash').innerHTML = `
+    <div class="fc-progress"><span>${i + 1} de ${cards.length}</span><span>😎 ${known}</span>
+      <div class="xp-track"><i style="width:${(i / cards.length) * 100}%"></i></div></div>
+    <div class="fc" data-action="flash.flip" title="Clique para virar">
+      <div class="fc-inner">
+        <div class="fc-face fc-front"><small>Complete a frase</small>${esc(c.question)}<em>toque para virar ↻</em></div>
+        <div class="fc-face fc-back"><small>Resposta</small><b>${esc(c.answer)}</b></div>
+      </div>
+    </div>
+    <div class="fc-actions">
+      <button class="chunky warn" data-action="flash.rate" data-arg="0">😅 Ainda não</button>
+      <button class="chunky ok" data-action="flash.rate" data-arg="1">😎 Sabia!</button>
+    </div>`;
+}
+
+function rate(knew) {
+  if (knew === '1') {
+    study.known++;
+    award(2);
+  } else {
+    study.again.push(study.cards[study.i]);
+  }
+  study.i++;
+  renderCard();
+}
+
+function renderResult() {
+  const { cards, known, again } = study;
+  const pct = Math.round((known / cards.length) * 100);
+  if (pct >= 70) confetti();
+  $('flash').innerHTML = `
+    <div class="fc-result">
+      <div class="fc-score">${pct >= 70 ? '🏆' : pct >= 40 ? '💪' : '📚'} ${pct}%</div>
+      <p>Você sabia <b>${known}</b> de <b>${cards.length}</b> cartões.</p>
+      <div class="fc-actions">
+        ${again.length ? `<button class="chunky" data-action="flash.again">🔁 Revisar os ${again.length} que faltaram</button>` : ''}
+        <button class="ghost" data-action="summary.flashcards">Recomeçar</button>
+      </div>
+    </div>`;
+}
+
+function reviewAgain() {
+  study = { cards: study.again, i: 0, known: 0, again: [] };
+  renderCard();
 }
 
 on('lesson:open', lesson => {
@@ -110,5 +166,7 @@ register({
   'summary.make': makeSummary,
   'summary.mindmap': makeMindmap,
   'summary.flashcards': makeFlashcards,
-  'flash.flip': (_, el) => el.querySelector('b').classList.toggle('hidden'),
+  'flash.flip': (_, el) => el.classList.toggle('flipped'),
+  'flash.rate': rate,
+  'flash.again': reviewAgain,
 });

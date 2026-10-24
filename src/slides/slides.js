@@ -8,6 +8,7 @@ import { currentLesson, save } from '../core/store.js';
 import { tryComplete, extractJson, hasKey } from '../ai/claude.js';
 import { topics, sentences, keywords, toItems, capitalize } from '../text/nlp.js';
 import { clip } from '../core/util.js';
+import { award, confetti } from '../study/xp.js';
 import { uid } from '../core/util.js';
 import { readImage, summarizeBoard, limitFiles } from '../capture/ocr.js';
 import { imageSrc, putImage, collage } from '../capture/images.js';
@@ -333,7 +334,12 @@ async function quiz() {
 }
 
 function answer(i, el) {
-  el.classList.add(Number(i) === quizAnswer ? 'right' : 'wrong');
+  const right = Number(i) === quizAnswer;
+  el.classList.add(right ? 'right' : 'wrong');
+  if (right) {
+    confetti(16);
+    award(5, 'pela resposta certa ✅');
+  }
 }
 
 // ----- Ligações -----

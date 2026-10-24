@@ -9,6 +9,7 @@ Transforme aulas (anotações, fotos do quadro, áudio e vídeos) em **resumos, 
 - 📝 **Várias anotações por aula**, cada uma vira um tópico do resumo, mapa e slides
 - 🤖 **Agente com tool use** (Claude) que organiza aulas, cria revisões e gera slides
 - 🔎 **RAG nas suas aulas** com BM25, embeddings no navegador ou busca híbrida, com avaliação
+- 🔥 **Gamificação**: XP, níveis, sequência de dias e flashcards que viram em 3D
 - ☁️ **Contas na nuvem** (Supabase) com painel de admin, ou tudo local no aparelho
 
 **▶️ App online:** https://anakarollina19.github.io/estudaai/ (clique em **“✨ Experimentar com aulas de exemplo”**; na aba **🤖 Agente**, **“▶️ Ver uma demonstração”** mostra o agente trabalhando sem precisar de chave)
@@ -37,11 +38,12 @@ Transforme aulas (anotações, fotos do quadro, áudio e vídeos) em **resumos, 
 | 📷 **Fotos do quadro** | Até 100 por aula, guardadas no IndexedDB. OCR no navegador (Tesseract.js, português e inglês, com um worker reaproveitado para lotes) + resumo. Dá para selecionar várias e **juntar numa colagem em 1 slide** com o resumo de todas. |
 | 🎤 **Áudio** | Transcrição ao vivo (Web Speech API), gravação e transcrição de arquivos (Whisper). |
 | 🎙️ **Comandos de voz** | "nova aula", "nova anotação", "resumo", "slides", "pesquisar …", "vídeo sobre …", "renomear para …". Avisa quando o microfone está bloqueado. |
-| ✨ **Resumo, mapa mental e flashcards** | Com LLM, ou offline por resumo extrativo (frequência de palavras-chave). |
+| ✨ **Resumo, mapa mental e flashcards** | Com LLM, ou offline por resumo extrativo (frequência de palavras-chave). Flashcards em modo estudo: o cartão vira em 3D, você marca "sabia" ou "ainda não" e revisa só os que faltaram. |
+| 🔥 **Gamificação** | XP por estudar (resumo, mapa, flashcards, quiz, anotações), níveis, sequência de dias seguidos e confete nas conquistas. |
 | 🎞️ **Slides interativos** | Tópicos revelados um a um, tela cheia, imagens, "explique este slide", quiz e PDF. |
 | 📝 **Anotações** | Várias anotações por aula (abas), cada uma marcada para entrar ou não no resumo, mapa, slides e PDF. |
 | 🗂️ **Organização** | Pastas, aulas com nome e data editáveis (no título ou pelo ✏️ da barra lateral), mover, excluir, busca, backup e salvar numa pasta do computador. |
-| 👤 **Contas** | Login com "Lembrar de mim" e senha salva pelo navegador. Com Supabase: aulas sincronizadas entre aparelhos, "Esqueci a senha" e painel 🛡️ Admin para bloquear ou excluir contas. |
+| 👤 **Contas** | Login com "Lembrar de mim", senha salva pelo navegador e "Esqueci a senha". Com Supabase: aulas sincronizadas entre aparelhos, "Esqueci a senha" e painel 🛡️ Admin para bloquear ou excluir contas. |
 | 🖍️ **Quadro branco**, ▶️ **YouTube** (abre um link ou pesquisa vídeos) e 🌐 **Google** ao lado das notas. |
 
 ## Arquitetura

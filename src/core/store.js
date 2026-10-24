@@ -30,6 +30,7 @@ export function save() {
   if (!state.me) return;
   try {
     localStorage.setItem('db_' + state.me, JSON.stringify(state.db));
+    emit('db:saved');
   } catch {
     emit('storage:full');
   }

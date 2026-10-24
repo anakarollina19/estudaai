@@ -2,6 +2,7 @@
 // Eventos usados no app:
 //   "lesson:open"   (lesson)  uma aula foi aberta
 //   "tab:show"      (name)    uma aba ficou visível
+//   "db:saved"                as aulas foram gravadas (a nuvem sincroniza a partir daqui)
 //   "storage:full"            o localStorage não coube
 
 const listeners = new Map();

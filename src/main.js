@@ -8,13 +8,11 @@
 import { run, register } from './core/actions.js';
 import { on } from './core/events.js';
 import { toast } from './core/dom.js';
-import { state } from './core/store.js';
-import { startApp } from './library.js';
 import { initBoard } from './board.js';
 
 import './core/files.js';
 import './ai/claude.js';
-import './auth.js';
+import { resumeSession } from './auth.js';
 import './tabs.js';
 import './study/summary.js';
 import './study/pdf.js';
@@ -26,6 +24,7 @@ import './web.js';
 import './rag/ask.js';
 import './agent/agent.js';
 import './demo.js';
+import './cloud/admin.js';
 
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-action]');
@@ -55,4 +54,4 @@ function toggleTheme() {
 register({ 'theme.toggle': toggleTheme });
 
 initBoard();
-if (state.me && state.users[state.me]) startApp();
+resumeSession();

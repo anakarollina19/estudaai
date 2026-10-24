@@ -28,7 +28,7 @@ async function makeSummary() {
   save();
 }
 
-const COLORS = ['#5b4cf0', '#16a37a', '#e0563b', '#f0a020', '#1f8ce0', '#c03ab0'];
+const COLORS = ['#7c4dff', '#ff5fa2', '#19b37d', '#ffb020', '#2bb6ff', '#ff6b57'];
 
 /** Desenha o mapa mental em SVG: aula no centro, tópicos ao redor e até 3 ideias por tópico. */
 export function mindmapSvg(title, parts) {
@@ -69,7 +69,7 @@ export function mindmapSvg(title, parts) {
     nodes += `<rect x="${x - 78}" y="${y - 18}" width="156" height="36" rx="18" fill="${color}"/>` +
       `<text x="${x}" y="${y + 5}" font-size="13" fill="#fff" text-anchor="middle" font-weight="700">${esc(clip(part.title, 20))}</text>`;
   });
-  nodes += `<rect x="${cx - 100}" y="${cy - 24}" width="200" height="48" rx="24" fill="#1d2140"/>` +
+  nodes += `<rect x="${cx - 100}" y="${cy - 24}" width="200" height="48" rx="24" fill="#2a2140"/>` +
     `<text x="${cx}" y="${cy + 6}" font-size="15" fill="#fff" text-anchor="middle" font-weight="800">${esc(clip(title, 24))}</text>`;
   const pad = 16, vx = box.x1 - pad, vy = box.y1 - pad, vw = box.x2 - box.x1 + 2 * pad, vh = box.y2 - box.y1 + 2 * pad;
   return `<svg viewBox="${vx} ${vy} ${vw} ${vh}" width="${vw}" height="${vh}" xmlns="http://www.w3.org/2000/svg" font-family="system-ui">${lines}${nodes}</svg>`;

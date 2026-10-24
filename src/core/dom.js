@@ -18,11 +18,12 @@ export const show = (el, visible = true) => el.classList.toggle('hidden', !visib
 
 // Janela própria em vez de confirm()/prompt(): alguns navegadores embutidos
 // bloqueiam essas janelas em silêncio.
-function dialog(message, { input = false, value = '' } = {}) {
+function dialog(message, { input = false, value = '', type = 'text' } = {}) {
   return new Promise(resolve => {
     const box = $('dlg'), field = $('dlgIn'), ok = $('dlgOk'), cancel = $('dlgNo');
     $('dlgMsg').textContent = message;
     show(field, input);
+    field.type = type;
     field.value = value;
     show(box);
     if (input) setTimeout(() => field.select(), 30);
@@ -43,6 +44,9 @@ function dialog(message, { input = false, value = '' } = {}) {
 
 /** Pede um texto ao usuário. Resolve com o texto, ou null se cancelar. */
 export const ask = (message, value = '') => dialog(message, { input: true, value });
+
+/** Pede uma senha (campo escondido). Resolve com o texto, ou null se cancelar. */
+export const askPassword = message => dialog(message, { input: true, type: 'password' });
 
 /** Pede confirmação. Resolve com true ou false. */
 export const sure = message => dialog(message);

@@ -1,36 +1,39 @@
-/* Layout: barra lateral + área de estudo em "papel" calmo; cor forte só na ação principal.
-   Fonte Atkinson Hyperlegible (feita para leitura confortável), contraste suave, sem branco puro. */
+/* Visual jovem e descontraído: cores vivas (roxo, rosa e um toque de amarelo), cantos bem
+   arredondados, botões em pílula e fonte Nunito (redonda e amigável), com Fredoka nos títulos. */
 
 /* ===== Tokens de tema ===== */
 :root {
-  --bg: #f4f2ee;          /* papel morno, cansa menos que branco azulado */
-  --side: #efece6;
-  --card: #fbfaf7;
-  --ink: #2e3038;         /* texto quase preto, sem contraste máximo */
-  --mut: #707281;
-  --line: #e4e0d8;
-  --pri: #4f5bb8;         /* índigo menos saturado */
-  --pri-soft: #e8e9f5;    /* fundo dos botões comuns */
-  --pri-ink: #3d4794;     /* texto sobre --pri-soft */
-  --ok: #2f8a6a;
-  --warn: #c0583f;
-  --warn-soft: #f6e6e0;
-  --stage: #2f3554;       /* fundo dos slides */
-  --shadow: 0 1px 2px rgb(40 35 20 / .05);
-  --font: "Atkinson Hyperlegible", system-ui, "Segoe UI", sans-serif;
+  --bg: #fbf7ff;          /* lilás bem clarinho */
+  --side: #f3ecff;
+  --card: #ffffff;
+  --ink: #2a2140;
+  --mut: #7a6f93;
+  --line: #ebe2fa;
+  --pri: #7c4dff;         /* roxo vibrante */
+  --pri2: #ff5fa2;        /* rosa do degradê */
+  --pri-soft: #efe8ff;
+  --pri-ink: #5b2fd6;
+  --sun: #ffd84d;         /* amarelo de destaque */
+  --ok: #19b37d;
+  --warn: #ff6b57;
+  --warn-soft: #ffe9e5;
+  --stage: #3a2a6b;       /* fundo dos slides */
+  --shadow: 0 6px 20px rgb(124 77 255 / .08);
+  --font: "Nunito", system-ui, "Segoe UI", sans-serif;
+  --display: "Fredoka", "Nunito", system-ui, sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #1c1d23; --side: #202128; --card: #25262e; --ink: #dcdde3; --mut: #9a9cab; --line: #34353f;
-    --pri: #8c95e6; --pri-soft: #2f3247; --pri-ink: #c3c8f5; --ok: #6cc4a0; --warn: #e58a72; --warn-soft: #3d2b27;
-    --stage: #2a2f4a; --shadow: none; color-scheme: dark;
+    --bg: #17121f; --side: #1d1729; --card: #241d33; --ink: #f1ecfb; --mut: #a99dc2; --line: #362c4b;
+    --pri: #a07bff; --pri2: #ff7ab6; --pri-soft: #33275a; --pri-ink: #d6c8ff; --sun: #ffd84d;
+    --ok: #4fd6a3; --warn: #ff8a78; --warn-soft: #43262a; --stage: #2e2257; --shadow: none; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #1c1d23; --side: #202128; --card: #25262e; --ink: #dcdde3; --mut: #9a9cab; --line: #34353f;
-  --pri: #8c95e6; --pri-soft: #2f3247; --pri-ink: #c3c8f5; --ok: #6cc4a0; --warn: #e58a72; --warn-soft: #3d2b27;
-  --stage: #2a2f4a; --shadow: none; color-scheme: dark;
+  --bg: #17121f; --side: #1d1729; --card: #241d33; --ink: #f1ecfb; --mut: #a99dc2; --line: #362c4b;
+  --pri: #a07bff; --pri2: #ff7ab6; --pri-soft: #33275a; --pri-ink: #d6c8ff; --sun: #ffd84d;
+  --ok: #4fd6a3; --warn: #ff8a78; --warn-soft: #43262a; --stage: #2e2257; --shadow: none; color-scheme: dark;
 }
 
 /* ===== Base ===== */
@@ -203,3 +206,54 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
 .admin-user .muted { font-size: 13px; }
 button.danger { color: #d0443a; }
 button.link { background: none; border: 0; color: var(--mut); text-decoration: underline; padding: 2px; }
+
+/* ===== Visual jovem ===== */
+b, h1, h2, .logo, .top input#title, #dlgMsg { font-family: var(--display); }
+button, .file-btn { border-radius: 99px; font-weight: 700; padding: 8px 15px; }
+button:active, .file-btn:active { transform: scale(.97); }
+button.primary, .file-btn.primary {
+  background: linear-gradient(135deg, var(--pri), var(--pri2)); color: #fff;
+  box-shadow: 0 6px 16px rgb(124 77 255 / .3);
+}
+button.primary:hover, .file-btn.primary:hover { background: linear-gradient(135deg, var(--pri), var(--pri2)); filter: brightness(1.06); }
+button.icon { padding: 2px 5px; font-weight: 400; }
+input, textarea, select { border-radius: 14px; border-width: 1.5px; }
+input:focus, textarea:focus, select:focus { border-color: var(--pri); outline: none; box-shadow: 0 0 0 4px rgb(124 77 255 / .15); }
+.card { border-radius: 20px; border: 1.5px solid var(--line); box-shadow: var(--shadow); }
+.pill { background: var(--pri-soft); color: var(--pri-ink); font-weight: 700; }
+.logo { font-size: 22px; background: linear-gradient(135deg, var(--pri), var(--pri2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* Login com fundo em degradê e emojis flutuando */
+#auth {
+  background:
+    radial-gradient(circle at 15% 20%, rgb(255 216 77 / .55), transparent 30%),
+    radial-gradient(circle at 85% 80%, rgb(255 95 162 / .5), transparent 35%),
+    linear-gradient(135deg, #7c4dff, #b14dff 55%, #ff5fa2);
+  position: relative; overflow: hidden;
+}
+#auth::before, #auth::after {
+  content: "📚 ✏️ 🧠 ✨ 🎧"; position: absolute; font-size: 34px; letter-spacing: 40px; opacity: .35;
+  top: 8%; left: -5%; transform: rotate(-12deg); animation: flutua 7s ease-in-out infinite;
+}
+#auth::after { content: "💡 📝 🚀 🎯 💜"; top: auto; bottom: 8%; left: 20%; transform: rotate(8deg); animation-delay: -3s; }
+@keyframes flutua { 50% { translate: 0 -14px; } }
+.authbox { border-radius: 28px; border: 0; box-shadow: 0 24px 60px rgb(40 10 80 / .35); position: relative; z-index: 1; }
+.authbox h1 { font-size: 32px; }
+
+/* Barra lateral e aulas */
+.lesson { border-radius: 14px; border-left-width: 4px; }
+.lesson.active { background: var(--card); border-left-color: var(--pri2); box-shadow: var(--shadow); }
+
+/* Abas em pílula */
+.tabs { border-bottom: 0; gap: 6px; }
+.tabs button { border-radius: 99px; border: 0; padding: 8px 14px; margin: 0; }
+.tabs button:hover { background: var(--pri-soft); color: var(--pri-ink); }
+.tabs button.on { background: linear-gradient(135deg, var(--pri), var(--pri2)); color: #fff; }
+.gen-bar b { color: var(--pri-ink); }
+
+/* Slides, anotações e avisos */
+#slideStage { background: linear-gradient(140deg, var(--stage), #5b2a8c); border-radius: 22px; }
+.pages .page.on { background: var(--sun); color: #2a2140; border-color: var(--sun); }
+#toast { background: linear-gradient(135deg, var(--pri), var(--pri2)); color: #fff; font-weight: 700; box-shadow: 0 10px 30px rgb(124 77 255 / .35); }
+#dlg .card, #adminPanel > .card { border-radius: 24px; }
+@media (prefers-reduced-motion: reduce) { #auth::before, #auth::after { animation: none; } }

@@ -3,7 +3,7 @@
 // SHA-256 (e-mail + senha) só neste navegador.
 // Com Supabase: login de verdade, aulas sincronizadas entre aparelhos e painel de admin.
 
-import { $, toast, ask } from './core/dom.js';
+import { $, toast, ask, askPassword, sure } from './core/dom.js';
 import { state, saveUsers } from './core/store.js';
 import { on } from './core/events.js';
 import { sha256 } from './core/util.js';
@@ -118,8 +118,54 @@ on('db:saved', () => {
   }, 1500);
 });
 
+/** Pede a nova senha duas vezes. Devolve a senha ou null se a pessoa desistir. */
+async function chooseNewPassword(min) {
+  for (;;) {
+    const first = await askPassword(`Nova senha (mín. ${min} caracteres):`);
+    if (first === null) return null;
+    if (first.length < min) { toast(`A senha precisa de pelo menos ${min} caracteres`); continue; }
+    const again = await askPassword('Repita a nova senha:');
+    if (again === null) return null;
+    if (again === first) return first;
+    toast('As senhas não são iguais. Tente de novo.');
+  }
+}
+
+/** Sem nuvem, a conta só existe neste aparelho: quem está com ele pode criar uma nova senha. */
+async function resetLocalPassword() {
+  const email = (await ask('E-mail da conta neste aparelho:', $('aEmail').value.trim()))?.trim().toLowerCase();
+  if (!email) return;
+  if (!state.users[email]) return toast('Não há conta com esse e-mail neste aparelho.');
+  const ok = await sure(`Criar uma nova senha para ${email}? Suas aulas continuam aqui.`);
+  if (!ok) return;
+  const password = await chooseNewPassword(4);
+  if (!password) return;
+  state.users[email].h = await sha256(email + password);
+  saveUsers();
+  $('aEmail').value = email;
+  $('aPass').value = '';
+  toast('✅ Senha alterada! Agora é só entrar.');
+}
+
+/** O link do e-mail traz a pessoa de volta com "type=recovery": aqui ela escolhe a nova senha. */
+async function finishCloudRecovery() {
+  const api = await cloud();
+  await api.sb(); // lê o token do link e cria a sessão
+  history.replaceState(null, '', location.pathname + location.search);
+  const password = await chooseNewPassword(6);
+  if (!password) return false;
+  try {
+    await api.updatePassword(password);
+    toast('✅ Senha alterada!');
+    return enterCloud();
+  } catch (e) {
+    toast(e.message);
+    return false;
+  }
+}
+
 async function forgotPassword() {
-  if (!cloudEnabled()) return toast('Sem nuvem configurada, a senha só existe neste aparelho e não dá para recuperar.');
+  if (!cloudEnabled()) return resetLocalPassword();
   const email = await ask('Seu e-mail para receber o link de nova senha:', $('aEmail').value.trim());
   if (!email) return;
   try {
@@ -147,6 +193,7 @@ function rememberedUser() {
 export async function resumeSession() {
   state.me = rememberedUser();
   if (cloudEnabled()) {
+    if (/type=recovery/.test(location.hash) && (await finishCloudRecovery())) return;
     try {
       if (await enterCloud()) return;
     } catch (e) {

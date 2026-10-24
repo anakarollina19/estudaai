@@ -61,6 +61,12 @@ export async function resetPassword(email) {
   return check(await c.auth.resetPasswordForEmail(email, { redirectTo: location.href.split('#')[0] }));
 }
 
+/** Grava a nova senha (depois de abrir o link de recuperação enviado por e-mail). */
+export async function updatePassword(password) {
+  const c = await sb();
+  return check(await c.auth.updateUser({ password }));
+}
+
 /** Sessão salva (o Supabase mantém o login entre visitas). */
 export async function currentUser() {
   const { data } = await (await sb()).auth.getSession();

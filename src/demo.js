@@ -51,7 +51,9 @@ function loadDemo() {
   state.users[DEMO_USER] ??= { name: 'Visitante', h: '' };
   saveUsers();
   state.me = DEMO_USER;
-  localStorage.setItem('me', DEMO_USER);
+  // A demonstração não fica lembrada: ao fechar o navegador, volta para o login.
+  localStorage.removeItem('me');
+  sessionStorage.setItem('me', DEMO_USER);
   state.db = emptyDb();
   for (const sample of [...SAMPLE_LESSONS].reverse()) createLesson(sample);
   save();

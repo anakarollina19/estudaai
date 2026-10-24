@@ -131,7 +131,21 @@ async function forgotPassword() {
 }
 
 /** Abertura do app: com nuvem, retoma a sessão salva do Supabase. */
+/**
+ * Só entra direto se a pessoa marcou "Lembrar de mim" (ou se a sessão é desta aba).
+ * Logins antigos, de antes dessa opção, e a demonstração não abrem o app sozinhos.
+ */
+function rememberedUser() {
+  const tab = sessionStorage.getItem('me');
+  if (tab) return tab;
+  const saved = localStorage.getItem('me');
+  if (saved && localStorage.getItem('remember') === '1') return saved;
+  localStorage.removeItem('me');
+  return null;
+}
+
 export async function resumeSession() {
+  state.me = rememberedUser();
   if (cloudEnabled()) {
     try {
       if (await enterCloud()) return;

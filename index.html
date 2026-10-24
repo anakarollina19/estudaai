@@ -25,6 +25,7 @@
     <input id="aPass" type="password" placeholder="Senha" autocomplete="current-password">
     <button type="button" class="primary" data-action="auth.login">Entrar</button>
     <button type="button" class="ghost" data-action="auth.signup">Criar conta</button>
+    <button type="button" class="link" data-action="auth.forgot">Esqueci a senha</button>
     <button type="button" class="ghost" data-action="demo.load">✨ Experimentar com aulas de exemplo</button>
   </form>
 </section>
@@ -42,6 +43,7 @@
       <button class="ghost" data-action="backup.export">⬇️ Backup (.json)</button>
       <label class="file-btn ghost">⬆️ Restaurar<input type="file" accept=".json" hidden data-change="backup.import"></label>
       <button class="ghost" data-action="ai.settings">⚙️ Chave de IA</button>
+      <button class="ghost hidden" id="adminBtn" data-action="admin.open">🛡️ Admin</button>
       <button class="ghost" data-action="auth.logout">Sair</button>
     </div>
   </aside>
@@ -224,6 +226,16 @@
       </div>
     </section>
   </main>
+</div>
+
+<div id="adminPanel" class="hidden" role="dialog" aria-modal="true">
+  <div class="card">
+    <div class="row between">
+      <b>🛡️ Contas do EstudaAI <span class="pill" id="adminCount"></span></b>
+      <span><button class="ghost" data-action="admin.refresh">↻</button> <button class="ghost" data-action="admin.close">Fechar</button></span>
+    </div>
+    <div id="adminUsers" class="stack"></div>
+  </div>
 </div>
 
 <div id="toast" role="status"></div>

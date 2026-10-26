@@ -51,67 +51,86 @@
   </aside>
 
   <main>
-    <div class="top">
-      <button id="menuBtn" class="ghost" data-action="library.toggleMenu">☰</button>
-      <input id="title" data-input="library.liveRename" data-change="library.rename" data-enter="library.blurTitle" placeholder="Nome da aula" title="Clique para editar o nome da aula">
-      <input id="lessonDate" type="date" data-change="library.setDate" title="Data da aula">
-      <span class="pill" id="when"></span>
-      <button class="ghost" data-action="library.deleteLesson">🗑️ Excluir aula</button>
-      <button class="mic" id="voiceBtn" data-action="voice.toggle">🎙️ Comandos de voz</button>
-    </div>
-    <!-- Barra de captura: fica visível em todas as abas, para gravar, fotografar e escrever ao mesmo tempo -->
-    <div class="capture-bar" id="captureBar">
-      <button id="recBtn" class="rec" data-action="audio.record" title="Gravar o áudio da aula">⏺ Gravar aula</button>
-      <span id="recInfo" class="pill hidden"></span>
-      <label class="file-btn ghost" title="Tirar foto do quadro">📷 Foto<input type="file" accept="image/*" capture="environment" hidden data-change="ocr.files"></label>
-      <label class="file-btn ghost" title="Anexar imagens">🖼️ Imagens<input type="file" accept="image/*" multiple hidden data-change="ocr.files"></label>
-      <button class="ghost" data-action="dictation.toggle" id="dictBtnBar" title="Transcrever ao vivo para a anotação aberta">🎤 Ditar</button>
-      <button class="ghost" data-action="capture.paste" title="Colar texto ou imagem (ou use Ctrl+V)">📋 Colar</button>
+    <!-- Cabeçalho da aula: nome em destaque, data e datas de edição discretas, ações raras num menu -->
+    <header class="lesson-head">
+      <button id="menuBtn" class="ghost" data-action="library.toggleMenu" aria-label="Abrir aulas">☰</button>
+      <div class="title-block">
+        <input id="title" data-input="library.liveRename" data-change="library.rename" data-enter="library.blurTitle" placeholder="Nome da aula" title="Clique para editar o nome da aula">
+        <div class="meta">
+          <input id="lessonDate" type="date" data-change="library.setDate" title="Data da aula">
+          <span id="when"></span>
+        </div>
+      </div>
+      <div class="head-actions">
+        <button class="ghost round" id="voiceBtn" data-action="voice.toggle" title="Comandos de voz">🎙️</button>
+        <details class="menu">
+          <summary class="ghost round" title="Mais opções">⋯</summary>
+          <div class="menu-list">
+            <button class="ghost" data-action="voice.toggle">🎙️ Comandos de voz</button>
+            <button class="ghost danger" data-action="library.deleteLesson">🗑️ Excluir aula</button>
+          </div>
+        </details>
+      </div>
+    </header>
+
+    <!-- Barra única: capturar (funciona em todas as abas, ao mesmo tempo que você escreve) e gerar -->
+    <div class="toolbar" id="captureBar">
+      <div class="tool-group" aria-label="Capturar">
+        <button id="recBtn" class="rec" data-action="audio.record" title="Gravar o áudio da aula">⏺ Gravar</button>
+        <span id="recInfo" class="pill hidden"></span>
+        <label class="file-btn ghost" title="Tirar foto do quadro">📷<span class="lbl"> Foto</span><input type="file" accept="image/*" capture="environment" hidden data-change="ocr.files"></label>
+        <label class="file-btn ghost" title="Anexar imagens">🖼️<span class="lbl"> Imagens</span><input type="file" accept="image/*" multiple hidden data-change="ocr.files"></label>
+        <button class="ghost" data-action="dictation.toggle" id="dictBtnBar" title="Transcrever ao vivo para a anotação aberta">🎤 Ditar</button>
+        <select id="lang" class="mini" title="Idioma do ditado e da transcrição"><option value="pt-BR">PT</option><option value="en-US">EN</option><option value="es-ES">ES</option></select>
+        <button class="ghost" data-action="capture.paste" title="Colar texto ou imagem (ou use Ctrl+V)">📋<span class="lbl"> Colar</span></button>
+      </div>
+      <div class="tool-group" aria-label="Gerar">
+        <span class="group-label">✨ Gerar</span>
+        <button data-action="summary.make" title="Resumo">📝<span class="lbl"> Resumo</span></button>
+        <button data-action="summary.mindmap" title="Mapa mental">🧠<span class="lbl"> Mapa</span></button>
+        <button data-action="summary.flashcards" title="Flashcards">🃏<span class="lbl"> Cards</span></button>
+        <button data-action="slides.build" title="Slides">🎞️<span class="lbl"> Slides</span></button>
+        <button data-action="pdf.lesson" title="PDF">📄<span class="lbl"> PDF</span></button>
+      </div>
       <span id="capState" class="cap-state"></span>
-    </div>
-    <div class="gen-bar">
-      <b>✨ Gerar:</b>
-      <button data-action="summary.make">📝 Resumo</button>
-      <button data-action="summary.mindmap">🧠 Mapa mental</button>
-      <button data-action="summary.flashcards">🃏 Flashcards</button>
-      <button data-action="slides.build">🎞️ Slides</button>
-      <button data-action="pdf.lesson">📄 PDF</button>
     </div>
     <nav class="tabs" id="tabs"></nav>
 
     <!-- Anotações -->
     <section data-tab="notas">
-      <div class="split">
-        <div class="card">
-          <div class="row" style="margin-bottom:8px">
-            <button data-action="dictation.toggle" id="dictBtn">🎤 Ditar / transcrever aula ao vivo</button>
-            <select id="lang" style="width:auto"><option value="pt-BR">Português</option><option value="en-US">English</option><option value="es-ES">Español</option></select>
-            <span class="pill" id="dictState">parado</span>
-          </div>
-          <div class="pages" id="pages"></div>
-          <div class="row page-tools">
-            <label class="pill"><input type="checkbox" id="pageUse" data-change="page.toggleUse"> usar no resumo, mapa e slides</label>
-            <button class="icon" data-action="page.rename" title="Renomear anotação">✏️ Renomear</button>
-            <button class="icon" data-action="page.delete" title="Excluir anotação">🗑️ Excluir</button>
-            <select id="pagePaper" data-change="page.paper" style="width:auto" aria-label="Tipo de folha">
-              <option value="liso">📄 Folha lisa</option>
-              <option value="caderno">📓 Folha de caderno</option>
-              <option value="quadriculado">🔲 Quadriculado</option>
-            </select>
+      <div class="split notes-split" id="notesSplit">
+        <div class="card notebook">
+          <!-- Abas das anotações + ferramentas da folha, numa linha só -->
+          <div class="notes-head">
+            <div class="pages" id="pages"></div>
+            <div class="notes-tools">
+              <span class="pill hidden" id="dictState"></span>
+              <label class="use-toggle" title="Quando ligado, esta anotação entra no resumo, mapa mental e slides">
+                <input type="checkbox" id="pageUse" data-change="page.toggleUse"> No resumo
+              </label>
+              <select id="pagePaper" class="mini" data-change="page.paper" aria-label="Tipo de folha" title="Tipo de folha">
+                <option value="liso">📄 Lisa</option>
+                <option value="caderno">📓 Caderno</option>
+                <option value="quadriculado">🔲 Quadriculada</option>
+              </select>
+              <button class="icon" data-action="page.rename" title="Renomear anotação">✏️</button>
+              <button class="icon" data-action="page.delete" title="Excluir anotação">🗑️</button>
+              <button class="ghost expand-btn" data-action="notes.expand" id="expandBtn" title="Expandir o caderno (Esc para voltar)">⛶ Expandir</button>
+            </div>
           </div>
           <textarea id="notes" data-input="library.saveNotes" placeholder="Anote aqui... Use '# Título' para criar tópicos (viram slides e mapa mental)."></textarea>
         </div>
-        <div>
-          <div class="card">
-            <b>▶️ YouTube enquanto anota</b>
-            <div class="row" style="margin:8px 0"><input id="ytUrl" class="grow" placeholder="Cole o link ou pesquise um vídeo" data-enter="web.youtube"><button data-action="web.youtube">Abrir</button><button class="ghost" data-action="web.youtubeSearch" title="Buscar no YouTube">🔎 Buscar</button></div>
+        <div class="notes-side">
+          <details class="card fold" open>
+            <summary><b>▶️ YouTube enquanto anota</b></summary>
+            <div class="row" style="margin:8px 0"><input id="ytUrl" class="grow" placeholder="Cole o link ou pesquise um vídeo" data-enter="web.youtube"><button data-action="web.youtube">Abrir</button><button class="ghost" data-action="web.youtubeSearch" title="Buscar no YouTube">🔎</button></div>
             <div id="ytBox"></div>
-          </div>
-          <div class="card">
-            <b>🌐 Tirar dúvida</b>
-            <div class="row" style="margin-top:8px"><input id="gq" class="grow" placeholder="O que você quer saber?" data-enter="web.google"><button data-action="web.google">Google</button><button class="ghost" data-action="web.askAI">🤖 Perguntar à IA</button></div>
+          </details>
+          <details class="card fold" open>
+            <summary><b>🌐 Tirar dúvida</b></summary>
+            <div class="row" style="margin-top:8px"><input id="gq" class="grow" placeholder="O que você quer saber?" data-enter="web.google"><button data-action="web.google">Google</button><button class="ghost" data-action="web.askAI">🤖 IA</button></div>
             <div id="aiAns" class="pre" style="margin-top:8px"></div>
-          </div>
+          </details>
         </div>
       </div>
     </section>

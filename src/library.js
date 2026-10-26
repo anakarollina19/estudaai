@@ -1,7 +1,7 @@
 // Interface da biblioteca: barra lateral com pastas e aulas, editor de notas e backup.
 
 import { $, esc, toast, ask, sure } from './core/dom.js';
-import { emit } from './core/events.js';
+import { emit, on } from './core/events.js';
 import { register } from './core/actions.js';
 import {
   state, save, loadDb, allLessons, findLesson, currentLesson,
@@ -35,18 +35,39 @@ export function renderSidebar() {
     <div class="folder">
       <div class="fh" data-action="library.toggleFolder" data-arg="${folder.id}">
         <span>${folder.open ? '📂' : '📁'} ${esc(folder.name)}</span>
-        <span>
-          <button class="icon" data-action="library.renameFolder" data-arg="${folder.id}" title="Renomear">✏️</button>
-          <button class="icon" data-action="library.deleteFolder" data-arg="${folder.id}" title="Excluir">🗑️</button>
-        </span>
+        ${dotsMenu([
+          ['library.renameFolder', folder.id, '✏️ Renomear pasta'],
+          ['library.deleteFolder', folder.id, '🗑️ Excluir pasta', 'danger'],
+        ])}
       </div>
       ${folder.open || query ? folder.lessons.filter(matches).map(l => `
         <div class="lesson ${l.id === state.cur ? 'active' : ''}" data-action="library.open" data-arg="${l.id}">
-          <button class="icon edit" data-action="library.editLesson" data-arg="${l.id}" title="Editar nome e data">✏️</button>
+          ${dotsMenu([
+            ['library.editLesson', l.id, '✏️ Renomear e mudar data'],
+            ['library.deleteLessonById', l.id, '🗑️ Excluir aula', 'danger'],
+          ])}
           ${esc(l.title)}<small>${l.date ? '📅 ' + brDate(l.date) : '🕒 ' + esc(l.created)}</small>
         </div>`).join('') : ''}
     </div>`).join('');
 }
+
+/**
+ * Menu ⋯ de um item da barra lateral. O <summary> tem uma ação vazia para o clique
+ * não abrir a aula nem fechar a pasta; as opções disparam as ações normais.
+ */
+const dotsMenu = items => `
+  <details class="menu dots">
+    <summary class="icon" data-action="ui.noop" title="Opções" aria-label="Opções">⋯</summary>
+    <div class="menu-list">${items.map(([action, arg, label, cls = '']) =>
+      `<button class="ghost ${cls}" data-action="${action}" data-arg="${arg}">${label}</button>`).join('')}</div>
+  </details>`;
+
+// Fecha menus ⋯ abertos ao clicar fora deles ou ao escolher uma opção.
+document.addEventListener('click', e => {
+  for (const menu of document.querySelectorAll('details.menu[open]')) {
+    if (!menu.contains(e.target) || e.target.closest('.menu-list button')) menu.removeAttribute('open');
+  }
+});
 
 // Data da aula guardada como AAAA-MM-DD (o formato do <input type="date">).
 const isoToday = () => new Date().toLocaleDateString('sv');
@@ -126,6 +147,24 @@ function applyPaper(paper = 'liso') {
   for (const p of PAPERS) $('notes').classList.toggle('paper-' + p, p === paper);
   $('pagePaper').value = paper;
 }
+
+// ----- Expandir o caderno: largura total, sem barra lateral nem painéis do lado -----
+
+function setExpanded(on) {
+  document.body.classList.toggle('notes-expanded', on);
+  $('expandBtn').textContent = on ? '🗗 Reduzir' : '⛶ Expandir';
+  try { localStorage.setItem('notesExpanded', on ? '1' : '0'); } catch {}
+  if (on) $('notes').focus();
+}
+
+const toggleExpanded = () => setExpanded(!document.body.classList.contains('notes-expanded'));
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.body.classList.contains('notes-expanded') && $('dlg')?.classList.contains('hidden')) setExpanded(false);
+});
+if ($('expandBtn') && localStorage.getItem('notesExpanded') === '1') setExpanded(true);
+// O modo expandido é do caderno: ao ir para outra aba, volta ao normal.
+on('tab:show', name => name !== 'notas' && document.body.classList.contains('notes-expanded') && setExpanded(false));
 
 function setPaper() {
   const page = currentPage();
@@ -310,11 +349,12 @@ function setLessonDate() {
   toast(lesson.date ? 'Data da aula: ' + brDate(lesson.date) : 'Data removida');
 }
 
-async function removeLesson() {
-  const lesson = currentLesson();
+async function removeLesson(id = state.cur) {
+  const lesson = findLesson(id)?.lesson;
   if (!lesson || !(await sure(`Excluir a aula "${lesson.title}"?`))) return;
   deleteLesson(lesson.id);
   refresh();
+  toast('Aula excluída');
 }
 
 async function renameFolder(id) {
@@ -383,7 +423,9 @@ register({
   'library.editLesson': editLesson,
   'library.blurTitle': () => $('title').blur(),
   'library.setDate': setLessonDate,
-  'library.deleteLesson': removeLesson,
+  'library.deleteLesson': () => removeLesson(),
+  'library.deleteLessonById': id => removeLesson(id),
+  'ui.noop': () => {},
   'library.renameFolder': renameFolder,
   'library.deleteFolder': removeFolder,
   'library.toggleFolder': toggleFolder,
@@ -395,6 +437,7 @@ register({
   'page.delete': removePage,
   'page.toggleUse': togglePageUse,
   'page.paper': setPaper,
+  'notes.expand': toggleExpanded,
   'backup.export': exportBackup,
   'backup.import': importBackup,
 });

@@ -182,7 +182,6 @@ hr { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
   .lesson .edit { opacity: 1; }
   .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
   .tabs button { white-space: nowrap; }
-  .top #when { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
@@ -208,7 +207,7 @@ button.danger { color: #d0443a; }
 button.link { background: none; border: 0; color: var(--mut); text-decoration: underline; padding: 2px; }
 
 /* ===== Visual jovem ===== */
-b, h1, h2, .logo, .top input#title, #dlgMsg { font-family: var(--display); }
+b, h1, h2, .logo, .lesson-head input#title, #dlgMsg { font-family: var(--display); }
 button, .file-btn { border-radius: 99px; font-weight: 700; padding: 8px 15px; }
 button:active, .file-btn:active { transform: scale(.97); }
 button.primary, .file-btn.primary {
@@ -296,18 +295,104 @@ button.chunky.warn { background: var(--warn); box-shadow: 0 4px 0 color-mix(in s
 .confetti { position: fixed; top: -40px; z-index: 50; pointer-events: none; animation: cai 2s ease-in forwards; }
 @keyframes cai { to { transform: translateY(110vh) rotate(540deg); opacity: .2; } }
 
-/* ===== Barra de captura (gravar, foto, ditar, colar) em todas as abas ===== */
-.capture-bar {
-  position: sticky; top: 0; z-index: 4; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
-  background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(6px);
-  padding: 8px 0; margin: -4px 0 10px;
+/* ===== Cabeçalho da aula ===== */
+.lesson-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+.title-block { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.lesson-head input#title {
+  font-size: 26px; font-weight: 600; background: transparent; border-color: transparent;
+  padding: 2px 6px; margin-left: -6px; max-width: 100%;
 }
-.capture-bar .rec { background: var(--warn-soft); color: var(--warn); }
-.capture-bar .live { background: var(--warn); color: #fff; animation: gravando 1.6s ease-in-out infinite; }
+.lesson-head input#title:hover, .lesson-head input#title:focus { border-color: var(--line); background: var(--card); }
+.meta { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; color: var(--mut); font-size: 12.5px; }
+.meta input#lessonDate { width: auto; padding: 3px 8px; font-size: 13px; border-radius: 99px; background: var(--card); }
+.head-actions { display: flex; gap: 6px; align-items: center; position: relative; }
+.round { width: 40px; height: 40px; padding: 0; display: grid; place-items: center; border-radius: 50%; }
+#voiceBtn.live { background: var(--warn); color: #fff; border-color: var(--warn); animation: gravando 1.6s ease-in-out infinite; }
+.menu > summary { list-style: none; cursor: pointer; border: 1px solid var(--line); font-size: 20px; line-height: 1; user-select: none; }
+.menu > summary::-webkit-details-marker { display: none; }
+.menu-list {
+  position: absolute; right: 0; top: 46px; z-index: 6; display: grid; gap: 4px; min-width: 210px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 8px; box-shadow: 0 12px 30px rgb(40 30 80 / .18);
+}
+.menu-list button { text-align: left; border: 0; }
+.menu-list .danger { color: var(--warn); }
+
+/* ===== Barra única: Capturar | Gerar (fixa no topo ao rolar) ===== */
+.toolbar {
+  position: sticky; top: 0; z-index: 4; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+  background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(8px);
+  padding: 8px 0; margin-bottom: 8px;
+}
+.tool-group {
+  display: flex; gap: 4px; align-items: center; flex-wrap: wrap;
+  background: var(--card); border: 1px solid var(--line); border-radius: 99px; padding: 4px;
+}
+.tool-group > button, .tool-group > .file-btn { padding: 6px 12px; font-size: 14px; box-shadow: none; transform: none; }
+.tool-group > .ghost { border-color: transparent; }
+.group-label { font-size: 12.5px; font-weight: 800; color: var(--pri-ink); padding: 0 6px 0 8px; }
+select.mini { width: auto; padding: 5px 8px; font-size: 13px; border-radius: 99px; }
+.toolbar .rec { background: var(--warn-soft); color: var(--warn); }
+.toolbar .live { background: var(--warn); color: #fff; animation: gravando 1.6s ease-in-out infinite; }
 #dictBtnBar.live { background: var(--pri); color: #fff; animation: gravando 1.6s ease-in-out infinite; }
 @keyframes gravando { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--warn) 25%, transparent); } }
 #recInfo { font-variant-numeric: tabular-nums; font-weight: 700; }
 .cap-state { color: var(--mut); font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 160px; }
+.cap-state:empty { display: none; }
+
+/* ===== Caderno ===== */
+.notes-split { grid-template-columns: minmax(0, 1.7fr) minmax(260px, 1fr); }
+.notebook { padding: 14px; }
+.notes-head { display: flex; gap: 8px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 10px; }
+.notes-head .pages { margin: 0; }
+.notes-tools { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.use-toggle { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--mut); cursor: pointer; padding: 4px 8px; border-radius: 99px; }
+.use-toggle input { width: auto; margin: 0; accent-color: var(--pri); }
+.expand-btn { font-size: 13.5px; padding: 6px 12px; }
+#notes { min-height: 58vh; border-radius: 16px; }
+.notes-side { display: grid; gap: 12px; align-content: start; }
+.notes-side .card { margin: 0; }
+.fold > summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; }
+.fold > summary::after { content: '▾'; color: var(--mut); }
+.fold:not([open]) > summary::after { content: '▸'; }
+.fold > summary::-webkit-details-marker { display: none; }
+
+/* Expandido: o caderno ocupa a tela toda (barra lateral e painéis somem; Esc volta) */
+body.notes-expanded #app { grid-template-columns: 1fr; }
+body.notes-expanded #side, body.notes-expanded .notes-side { display: none; }
+body.notes-expanded .notes-split { grid-template-columns: 1fr; }
+body.notes-expanded main { padding-inline: max(16px, 4vw); }
+body.notes-expanded #notes { min-height: calc(100vh - 290px); }
+
+/* Telas médias: YouTube e dúvidas vão para baixo do caderno, lado a lado */
+@media (max-width: 1100px) {
+  .notes-split { grid-template-columns: 1fr; }
+  .notes-side { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+}
+
+/* ===== Menu ⋯ das aulas e pastas na barra lateral ===== */
+.lesson { position: relative; }
+.dots { float: right; position: relative; margin: -2px -4px 0 4px; }
+.dots > summary.icon {
+  list-style: none; border: 0; width: 28px; height: 24px; display: grid; place-items: center;
+  border-radius: 8px; font-size: 18px; line-height: 1; letter-spacing: 1px; opacity: 0; transition: opacity .15s;
+}
+.dots > summary::-webkit-details-marker { display: none; }
+.lesson:hover .dots > summary, .lesson.active .dots > summary, .fh:hover .dots > summary,
+.dots[open] > summary, .dots > summary:focus-visible { opacity: 1; }
+.dots > summary:hover, .dots[open] > summary { background: var(--pri-soft); color: var(--pri-ink); }
+.dots .menu-list { top: 28px; right: 0; min-width: 200px; z-index: 8; }
+.fh .dots { margin: 0; }
+
+/* Celular: só ícones na barra, uma coluna, data de edição escondida */
+@media (max-width: 820px) {
+  .notes-split { grid-template-columns: 1fr; }
+  .tool-group .lbl, .meta #when { display: none; }
+  .lesson-head input#title { font-size: 21px; }
+  .toolbar { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  .tool-group { flex-wrap: nowrap; flex-shrink: 0; }
+  #notes { min-height: 50vh; }
+  .dots > summary.icon { opacity: 1; }
+}
 
 /* ===== Tipos de folha da anotação ===== */
 /* As linhas acompanham o texto: mesma altura de linha (28px) e rolam junto (attachment: local). */

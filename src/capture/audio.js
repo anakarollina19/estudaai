@@ -48,7 +48,7 @@ async function toggleRecording() {
     const blob = new Blob(chunks, { type: 'audio/webm' });
     const name = `${currentLesson().title} - gravação ${timeHM().replace(':', 'h')}.webm`;
     saveFile(name, blob);
-    $('recBtn').textContent = '⏺ Gravar aula';
+    $('recBtn').textContent = '⏺ Gravar';
     $('recBtn').classList.remove('live');
     $('recInfo').textContent = `💾 ${clock((Date.now() - recStarted) / 1000)} salvos`;
     if (await sure('Gravação salva. Transcrever agora?')) transcribe(new File([blob], name));
@@ -59,7 +59,7 @@ async function toggleRecording() {
   const tick = () => ($('recInfo').textContent = `🔴 ${recordingTime()}`);
   tick();
   timer = setInterval(tick, 500);
-  $('recBtn').textContent = '⏹️ Parar gravação';
+  $('recBtn').textContent = '⏹️ Parar';
   $('recBtn').classList.add('live');
   toast('Gravando. Pode continuar escrevendo e tirando fotos.');
 }

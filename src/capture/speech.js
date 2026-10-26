@@ -1,6 +1,6 @@
 // Voz: ditado contínuo para as notas e comandos de voz (Web Speech API, Chrome/Edge).
 
-import { $, toast } from '../core/dom.js';
+import { $, toast, show } from '../core/dom.js';
 import { register, run } from '../core/actions.js';
 import { appendNotes } from '../library.js';
 
@@ -69,20 +69,19 @@ function toggleDictation() {
         else partial += r[0].transcript;
       }
       if (final) appendNotes(final.trim().replace(/^./, c => c.toUpperCase()) + '.');
-      $('dictState').textContent = partial ? '… ' + partial.slice(-40) : 'ouvindo';
+      $('dictState').textContent = partial ? '🎤 … ' + partial.slice(-40) : '🎤 ouvindo';
     },
     onStop: () => {
-      $('dictState').textContent = 'parado';
-      $('dictBtn').textContent = '🎤 Ditar / transcrever aula ao vivo';
+      show($('dictState'), false);
       $('dictBtnBar').textContent = '🎤 Ditar';
       $('dictBtnBar').classList.remove('live');
     },
   });
   if (!dictating) return;
-  $('dictBtn').textContent = '⏹️ Parar ditado';
   $('dictBtnBar').textContent = '⏹️ Parar ditado';
   $('dictBtnBar').classList.add('live');
-  $('dictState').textContent = 'ouvindo';
+  $('dictState').textContent = '🎤 ouvindo';
+  show($('dictState'));
 }
 
 // ----- Comandos de voz -----
@@ -127,7 +126,7 @@ function toggleVoiceCommands() {
   if (listening) {
     listening = false;
     commands.stop();
-    $('voiceBtn').textContent = '🎙️ Comandos de voz';
+    $('voiceBtn').classList.remove('live');
     return;
   }
   listening = true;
@@ -136,7 +135,7 @@ function toggleVoiceCommands() {
     interim: false,
     isOn: () => listening,
     onFatal: () => (listening = false),
-    onStop: () => ($('voiceBtn').textContent = '🎙️ Comandos de voz'),
+    onStop: () => $('voiceBtn').classList.remove('live'),
     onResult: e => {
       const phrase = e.results[e.resultIndex][0].transcript.toLowerCase().trim().replace(/[.!?]$/, '');
       const command = matchCommand(phrase);
@@ -145,7 +144,8 @@ function toggleVoiceCommands() {
     },
   });
   if (!listening) return;
-  $('voiceBtn').textContent = '🔴 Ouvindo comandos';
+  $('voiceBtn').classList.add('live');
+  document.querySelector('.menu[open]')?.removeAttribute('open');
   toast('Diga: "nova aula", "resumo", "slides", "pesquisar ...", "vídeo sobre ...", "renomear para ..."');
 }
 

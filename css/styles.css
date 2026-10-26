@@ -222,7 +222,16 @@ input, textarea, select { border-radius: 14px; border-width: 1.5px; }
 input:focus, textarea:focus, select:focus { border-color: var(--pri); outline: none; box-shadow: 0 0 0 4px rgb(30 107 255 / .18); }
 .card { border-radius: 20px; border: 1.5px solid var(--line); box-shadow: var(--shadow); }
 .pill { background: var(--pri-soft); color: var(--pri-ink); font-weight: 700; }
-.logo { font-size: 22px; background: linear-gradient(135deg, var(--pri), color-mix(in srgb, var(--pri) 55%, var(--pri2))); -webkit-background-clip: text; background-clip: text; color: transparent; }
+/* Logo: ícone do livro colorido + "Estuda" escuro e "AI" em azul com sublinhado amarelo */
+.logo { display: inline-flex; align-items: center; gap: 9px; font-size: 23px; font-weight: 600; color: var(--ink); line-height: 1; }
+.logo-icon { width: 36px; height: 36px; flex: none; transform: rotate(-6deg); transition: transform .25s; filter: drop-shadow(0 4px 8px rgb(30 107 255 / .3)); }
+.logo:hover .logo-icon { transform: rotate(4deg) scale(1.06); }
+.logo-text em { font-style: normal; color: var(--pri); position: relative; margin-left: 1px; }
+.logo-text em::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -3px; height: 5px; border-radius: 99px;
+  background: var(--sun); opacity: .85; z-index: -1;
+}
+.logo-text { position: relative; z-index: 0; }
 
 /* Login com fundo em degradê e emojis flutuando */
 #auth {
@@ -245,7 +254,7 @@ input:focus, textarea:focus, select:focus { border-color: var(--pri); outline: n
   border-radius: 24px; padding: 28px 28px 20px; display: flex; flex-direction: column; gap: 8px;
   background: linear-gradient(160deg, #e9f2ff, #dbe9ff 60%, #cfe2ff); color: #14213d; overflow: hidden;
 }
-.auth-brand { font-family: var(--display); font-weight: 600; font-size: 20px; color: #1553cc; }
+.auth-brand { font-family: var(--display); font-size: 22px; color: #14213d; }
 .auth-art h2 { font-family: var(--display); font-size: clamp(24px, 3vw, 32px); margin: 10px 0 0; line-height: 1.15; text-wrap: balance; }
 .auth-art p { margin: 0; color: #4f6185; max-width: 40ch; }
 .auth-scene { width: 100%; max-width: 460px; margin: auto auto 0; display: block; animation: flutua 6s ease-in-out infinite; }

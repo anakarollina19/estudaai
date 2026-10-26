@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="EstudaAI">
+  <defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4f9bff"/>
+      <stop offset="1" stop-color="#1e6bff"/>
+    </linearGradient>
+  </defs>
+  <!-- fundo arredondado -->
+  <rect width="64" height="64" rx="18" fill="url(#fundo)"/>
+  <circle cx="52" cy="10" r="14" fill="#fff" opacity=".12"/>
+
+  <!-- livro aberto, inclinado e colorido -->
+  <g transform="rotate(-8 32 38)">
+    <!-- capa -->
+    <path d="M8 22c8-3 16-2 24 3 8-5 16-6 24-3v28c-8-3-16-2-24 3-8-5-16-6-24-3z" fill="#14213d" opacity=".25" transform="translate(0 3)"/>
+    <path d="M8 21c8-3 16-2 24 3 8-5 16-6 24-3v28c-8-3-16-2-24 3-8-5-16-6-24-3z" fill="#ff6b5b"/>
+    <!-- páginas -->
+    <path d="M11 20c7-2 14-1 21 3v27c-7-4-14-5-21-3z" fill="#ffc83d"/>
+    <path d="M53 20c-7-2-14-1-21 3v27c7-4 14-5 21-3z" fill="#ffffff"/>
+    <path d="M32 23v27" stroke="#e8a516" stroke-width="1.6"/>
+    <!-- linhas de texto -->
+    <path d="M15 27c5-1 9 0 13 2M15 33c5-1 9 0 13 2M15 39c5-1 8 0 11 1.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
+    <path d="M36 29c4-2 8-3 13-2M36 35c4-2 8-3 13-2M36 41c3-1.5 6-2 10-1.5" fill="none" stroke="#9cc4ff" stroke-width="2.2" stroke-linecap="round"/>
+  </g>
+
+  <!-- brilho da IA -->
+  <path d="M47 5l2.4 6.1L55.5 13.5 49.4 15.9 47 22 44.6 15.9 38.5 13.5 44.6 11.1z" fill="#ffc83d" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/>
+  <circle cx="14" cy="11" r="2.6" fill="#fff" opacity=".9"/>
+</svg>

@@ -111,8 +111,27 @@ function renderPages() {
 
 function openPage(id) {
   curPage = id;
-  $('notes').value = currentPage().text;
+  const page = currentPage();
+  $('notes').value = page.text;
+  lastCursor = page.text.length;
+  applyPaper(page.paper);
   renderPages();
+}
+
+// ----- Tipo de folha (lisa, caderno, quadriculado), escolhido por anotação -----
+
+const PAPERS = ['liso', 'caderno', 'quadriculado'];
+
+function applyPaper(paper = 'liso') {
+  for (const p of PAPERS) $('notes').classList.toggle('paper-' + p, p === paper);
+  $('pagePaper').value = paper;
+}
+
+function setPaper() {
+  const page = currentPage();
+  page.paper = $('pagePaper').value;
+  applyPaper(page.paper);
+  save();
 }
 
 async function newPage() {
@@ -170,11 +189,36 @@ function saveNotes() {
   }, 400);
 }
 
-/** Acrescenta texto ao fim das notas da aula aberta (ditado, OCR, transcrição). */
+// Onde o cursor estava na anotação (para "colar na anotação" mesmo depois de clicar fora).
+let lastCursor = 0;
+const rememberCursor = () => (lastCursor = $('notes').selectionStart);
+for (const ev of ['keyup', 'click', 'select', 'blur']) $('notes')?.addEventListener(ev, rememberCursor);
+
+/**
+ * Acrescenta texto ao fim da anotação aberta (ditado, OCR, transcrição).
+ * Quem está digitando ao mesmo tempo não perde a posição do cursor nem a rolagem.
+ */
 export function appendNotes(text) {
   const notes = $('notes');
+  const { selectionStart, selectionEnd, scrollTop } = notes;
+  const typing = document.activeElement === notes;
   const needsBreak = notes.value && !notes.value.endsWith('\n');
   notes.value += (needsBreak ? '\n' : '') + text;
+  if (typing) {
+    notes.setSelectionRange(selectionStart, selectionEnd);
+    notes.scrollTop = scrollTop;
+  }
+  saveNotes();
+}
+
+/** Insere texto onde o cursor estava na anotação aberta. */
+export function insertAtCursor(text) {
+  const notes = $('notes');
+  const at = Math.min(lastCursor, notes.value.length);
+  notes.value = notes.value.slice(0, at) + text + notes.value.slice(at);
+  lastCursor = at + text.length;
+  notes.focus();
+  notes.setSelectionRange(lastCursor, lastCursor);
   saveNotes();
 }
 
@@ -350,6 +394,7 @@ register({
   'page.rename': renamePage,
   'page.delete': removePage,
   'page.toggleUse': togglePageUse,
+  'page.paper': setPaper,
   'backup.export': exportBackup,
   'backup.import': importBackup,
 });

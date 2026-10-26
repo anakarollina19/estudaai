@@ -20,6 +20,7 @@ import './slides/slides.js';
 import './capture/ocr.js';
 import './capture/audio.js';
 import './capture/speech.js';
+import './capture/paste.js';
 import './web.js';
 import './rag/ask.js';
 import './agent/agent.js';

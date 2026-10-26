@@ -74,10 +74,14 @@ function toggleDictation() {
     onStop: () => {
       $('dictState').textContent = 'parado';
       $('dictBtn').textContent = '🎤 Ditar / transcrever aula ao vivo';
+      $('dictBtnBar').textContent = '🎤 Ditar';
+      $('dictBtnBar').classList.remove('live');
     },
   });
   if (!dictating) return;
   $('dictBtn').textContent = '⏹️ Parar ditado';
+  $('dictBtnBar').textContent = '⏹️ Parar ditado';
+  $('dictBtnBar').classList.add('live');
   $('dictState').textContent = 'ouvindo';
 }
 

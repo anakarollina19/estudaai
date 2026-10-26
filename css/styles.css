@@ -295,3 +295,44 @@ button.chunky.warn { background: var(--warn); box-shadow: 0 4px 0 color-mix(in s
 
 .confetti { position: fixed; top: -40px; z-index: 50; pointer-events: none; animation: cai 2s ease-in forwards; }
 @keyframes cai { to { transform: translateY(110vh) rotate(540deg); opacity: .2; } }
+
+/* ===== Barra de captura (gravar, foto, ditar, colar) em todas as abas ===== */
+.capture-bar {
+  position: sticky; top: 0; z-index: 4; display: flex; gap: 6px; flex-wrap: wrap; align-items: center;
+  background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(6px);
+  padding: 8px 0; margin: -4px 0 10px;
+}
+.capture-bar .rec { background: var(--warn-soft); color: var(--warn); }
+.capture-bar .live { background: var(--warn); color: #fff; animation: gravando 1.6s ease-in-out infinite; }
+#dictBtnBar.live { background: var(--pri); color: #fff; animation: gravando 1.6s ease-in-out infinite; }
+@keyframes gravando { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--warn) 25%, transparent); } }
+#recInfo { font-variant-numeric: tabular-nums; font-weight: 700; }
+.cap-state { color: var(--mut); font-size: 13px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1 1 160px; }
+
+/* ===== Tipos de folha da anotação ===== */
+/* As linhas acompanham o texto: mesma altura de linha (28px) e rolam junto (attachment: local). */
+#notes.paper-caderno, #notes.paper-quadriculado {
+  font-size: 16px; line-height: 28px; padding: 14px 16px 14px 62px;
+  background-attachment: local; background-color: #fffdf6; color: #2a2140;
+}
+#notes.paper-caderno {
+  background-image:
+    linear-gradient(to right, transparent 46px, #f2a3a3 46px, #f2a3a3 48px, transparent 48px),
+    repeating-linear-gradient(to bottom, transparent 0 27px, #b9d3ee 27px 28px);
+  background-position: 0 0, 0 14px;
+}
+#notes.paper-quadriculado {
+  padding-left: 16px;
+  background-image:
+    repeating-linear-gradient(to bottom, transparent 0 27px, #d6e2f0 27px 28px),
+    repeating-linear-gradient(to right, transparent 0 27px, #d6e2f0 27px 28px);
+  background-position: 0 14px, 0 0;
+}
+:root[data-theme="dark"] #notes.paper-caderno, :root[data-theme="dark"] #notes.paper-quadriculado { background-color: #f6f1e4; }
+
+/* ===== Transcrições embaixo do áudio ===== */
+.transcript { padding: 10px 12px; }
+.transcript > .row { cursor: pointer; }
+.transcript .tr-text, .transcript .tr-tools { display: none; }
+.transcript.open .tr-text { display: block; margin-top: 8px; resize: vertical; line-height: 1.6; }
+.transcript.open .tr-tools { display: flex; margin-top: 8px; }

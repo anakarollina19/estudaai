@@ -59,6 +59,16 @@
       <button class="ghost" data-action="library.deleteLesson">🗑️ Excluir aula</button>
       <button class="mic" id="voiceBtn" data-action="voice.toggle">🎙️ Comandos de voz</button>
     </div>
+    <!-- Barra de captura: fica visível em todas as abas, para gravar, fotografar e escrever ao mesmo tempo -->
+    <div class="capture-bar" id="captureBar">
+      <button id="recBtn" class="rec" data-action="audio.record" title="Gravar o áudio da aula">⏺ Gravar aula</button>
+      <span id="recInfo" class="pill hidden"></span>
+      <label class="file-btn ghost" title="Tirar foto do quadro">📷 Foto<input type="file" accept="image/*" capture="environment" hidden data-change="ocr.files"></label>
+      <label class="file-btn ghost" title="Anexar imagens">🖼️ Imagens<input type="file" accept="image/*" multiple hidden data-change="ocr.files"></label>
+      <button class="ghost" data-action="dictation.toggle" id="dictBtnBar" title="Transcrever ao vivo para a anotação aberta">🎤 Ditar</button>
+      <button class="ghost" data-action="capture.paste" title="Colar texto ou imagem (ou use Ctrl+V)">📋 Colar</button>
+      <span id="capState" class="cap-state"></span>
+    </div>
     <div class="gen-bar">
       <b>✨ Gerar:</b>
       <button data-action="summary.make">📝 Resumo</button>
@@ -83,6 +93,11 @@
             <label class="pill"><input type="checkbox" id="pageUse" data-change="page.toggleUse"> usar no resumo, mapa e slides</label>
             <button class="icon" data-action="page.rename" title="Renomear anotação">✏️ Renomear</button>
             <button class="icon" data-action="page.delete" title="Excluir anotação">🗑️ Excluir</button>
+            <select id="pagePaper" data-change="page.paper" style="width:auto" aria-label="Tipo de folha">
+              <option value="liso">📄 Folha lisa</option>
+              <option value="caderno">📓 Folha de caderno</option>
+              <option value="quadriculado">🔲 Quadriculado</option>
+            </select>
           </div>
           <textarea id="notes" data-input="library.saveNotes" placeholder="Anote aqui... Use '# Título' para criar tópicos (viram slides e mapa mental)."></textarea>
         </div>
@@ -128,15 +143,15 @@
             <label class="file-btn primary">🎧 Escolher áudio<input type="file" hidden data-change="audio.transcribeFile"
               accept="audio/*,video/*,.mp3,.m4a,.aac,.wav,.ogg,.oga,.opus,.webm,.flac,.wma,.amr,.3gp,.mp4,.mov,.mkv"></label>
             <select id="sttEngine" style="width:auto" aria-label="Como transcrever">
-              <option value="local">Grátis, no navegador (Whisper local)</option>
+              <option value="local">Grátis e rápido, no navegador (~80 MB)</option>
+              <option value="local-small">Grátis e mais preciso, no navegador (~240 MB)</option>
               <option value="openai">Mais preciso: Whisper da OpenAI (precisa de chave)</option>
             </select>
           </div>
-          <p class="hint" style="margin-top:8px">O modo grátis baixa um modelo de ~80 MB na primeira vez e funciona sem internet depois. Para gravar ao vivo, use 🎤 em Anotações.</p>
+          <p class="hint" style="margin-top:8px">Os modos grátis baixam o modelo só na primeira vez e depois funcionam sem internet. O texto da transcrição aparece aqui embaixo, e você pode corrigir, copiar ou colar na anotação. Para gravar ao vivo, use 🎤 em Anotações.</p>
           <div id="trOut" class="pre"></div>
-          <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
-          <b>⏺️ Gravar áudio da aula</b>
-          <div class="row" style="margin-top:8px"><button id="recBtn" data-action="audio.record">Gravar</button><span id="recInfo" class="pill">—</span></div>
+          <p class="hint" style="margin-top:8px">⏺ Para gravar a aula, use o botão <b>Gravar aula</b> no topo: dá para continuar escrevendo e tirando fotos enquanto grava.</p>
+          <div id="transcripts" class="stack"></div>
         </div>
       </div>
     </section>

@@ -10,6 +10,7 @@ import { uid, timeHM } from '../core/util.js';
 import { tryComplete } from '../ai/claude.js';
 import { sentences, keywords, toItems } from '../text/nlp.js';
 import { appendNotes } from '../library.js';
+import { recordingTime } from './audio.js';
 import { putImage, deleteImage as deleteStored, imageSrc, MAX_IMAGES_PER_LESSON } from './images.js';
 
 /** Redimensiona para no máximo `max` px e devolve um data URL JPEG. */
@@ -89,22 +90,30 @@ export function limitFiles(files) {
   return files.slice(0, Math.max(slots, 0));
 }
 
-async function processImages(files) {
+/** O andamento aparece na aba Foto & Áudio e na barra de captura (visível em qualquer aba). */
+function setStatus(text) {
+  $('ocrSt').textContent = text;
+  $('capState').textContent = text;
+}
+
+export async function processImages(files) {
   files = limitFiles(files);
   if (!files.length) return;
-  const status = $('ocrSt');
   let ok = 0;
   for (const [i, file] of files.entries()) {
     const tag = files.length > 1 ? ` ${i + 1} de ${files.length}` : '';
     try {
-      const image = await readImage(file, { onProgress: p => (status.textContent = `Lendo imagem${tag}... ${p}%`) });
-      appendNotes(`\n# Quadro ${image.time}\n${image.text}`);
+      const image = await readImage(file, { onProgress: p => setStatus(`📷 Lendo imagem${tag}... ${p}%`) });
+      // Foto tirada durante a gravação: anota em que minuto do áudio ela foi tirada.
+      const rec = recordingTime();
+      appendNotes(`\n# Quadro ${image.time}${rec ? ` (⏺ ${rec} da gravação)` : ''}\n${image.text}`);
       ok++;
     } catch (e) {
       toast(`Erro na imagem ${file.name ?? ''}: ${e.message}`);
     }
   }
-  status.textContent = `✅ ${ok} imagem(ns) lida(s), resumida(s) e guardada(s). Total na aula: ${currentLesson().images.length}/${MAX_IMAGES_PER_LESSON}.`;
+  setStatus(`✅ ${ok} imagem(ns) lida(s) e guardada(s) · ${currentLesson().images.length}/${MAX_IMAGES_PER_LESSON} na aula`);
+  setTimeout(() => $('capState').textContent.startsWith('✅') && ($('capState').textContent = ''), 6000);
 }
 
 // ----- Galeria com seleção -----

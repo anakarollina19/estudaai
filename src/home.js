@@ -79,7 +79,7 @@ export function renderHome() {
       <p>${stats.today >= stats.goal ? 'Meta de hoje batida! Que tal revisar com flashcards?' : 'Uma aula de cada vez. Bora continuar?'}</p>
       <button class="primary big" data-action="home.continue">Continuar estudando →</button>
     </div>
-    <img src="img/mascote.svg" alt="" class="hero-mascot">`;
+    <img src="img/estudante.svg" alt="" class="hero-mascot">`;
 
   if (last) {
     const steps = lessonSteps(last.lesson);

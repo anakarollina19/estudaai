@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 400" role="img" aria-label="Cantinho de estudos: a coruja do EstudaAI na escrivaninha com notebook, livros, planta e caneca">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 400" role="img" aria-label="Dois estudantes estudando juntos na escrivaninha: uma garota de fones no notebook e um garoto de óculos escrevendo no caderno">
   <defs>
     <linearGradient id="ceu" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#bfe3ff"/>
@@ -8,78 +8,119 @@
       <stop offset="0" stop-color="#f2cf9e"/>
       <stop offset="1" stop-color="#e2b77f"/>
     </linearGradient>
-    <linearGradient id="corpo2" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#9d8cf0"/>
-      <stop offset="1" stop-color="#7a66d6"/>
+    <linearGradient id="lilas" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a596e8"/>
+      <stop offset="1" stop-color="#8a78e0"/>
+    </linearGradient>
+    <linearGradient id="amarelo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd98a"/>
+      <stop offset="1" stop-color="#f6c15a"/>
     </linearGradient>
   </defs>
 
   <!-- janela em arco -->
-  <path d="M330 60a70 70 0 0 1 140 0v130H330z" fill="#f4ead9"/>
-  <path d="M342 64a58 58 0 0 1 116 0v114H342z" fill="url(#ceu)"/>
-  <path d="M400 8v170M342 112h116" stroke="#f4ead9" stroke-width="8"/>
+  <path d="M340 64a64 64 0 0 1 128 0v120H340z" fill="#f4ead9"/>
+  <path d="M351 68a53 53 0 0 1 106 0v106H351z" fill="url(#ceu)"/>
+  <path d="M404 14v160M351 112h106" stroke="#f4ead9" stroke-width="7"/>
   <g fill="#fff" opacity=".95">
-    <ellipse cx="372" cy="150" rx="22" ry="10"/><ellipse cx="392" cy="144" rx="16" ry="12"/>
-    <ellipse cx="430" cy="92" rx="16" ry="7"/><ellipse cx="444" cy="88" rx="11" ry="8"/>
+    <ellipse cx="378" cy="150" rx="20" ry="9"/><ellipse cx="396" cy="144" rx="14" ry="11"/>
+    <ellipse cx="434" cy="92" rx="14" ry="6"/><ellipse cx="446" cy="88" rx="10" ry="7"/>
   </g>
 
   <!-- prateleira com livros e planta -->
-  <rect x="40" y="120" width="170" height="10" rx="5" fill="#e2b77f"/>
-  <rect x="58" y="72" width="16" height="48" rx="3" fill="#c9bff5"/>
-  <rect x="76" y="80" width="14" height="40" rx="3" fill="#f7a8c8"/>
-  <rect x="92" y="66" width="18" height="54" rx="3" fill="#8a78e0"/>
-  <rect x="112" y="76" width="13" height="44" rx="3" fill="#ffd166"/>
-  <path d="M150 120h40l-5-24h-30z" fill="#f7a8c8"/>
-  <path d="M170 98c-4-22 8-36 22-40-4 14-8 26-22 40zM168 98c-14-12-22-26-14-40 10 10 16 22 14 40zM170 98c6-16 20-22 32-18-8 10-18 16-32 18z" fill="#7cc9a0"/>
+  <rect x="34" y="104" width="150" height="9" rx="4.5" fill="#e2b77f"/>
+  <rect x="48" y="60" width="15" height="44" rx="3" fill="#c9bff5"/>
+  <rect x="65" y="68" width="13" height="36" rx="3" fill="#f7a8c8"/>
+  <rect x="80" y="54" width="17" height="50" rx="3" fill="#8a78e0"/>
+  <rect x="99" y="64" width="12" height="40" rx="3" fill="#ffd166"/>
+  <path d="M132 104h36l-4-22h-28z" fill="#f7a8c8"/>
+  <path d="M150 84c-4-20 7-32 20-36-4 13-7 24-20 36zM148 84c-13-11-20-24-13-36 9 9 15 20 13 36z" fill="#7cc9a0"/>
 
   <!-- quadro de recados -->
-  <rect x="70" y="156" width="62" height="72" rx="10" fill="#c9bff5"/>
-  <circle cx="101" cy="158" r="6" fill="#f7a8c8"/>
-  <path d="M84 182h34M84 196h34M84 210h22" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+  <rect x="40" y="140" width="56" height="64" rx="9" fill="#c9bff5"/>
+  <circle cx="68" cy="142" r="5" fill="#f7a8c8"/>
+  <path d="M52 162h32M52 175h32M52 188h20" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>
 
-  <!-- coruja -->
-  <g transform="translate(176 104)">
-    <path d="M90 22c42 0 64 30 64 76 0 40-28 64-64 64s-64-24-64-64c0-46 22-76 64-76z" fill="url(#corpo2)"/>
-    <path d="M36 44 30 14l28 20zM144 44l6-30-28 20z" fill="#7a66d6"/>
-    <circle cx="66" cy="68" r="22" fill="#fff"/><circle cx="114" cy="68" r="22" fill="#fff"/>
-    <circle cx="70" cy="72" r="11" fill="#2a2140"/><circle cx="110" cy="72" r="11" fill="#2a2140"/>
-    <circle cx="74" cy="67" r="4.5" fill="#fff"/><circle cx="114" cy="67" r="4.5" fill="#fff"/>
-    <ellipse cx="50" cy="92" rx="8" ry="4.5" fill="#f7a8c8" opacity=".8"/><ellipse cx="130" cy="92" rx="8" ry="4.5" fill="#f7a8c8" opacity=".8"/>
-    <path d="M83 86h14l-7 11z" fill="#f6a94a"/>
-    <path d="M90-6 40 14l50 20 50-20z" fill="#3d3566"/>
-    <path d="M62 22v12c0 5 12 10 28 10s28-5 28-10V22l-28 12z" fill="#2f2852"/>
-    <path d="M140 14v24" stroke="#ffd166" stroke-width="3" stroke-linecap="round"/><circle cx="140" cy="41" r="5" fill="#ffd166"/>
+  <!-- ===== Estudante 1: garota de cabelo cacheado, fones e moletom lilás ===== -->
+  <g transform="translate(196 168)">
+    <g fill="#2b1d16">
+      <circle cx="-28" cy="-6" r="18"/><circle cx="28" cy="-6" r="18"/>
+      <circle cx="-22" cy="-28" r="19"/><circle cx="22" cy="-28" r="19"/>
+      <circle cx="0" cy="-38" r="21"/><circle cx="-32" cy="16" r="13"/><circle cx="32" cy="16" r="13"/>
+    </g>
+    <path d="M-34 66c0-18 16-26 34-26s34 8 34 26z" fill="#7a66d6"/>
+    <rect x="-8" y="26" width="16" height="22" rx="5" fill="#b87a52"/>
+    <path d="M-50 132c0-50 20-82 50-82s50 32 50 82z" fill="url(#lilas)"/>
+    <path d="M-20 52q20 16 40 0" fill="none" stroke="#7a66d6" stroke-width="5" stroke-linecap="round"/>
+    <ellipse cx="0" cy="2" rx="28" ry="31" fill="#c98a5f"/>
+    <g fill="#2b1d16"><circle cx="-14" cy="-26" r="12"/><circle cx="4" cy="-30" r="13"/><circle cx="20" cy="-24" r="10"/></g>
+    <!-- fones na cabeça -->
+    <path d="M-32 0a32 34 0 0 1 64 0" fill="none" stroke="#f7a8c8" stroke-width="6"/>
+    <rect x="-38" y="-4" width="12" height="20" rx="6" fill="#ee86b2"/>
+    <rect x="26" y="-4" width="12" height="20" rx="6" fill="#ee86b2"/>
+    <!-- rosto olhando para a tela -->
+    <path d="M-16 -4q5-4 10 0M6 -4q5-4 10 0" fill="none" stroke="#2b1d16" stroke-width="2.6" stroke-linecap="round"/>
+    <ellipse cx="-10" cy="6" rx="3.6" ry="4.4" fill="#2a2140"/><ellipse cx="11" cy="6" rx="3.6" ry="4.4" fill="#2a2140"/>
+    <circle cx="-8.8" cy="4.4" r="1.3" fill="#fff"/><circle cx="12.2" cy="4.4" r="1.3" fill="#fff"/>
+    <ellipse cx="-17" cy="15" rx="5.5" ry="3" fill="#ee86b2" opacity=".55"/><ellipse cx="18" cy="15" rx="5.5" ry="3" fill="#ee86b2" opacity=".55"/>
+    <path d="M-6 17q6 6 12 0" fill="none" stroke="#7a3b2e" stroke-width="2.6" stroke-linecap="round"/>
+  </g>
+
+  <!-- ===== Estudante 2: garoto de óculos e moletom amarelo ===== -->
+  <g transform="translate(332 178)">
+    <path d="M-32 60c0-16 14-22 32-22s32 6 32 22z" fill="#e9a93a"/>
+    <rect x="-8" y="24" width="16" height="20" rx="5" fill="#d9a07a"/>
+    <path d="M-48 122c0-48 18-76 48-76s48 28 48 76z" fill="url(#amarelo)"/>
+    <path d="M-18 48q18 14 36 0" fill="none" stroke="#e9a93a" stroke-width="5" stroke-linecap="round"/>
+    <ellipse cx="-27" cy="4" rx="5" ry="8" fill="#d9a07a"/><ellipse cx="27" cy="4" rx="5" ry="8" fill="#d9a07a"/>
+    <ellipse cx="0" cy="0" rx="27" ry="30" fill="#e8b48a"/>
+    <!-- cabelo curto com topete -->
+    <path d="M-28 -2c-4-30 12-42 30-42 20 0 32 14 27 40-6-12-16-18-28-18-10 0-20 6-29 20z" fill="#4a2c1a"/>
+    <path d="M-6 -42c6-10 20-12 26-4-10 0-16 2-26 4z" fill="#4a2c1a"/>
+    <!-- óculos -->
+    <circle cx="-10" cy="4" r="9" fill="none" stroke="#2a2140" stroke-width="2.6"/>
+    <circle cx="11" cy="4" r="9" fill="none" stroke="#2a2140" stroke-width="2.6"/>
+    <path d="M-1 4h3" stroke="#2a2140" stroke-width="2.6"/>
+    <ellipse cx="-10" cy="6" rx="3" ry="3.6" fill="#2a2140"/><ellipse cx="11" cy="6" rx="3" ry="3.6" fill="#2a2140"/>
+    <path d="M-16 -10q6-3 11 0M5 -10q6-3 11 0" fill="none" stroke="#4a2c1a" stroke-width="2.6" stroke-linecap="round"/>
+    <ellipse cx="-17" cy="16" rx="5" ry="3" fill="#ee86b2" opacity=".45"/><ellipse cx="18" cy="16" rx="5" ry="3" fill="#ee86b2" opacity=".45"/>
+    <path d="M-6 17q7 7 14 0" fill="#fff" stroke="#7a3b2e" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 
   <!-- mesa -->
-  <rect x="20" y="296" width="480" height="26" rx="13" fill="url(#mesa)"/>
-  <rect x="60" y="318" width="20" height="82" rx="6" fill="#e2b77f"/>
-  <rect x="440" y="318" width="20" height="82" rx="6" fill="#e2b77f"/>
+  <rect x="20" y="290" width="480" height="24" rx="12" fill="url(#mesa)"/>
+  <rect x="58" y="310" width="18" height="90" rx="6" fill="#e2b77f"/>
+  <rect x="444" y="310" width="18" height="90" rx="6" fill="#e2b77f"/>
 
-  <!-- notebook -->
-  <path d="M196 214h150a10 10 0 0 1 10 10v66H186v-66a10 10 0 0 1 10-10z" fill="#d8dbe6"/>
-  <rect x="196" y="224" width="150" height="62" rx="4" fill="#eef0f7"/>
-  <path d="M212 242h70M212 256h96M212 270h52" stroke="#c9bff5" stroke-width="6" stroke-linecap="round"/>
-  <path d="M170 290h202l-14 8H184z" fill="#c4c8d6"/>
-  <circle cx="271" cy="252" r="7" fill="#f7a8c8" opacity=".9"/>
+  <!-- notebook da garota -->
+  <path d="M132 232h124a9 9 0 0 1 9 9v51H123v-51a9 9 0 0 1 9-9z" fill="#d8dbe6"/>
+  <rect x="132" y="241" width="124" height="46" rx="4" fill="#eef0f7"/>
+  <path d="M146 256h58M146 268h78" stroke="#c9bff5" stroke-width="5.5" stroke-linecap="round"/>
+  <circle cx="236" cy="262" r="7" fill="#f7a8c8" opacity=".9"/>
+  <path d="M110 291h168l-12 7H122z" fill="#c4c8d6"/>
+  <!-- mãos da garota no teclado -->
+  <ellipse cx="150" cy="288" rx="10" ry="6" fill="#c98a5f"/>
+  <ellipse cx="236" cy="288" rx="10" ry="6" fill="#c98a5f"/>
 
-  <!-- caderno e lápis -->
-  <path d="M90 282l64-8 4 22-64 6z" fill="#fff" stroke="#e4e0d8" stroke-width="2"/>
-  <path d="M100 288l44-5" stroke="#c9bff5" stroke-width="3" stroke-linecap="round"/>
-  <path d="M128 268l34 22" stroke="#ffd166" stroke-width="7" stroke-linecap="round"/>
-  <path d="M162 290l6 4" stroke="#f6a94a" stroke-width="7" stroke-linecap="round"/>
+  <!-- caderno e lápis do garoto -->
+  <path d="M296 278l70-6 3 20-70 6z" fill="#fff" stroke="#e4e0d8" stroke-width="2"/>
+  <path d="M306 283l48-4M308 290l36-3" stroke="#c9bff5" stroke-width="3" stroke-linecap="round"/>
+  <ellipse cx="366" cy="282" rx="10" ry="7" fill="#e8b48a"/>
+  <path d="M360 284l18-26" stroke="#ffd166" stroke-width="6" stroke-linecap="round"/>
+  <path d="M361 283l-3 5" stroke="#f6a94a" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="300" cy="286" rx="9" ry="6" fill="#e8b48a"/>
 
-  <!-- caneca -->
-  <rect x="396" y="250" width="44" height="46" rx="10" fill="#f7a8c8"/>
-  <path d="M440 260c14 0 14 26 0 26" fill="none" stroke="#f7a8c8" stroke-width="7"/>
-  <path d="M418 262c-6-7-14 1-6 9l6 6 6-6c8-8 0-16-6-9z" fill="#fff"/>
-  <path d="M410 236c-4-8 4-10 0-18M426 236c-4-8 4-10 0-18" stroke="#c9bff5" stroke-width="3" stroke-linecap="round" fill="none"/>
-
-  <!-- vasinho na mesa -->
-  <path d="M462 296h30l-4-22h-22z" fill="#c9bff5"/>
-  <path d="M477 274c-10-12-6-24 4-28 2 10 2 18-4 28zM477 274c10-8 20-8 24-2-6 4-14 6-24 2z" fill="#7cc9a0"/>
+  <!-- caneca e livros na mesa -->
+  <rect x="404" y="246" width="40" height="44" rx="10" fill="#f7a8c8"/>
+  <path d="M444 256c13 0 13 24 0 24" fill="none" stroke="#f7a8c8" stroke-width="6"/>
+  <path d="M424 258c-6-7-13 1-6 8l6 6 6-6c7-7 0-15-6-8z" fill="#fff"/>
+  <path d="M416 234c-4-8 4-10 0-18M432 234c-4-8 4-10 0-18" stroke="#c9bff5" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <rect x="40" y="272" width="62" height="10" rx="3" fill="#8a78e0"/>
+  <rect x="46" y="262" width="56" height="10" rx="3" fill="#7cc9a0"/>
+  <rect x="42" y="280" width="64" height="10" rx="3" fill="#ffd166"/>
 
   <!-- brilhinhos -->
-  <path d="M300 30l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#ffd166"/>
-  <path d="M60 30l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#f7a8c8"/>
+  <path d="M290 40l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#ffd166"/>
+  <path d="M24 30l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#f7a8c8"/>
+  <path d="M262 120l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z" fill="#c9bff5"/>
 </svg>

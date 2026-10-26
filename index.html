@@ -123,9 +123,17 @@
         </div>
         <div class="card">
           <b>🎧 Transcrever arquivo de áudio</b>
-          <p class="hint">Alta precisão com Whisper (OpenAI), precisa da chave em ⚙️. Para gravar ao vivo, use 🎤 em Anotações.</p>
-          <input type="file" accept="audio/*,video/*" data-change="audio.transcribeFile">
-          <div id="trOut" style="margin-top:10px"></div>
+          <p class="hint">Aceita gravações do celular e do WhatsApp (mp3, m4a, ogg, opus, wav, webm, mp4...). O texto vai para as anotações.</p>
+          <div class="row">
+            <label class="file-btn primary">🎧 Escolher áudio<input type="file" hidden data-change="audio.transcribeFile"
+              accept="audio/*,video/*,.mp3,.m4a,.aac,.wav,.ogg,.oga,.opus,.webm,.flac,.wma,.amr,.3gp,.mp4,.mov,.mkv"></label>
+            <select id="sttEngine" style="width:auto" aria-label="Como transcrever">
+              <option value="local">Grátis, no navegador (Whisper local)</option>
+              <option value="openai">Mais preciso: Whisper da OpenAI (precisa de chave)</option>
+            </select>
+          </div>
+          <p class="hint" style="margin-top:8px">O modo grátis baixa um modelo de ~80 MB na primeira vez e funciona sem internet depois. Para gravar ao vivo, use 🎤 em Anotações.</p>
+          <div id="trOut" class="pre"></div>
           <hr style="border:0;border-top:1px solid var(--line);margin:14px 0">
           <b>⏺️ Gravar áudio da aula</b>
           <div class="row" style="margin-top:8px"><button id="recBtn" data-action="audio.record">Gravar</button><span id="recInfo" class="pill">—</span></div>

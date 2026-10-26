@@ -4,8 +4,8 @@
 // Na primeira vez o modelo (~120 MB) é baixado; depois fica no cache do navegador.
 
 import { bm25, fuseRankings } from './search.js';
+import { createPipeline } from '../ai/transformers.js';
 
-const LIBRARY_URL = 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2';
 export const EMBEDDING_MODEL = 'Xenova/paraphrase-multilingual-MiniLM-L12-v2';
 
 let extractorPromise = null;
@@ -13,20 +13,7 @@ const cache = new Map(); // texto -> vetor
 
 /** Carrega o modelo uma única vez. `onProgress(pct)` recebe o andamento do download. */
 export function loadEmbedder(onProgress) {
-  extractorPromise ??= (async () => {
-    const { pipeline, env } = await import(LIBRARY_URL);
-    env.allowLocalModels = false; // baixa direto do Hugging Face, sem procurar /models/ no nosso site
-    const files = {};
-    return pipeline('feature-extraction', EMBEDDING_MODEL, {
-      quantized: true,
-      progress_callback: p => {
-        if (p.status !== 'progress' || !p.total) return;
-        files[p.file] = [p.loaded, p.total];
-        const [loaded, total] = Object.values(files).reduce(([a, b], [l, t]) => [a + l, b + t], [0, 0]);
-        onProgress?.(Math.round((loaded / total) * 100));
-      },
-    });
-  })();
+  extractorPromise ??= createPipeline('feature-extraction', EMBEDDING_MODEL, onProgress);
   extractorPromise.catch(() => (extractorPromise = null)); // permite tentar de novo
   return extractorPromise;
 }

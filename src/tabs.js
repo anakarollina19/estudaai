@@ -3,6 +3,7 @@ import { emit } from './core/events.js';
 import { register } from './core/actions.js';
 
 export const TABS = {
+  inicio: '🏠 Início',
   notas: '📝 Anotações',
   captura: '📷 Foto & Áudio',
   resumo: '✨ Resumo & Mapa',

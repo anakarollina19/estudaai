@@ -17,18 +17,54 @@
 
 <!-- ===== Login / cadastro ===== -->
 <section id="auth">
-  <form class="authbox" id="authForm">
-    <h1>📚 EstudaAI</h1>
-    <p class="muted" style="margin:0">Suas aulas, resumos e slides num lugar só. Bora estudar? 🚀</p>
-    <input id="aName" name="name" placeholder="Nome (só no cadastro)" autocomplete="name">
-    <input id="aEmail" name="email" type="email" placeholder="E-mail" autocomplete="username">
-    <input id="aPass" name="password" type="password" placeholder="Senha" autocomplete="current-password">
-    <label class="remember"><input type="checkbox" id="aRemember" checked> Lembrar de mim neste aparelho</label>
-    <button type="submit" class="primary">Entrar</button>
-    <button type="button" class="ghost" data-action="auth.signup">Criar conta</button>
-    <button type="button" class="link" data-action="auth.forgot">Esqueci a senha</button>
-    <button type="button" class="ghost" data-action="demo.load">✨ Experimentar com aulas de exemplo</button>
-  </form>
+  <div class="auth-shell">
+    <!-- Lado ilustrado: boas-vindas e o que o app faz -->
+    <div class="auth-art">
+      <div class="auth-brand">📚 EstudaAI</div>
+      <h2>Que bom ter você aqui! 🌸</h2>
+      <p>Grave a aula, fotografe o quadro e deixe a IA montar resumos, slides e flashcards pra você.</p>
+      <img src="img/estudo.svg" alt="" class="auth-scene">
+      <div class="auth-chips">
+        <span>🎧 Transcreve áudio</span><span>📷 Lê o quadro</span><span>🎞️ Cria slides</span>
+      </div>
+    </div>
+
+    <!-- Cartão do formulário: Entrar / Criar conta -->
+    <form class="auth-card" id="authForm" data-mode="login" novalidate>
+      <div class="auth-tabs" role="tablist">
+        <button type="button" role="tab" class="on" data-action="auth.mode" data-arg="login" aria-selected="true">Entrar</button>
+        <button type="button" role="tab" data-action="auth.mode" data-arg="signup" aria-selected="false">Criar conta</button>
+      </div>
+      <div>
+        <h1 id="authTitle">Bem-vindo(a) de volta!</h1>
+        <p class="muted" id="authSub">Entre para continuar seus estudos 💜</p>
+      </div>
+
+      <label class="field signup-only"><span>Nome</span>
+        <span class="input-icon"><i>👤</i><input id="aName" name="name" placeholder="Como quer ser chamado(a)?" autocomplete="name"></span>
+      </label>
+      <label class="field"><span>E-mail</span>
+        <span class="input-icon"><i>✉️</i><input id="aEmail" name="email" type="email" placeholder="seu@email.com" autocomplete="username"></span>
+      </label>
+      <div class="field">
+        <div class="row between"><label for="aPass">Senha</label><button type="button" class="link login-only" data-action="auth.forgot">Esqueci a senha</button></div>
+        <span class="input-icon"><i>🔒</i><input id="aPass" name="password" type="password" placeholder="Sua senha" autocomplete="current-password">
+          <button type="button" class="eye" data-action="auth.togglePass" aria-label="Mostrar senha" title="Mostrar senha">👁️</button></span>
+      </div>
+      <label class="field signup-only"><span>Confirmar senha</span>
+        <span class="input-icon"><i>🔒</i><input id="aPass2" type="password" placeholder="Repita a senha" autocomplete="new-password"></span>
+      </label>
+
+      <label class="remember"><input type="checkbox" id="aRemember" checked> Lembrar de mim neste aparelho</label>
+      <button type="submit" class="primary big" id="authSubmit">Entrar</button>
+
+      <div class="or"><span>ou</span></div>
+      <button type="button" class="ghost big" data-action="demo.load">✨ Experimentar com aulas de exemplo</button>
+
+      <p class="auth-switch login-only">Ainda não tem conta? <button type="button" class="link strong" data-action="auth.mode" data-arg="signup">Criar conta</button></p>
+      <p class="auth-switch signup-only">Já tem conta? <button type="button" class="link strong" data-action="auth.mode" data-arg="login">Entrar</button></p>
+    </form>
+  </div>
 </section>
 
 <!-- ===== App ===== -->
@@ -95,6 +131,25 @@
       <span id="capState" class="cap-state"></span>
     </div>
     <nav class="tabs" id="tabs"></nav>
+
+    <!-- Início -->
+    <section data-tab="inicio" class="hidden">
+      <div class="home">
+        <div class="home-main">
+          <div class="hero" id="homeHero"></div>
+          <div class="section-head"><h3>Continue de onde parou</h3></div>
+          <div class="card continue" id="homeContinue"></div>
+          <div class="section-head"><h3>Ferramentas</h3></div>
+          <div class="tool-grid" id="homeTools"></div>
+          <div class="section-head"><h3>Aulas recentes</h3><button class="link strong" data-action="library.newLesson">+ Nova aula</button></div>
+          <div class="recent-list" id="homeRecent"></div>
+        </div>
+        <div class="home-side">
+          <div class="card goal" id="homeGoal"></div>
+          <div class="card" id="homeStats"></div>
+        </div>
+      </div>
+    </section>
 
     <!-- Anotações -->
     <section data-tab="notas">

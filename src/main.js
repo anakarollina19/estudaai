@@ -21,6 +21,7 @@ import './capture/ocr.js';
 import './capture/audio.js';
 import './capture/speech.js';
 import './capture/paste.js';
+import './home.js';
 import './web.js';
 import './rag/ask.js';
 import './agent/agent.js';

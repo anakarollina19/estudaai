@@ -3,7 +3,7 @@
 // Os valores ficam em Supabase → Project Settings → API. A "anon key" pode ser pública;
 // NUNCA coloque aqui a "service_role" key.
 
-export const SUPABASE_URL = '';
-export const SUPABASE_ANON_KEY = '';
+export const SUPABASE_URL = 'https://riegdjwecgnhfbgomnui.supabase.co';
+export const SUPABASE_ANON_KEY = 'sb_publishable_O89ncwbl3HY8NNQqrZVa6A_FHh8m-Kq'; // chave pública (publishable)
 
 export const cloudEnabled = () => Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);

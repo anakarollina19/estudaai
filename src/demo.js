@@ -3,13 +3,12 @@
 
 import { $, esc } from './core/dom.js';
 import { register } from './core/actions.js';
-import { state, emptyDb, createLesson, save, saveUsers } from './core/store.js';
+import { state, emptyDb, createLesson, save, saveUsers, DEMO_USER } from './core/store.js';
 import { startApp, refresh } from './library.js';
 import { runAgentLoop } from './agent/agent.js';
 import { TOOLS } from './agent/tools.js';
 import { showTab } from './tabs.js';
 
-const DEMO_USER = 'demo@estudaai';
 
 export const SAMPLE_LESSONS = [
   {
@@ -51,8 +50,8 @@ function loadDemo() {
   state.users[DEMO_USER] ??= { name: 'Visitante', h: '' };
   saveUsers();
   state.me = DEMO_USER;
-  // A demonstração não fica lembrada: ao fechar o navegador, volta para o login.
-  localStorage.removeItem('me');
+  // A demonstração vale só para esta aba e não mexe no login lembrado de quem usa o
+  // aparelho: ao sair da demo (ou abrir outra aba), a pessoa volta para a própria conta.
   sessionStorage.setItem('me', DEMO_USER);
   state.db = emptyDb();
   for (const sample of [...SAMPLE_LESSONS].reverse()) createLesson(sample);

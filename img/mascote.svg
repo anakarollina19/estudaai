@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 230" role="img" aria-label="Coruja do EstudaAI de capelo, segurando um livro">
+  <defs>
+    <linearGradient id="corpo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#9d8cf0"/>
+      <stop offset="1" stop-color="#7a66d6"/>
+    </linearGradient>
+    <linearGradient id="barriga" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ede8ff"/>
+      <stop offset="1" stop-color="#d9d0fb"/>
+    </linearGradient>
+    <linearGradient id="livro" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f7a8c8"/>
+      <stop offset="1" stop-color="#ee86b2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- sombra -->
+  <ellipse cx="110" cy="218" rx="62" ry="8" fill="#5d4bb0" opacity=".15"/>
+
+  <!-- pés -->
+  <ellipse cx="88" cy="206" rx="14" ry="7" fill="#f6a94a"/>
+  <ellipse cx="132" cy="206" rx="14" ry="7" fill="#f6a94a"/>
+
+  <!-- corpo -->
+  <path d="M110 52c46 0 70 34 70 84 0 44-30 72-70 72s-70-28-70-72c0-50 24-84 70-84z" fill="url(#corpo)"/>
+  <!-- orelhas -->
+  <path d="M52 78 46 44l30 22z" fill="#7a66d6"/>
+  <path d="M168 78l6-34-30 22z" fill="#7a66d6"/>
+  <!-- barriga com penas -->
+  <path d="M110 112c28 0 44 22 44 50 0 26-20 40-44 40s-44-14-44-40c0-28 16-50 44-50z" fill="url(#barriga)"/>
+  <path d="M94 150q8 7 16 0q8 7 16 0M90 168q10 7 20 0q10 7 20 0" fill="none" stroke="#bcb0f3" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- olhos -->
+  <circle cx="84" cy="102" r="25" fill="#fff"/>
+  <circle cx="136" cy="102" r="25" fill="#fff"/>
+  <circle cx="88" cy="105" r="13" fill="#2a2140"/>
+  <circle cx="132" cy="105" r="13" fill="#2a2140"/>
+  <circle cx="93" cy="99" r="5" fill="#fff"/>
+  <circle cx="137" cy="99" r="5" fill="#fff"/>
+  <circle cx="84" cy="110" r="2.2" fill="#fff" opacity=".8"/>
+  <circle cx="128" cy="110" r="2.2" fill="#fff" opacity=".8"/>
+  <!-- bochechas -->
+  <ellipse cx="66" cy="128" rx="9" ry="5" fill="#f7a8c8" opacity=".75"/>
+  <ellipse cx="154" cy="128" rx="9" ry="5" fill="#f7a8c8" opacity=".75"/>
+  <!-- bico -->
+  <path d="M102 120h16l-8 12z" fill="#f6a94a" stroke="#e48f2c" stroke-width="1.5" stroke-linejoin="round"/>
+
+  <!-- capelo -->
+  <path d="M110 22 54 44l56 22 56-22z" fill="#3d3566"/>
+  <path d="M78 54v14c0 6 14 12 32 12s32-6 32-12V54l-32 12z" fill="#2f2852"/>
+  <path d="M166 44v26" stroke="#ffd166" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="166" cy="74" r="6" fill="#ffd166"/>
+  <circle cx="110" cy="43" r="4" fill="#ffd166"/>
+
+  <!-- livro aberto nas asas -->
+  <g transform="rotate(-6 110 176)">
+    <path d="M60 160c18-6 34-4 50 6v40c-16-10-32-12-50-6z" fill="url(#livro)"/>
+    <path d="M160 160c-18-6-34-4-50 6v40c16-10 32-12 50-6z" fill="#f7a8c8"/>
+    <path d="M110 166v40" stroke="#d9709c" stroke-width="2"/>
+    <path d="M72 172q14-3 28 3M72 182q14-3 28 3M120 175q14-6 28-3M120 185q14-6 28-3" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" opacity=".85"/>
+  </g>
+  <!-- asas segurando o livro -->
+  <ellipse cx="58" cy="178" rx="13" ry="19" fill="#7a66d6" transform="rotate(20 58 178)"/>
+  <ellipse cx="162" cy="178" rx="13" ry="19" fill="#7a66d6" transform="rotate(-20 162 178)"/>
+</svg>

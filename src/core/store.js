@@ -13,6 +13,9 @@ function read(key, fallback) {
   }
 }
 
+/** Conta usada pelo modo demonstração (só existe na aba em que foi aberta). */
+export const DEMO_USER = 'demo@estudaai';
+
 export const state = {
   users: read('users', {}),
   // "Lembrar de mim" grava a sessão no localStorage; sem ele, só até fechar o navegador.

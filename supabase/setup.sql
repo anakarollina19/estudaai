@@ -22,6 +22,14 @@ create table if not exists public.lesson_dbs (
 alter table public.profiles enable row level security;
 alter table public.lesson_dbs enable row level security;
 
+-- Acesso explícito pela API, para funcionar mesmo com "Expor automaticamente novas tabelas"
+-- desligado. Só quem está logado (authenticated) acessa; as regras (RLS) abaixo limitam
+-- cada pessoa às próprias linhas. Visitantes sem login (anon) não acessam nada.
+grant usage on schema public to authenticated;
+grant select on public.profiles to authenticated;
+grant select, insert, update, delete on public.lesson_dbs to authenticated;
+revoke all on public.profiles, public.lesson_dbs from anon;
+
 create or replace function public.is_admin() returns boolean
 language sql stable security definer set search_path = public as $$
   select coalesce((select is_admin from profiles where id = auth.uid()), false);
@@ -95,9 +103,13 @@ begin
 end;
 $$;
 
-revoke all on function public.admin_list_users() from anon;
-revoke all on function public.admin_set_blocked(uuid, boolean) from anon;
-revoke all on function public.admin_delete_user(uuid) from anon;
+revoke all on function public.admin_list_users() from anon, public;
+revoke all on function public.admin_set_blocked(uuid, boolean) from anon, public;
+revoke all on function public.admin_delete_user(uuid) from anon, public;
+grant execute on function public.admin_list_users() to authenticated;
+grant execute on function public.admin_set_blocked(uuid, boolean) to authenticated;
+grant execute on function public.admin_delete_user(uuid) to authenticated;
+grant execute on function public.is_admin(), public.is_blocked() to authenticated;
 
 -- ----- Quem é admin -----
 -- Depois de criar sua conta no app, rode esta linha (com o seu e-mail):

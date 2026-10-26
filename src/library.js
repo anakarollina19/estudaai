@@ -20,7 +20,7 @@ export function startApp() {
   show('auth', false);
   show('app', true);
   $('hello').textContent = `Olá, ${state.users[state.me]?.name ?? ''} 👋`;
-  showTab('notas');
+  showTab('inicio');
   openLesson(state.cur ?? allLessons()[0].lesson.id);
 }
 

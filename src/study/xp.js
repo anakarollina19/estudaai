@@ -3,13 +3,40 @@
 
 import { $, toast } from '../core/dom.js';
 import { state, save } from '../core/store.js';
-import { on } from '../core/events.js';
+import { on, emit } from '../core/events.js';
 
 const PER_LEVEL = 100;
-const isoDay = (d = new Date()) => d.toLocaleDateString('sv');
+export const DAILY_GOAL = 30; // XP por dia para bater a meta (≈ 3 ações de estudo)
+export const isoDay = (d = new Date()) => d.toLocaleDateString('sv');
 
 const data = () => (state.db.xp ??= { xp: 0, streak: 0, last: null });
 export const level = xp => Math.floor(xp / PER_LEVEL) + 1;
+
+/** XP de hoje e dias estudados (para a meta do dia e a semana na tela Início). */
+export function dailyStats() {
+  const x = data();
+  const today = isoDay();
+  const alive = x.last === today || x.last === isoDay(new Date(Date.now() - 864e5));
+  return {
+    today: x.daily?.day === today ? x.daily.xp : 0,
+    goal: DAILY_GOAL,
+    days: new Set(x.days ?? []),
+    streak: alive ? x.streak : 0,
+    xp: x.xp,
+    level: level(x.xp),
+    toNext: PER_LEVEL - (x.xp % PER_LEVEL),
+    pct: (x.xp % PER_LEVEL) / PER_LEVEL,
+  };
+}
+
+/** Soma o XP do dia e guarda os últimos 60 dias em que houve estudo. */
+function trackDay(points) {
+  const x = data();
+  const today = isoDay();
+  if (x.daily?.day !== today) x.daily = { day: today, xp: 0 };
+  x.daily.xp += points;
+  x.days = [...new Set([...(x.days ?? []), today])].slice(-60);
+}
 
 /** Conta o dia de estudo: continua a sequência se ontem teve estudo, senão recomeça. */
 function touchStreak() {
@@ -28,9 +55,16 @@ export function award(points, reason = '') {
   const x = data();
   const before = level(x.xp);
   const newDay = touchStreak();
+  const goalBefore = dailyStats().today >= DAILY_GOAL;
   x.xp += points;
+  trackDay(points);
   save();
   render();
+  emit('xp:changed');
+  if (!goalBefore && dailyStats().today >= DAILY_GOAL) {
+    confetti();
+    return toast('🎯 Meta do dia batida! Mandou bem!');
+  }
   if (level(x.xp) > before) {
     confetti();
     toast(`🎉 Subiu para o nível ${level(x.xp)}!`);

@@ -94,7 +94,7 @@ export function render() {
 /** Chuva de emojis rápida, sem biblioteca. */
 export function confetti(count = 28) {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const emojis = ['🎉', '✨', '⭐', '💜', '🎊', '🔥'];
+  const emojis = ['🎉', '✨', '⭐', '💙', '🎊', '🔥'];
   for (let i = 0; i < count; i++) {
     const el = document.createElement('span');
     el.className = 'confetti';

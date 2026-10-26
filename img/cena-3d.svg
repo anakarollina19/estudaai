@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 420" role="img" aria-label="Formas 3D de estudo flutuando sobre uma plataforma azul: cubo, livros, esferas, anel, capelo e lápis">
+  <defs>
+    <radialGradient id="esferaAzul" cx=".35" cy=".3" r=".75">
+      <stop offset="0" stop-color="#cfe3ff"/>
+      <stop offset=".35" stop-color="#5c9dff"/>
+      <stop offset="1" stop-color="#1240b0"/>
+    </radialGradient>
+    <radialGradient id="esferaCoral" cx=".35" cy=".3" r=".75">
+      <stop offset="0" stop-color="#ffd9d3"/>
+      <stop offset=".4" stop-color="#ff7a6b"/>
+      <stop offset="1" stop-color="#c8392b"/>
+    </radialGradient>
+    <radialGradient id="esferaAmarela" cx=".35" cy=".3" r=".75">
+      <stop offset="0" stop-color="#fff4c9"/>
+      <stop offset=".45" stop-color="#ffc83d"/>
+      <stop offset="1" stop-color="#d9930a"/>
+    </radialGradient>
+    <linearGradient id="anel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffe08a"/>
+      <stop offset=".5" stop-color="#ffc83d"/>
+      <stop offset="1" stop-color="#e59a0e"/>
+    </linearGradient>
+    <linearGradient id="topoPlataforma" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5c9dff"/>
+      <stop offset="1" stop-color="#2f78ff"/>
+    </linearGradient>
+    <filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+  </defs>
+
+  <!-- ===== Plataforma isométrica ===== -->
+  <path d="M260 160 456 273 260 386 64 273z" fill="url(#topoPlataforma)"/>
+  <path d="M64 273 260 386v24L64 297z" fill="#1553cc"/>
+  <path d="M456 273 260 386v24l196-113z" fill="#0f3fa8"/>
+  <path d="M260 178 424 273 260 368 96 273z" fill="none" stroke="#9cc4ff" stroke-width="2" opacity=".45"/>
+
+  <!-- sombras no chão (dos objetos flutuando) -->
+  <ellipse cx="150" cy="262" rx="34" ry="11" fill="#0b2a7a" opacity=".22" filter="url(#blur)"/>
+  <ellipse cx="398" cy="252" rx="34" ry="10" fill="#0b2a7a" opacity=".18" filter="url(#blur)"/>
+
+  <!-- ===== Pilha de livros (isométrica) ===== -->
+  <g>
+    <!-- livro de baixo: azul-marinho -->
+    <path d="M190 290 246 322 190 354 134 322z" fill="#3d63c9"/>
+    <path d="M134 322 190 354v14l-56-32z" fill="#21409a"/>
+    <path d="M246 322 190 354v14l56-32z" fill="#17307a"/>
+    <path d="M190 354v14l56-32v-14z" fill="#fff" opacity=".0"/>
+    <!-- livro do meio: coral -->
+    <path d="M188 274 240 304 188 334 136 304z" fill="#ff8a7d"/>
+    <path d="M136 304 188 334v14l-52-30z" fill="#e5594a"/>
+    <path d="M240 304 188 334v14l52-30z" fill="#c8392b"/>
+    <path d="M140 306l48 28 48-28" fill="none" stroke="#fff" stroke-width="2" opacity=".7"/>
+    <!-- livro de cima: branco com faixa amarela -->
+    <path d="M192 256 242 285 192 314 142 285z" fill="#ffffff"/>
+    <path d="M142 285 192 314v13l-50-29z" fill="#dfe8f8"/>
+    <path d="M242 285 192 314v13l50-29z" fill="#c4d3ee"/>
+    <path d="M167 270l50 29" stroke="#ffc83d" stroke-width="7"/>
+  </g>
+
+  <!-- ===== Cubo amarelo ===== -->
+  <g>
+    <path d="M316 196 362 222 316 248 270 222z" fill="#ffe08a"/>
+    <path d="M270 222 316 248v54l-46-26z" fill="#ffc83d"/>
+    <path d="M362 222 316 248v54l46-26z" fill="#e8a516"/>
+    <path d="M316 196 362 222 316 248 270 222z" fill="none" stroke="#fff" stroke-width="1.5" opacity=".6"/>
+  </g>
+
+  <!-- ===== Pedestal com esfera coral ===== -->
+  <g>
+    <path d="M374 262v26a36 18 0 0 0 72 0v-26z" fill="#c4d3ee"/>
+    <ellipse cx="410" cy="262" rx="36" ry="18" fill="#ffffff"/>
+    <ellipse cx="410" cy="262" rx="24" ry="11" fill="#e8eefb"/>
+    <circle cx="410" cy="236" r="24" fill="url(#esferaCoral)"/>
+  </g>
+
+  <!-- ===== Objetos flutuando ===== -->
+  <!-- esfera azul grande -->
+  <circle cx="150" cy="150" r="42" fill="url(#esferaAzul)"/>
+  <ellipse cx="136" cy="132" rx="12" ry="7" fill="#fff" opacity=".55" transform="rotate(-30 136 132)"/>
+
+  <!-- anel (toro) amarelo -->
+  <g transform="rotate(-24 400 128)">
+    <ellipse cx="400" cy="128" rx="44" ry="26" fill="none" stroke="#c98208" stroke-width="18" opacity=".55" transform="translate(0 4)"/>
+    <ellipse cx="400" cy="128" rx="44" ry="26" fill="none" stroke="url(#anel)" stroke-width="16"/>
+    <ellipse cx="392" cy="106" rx="16" ry="3" fill="#fff" opacity=".7"/>
+  </g>
+
+  <!-- capelo de formatura -->
+  <g transform="translate(272 58) rotate(-8)">
+    <path d="M0 0 58 24 0 48 -58 24z" fill="#14213d"/>
+    <path d="M-34 34v20c0 8 15 15 34 15s34-7 34-15V34L0 48z" fill="#22335c"/>
+    <path d="M0 0 58 24 0 48 -58 24z" fill="none" stroke="#3a5288" stroke-width="2"/>
+    <path d="M48 28v30" stroke="#ffc83d" stroke-width="3.5" stroke-linecap="round"/>
+    <circle cx="48" cy="62" r="6" fill="#ffc83d"/>
+    <circle cx="0" cy="24" r="4" fill="#ffc83d"/>
+  </g>
+
+  <!-- lápis -->
+  <g transform="translate(232 176) rotate(-38)">
+    <rect x="-46" y="-8" width="72" height="16" rx="3" fill="#ffc83d"/>
+    <rect x="-46" y="-8" width="72" height="5" rx="2" fill="#ffe08a"/>
+    <rect x="-58" y="-8" width="14" height="16" rx="4" fill="#ff8a7d"/>
+    <rect x="-46" y="-8" width="6" height="16" fill="#c4d3ee"/>
+    <path d="M26 -8 46 0 26 8z" fill="#f4d7a8"/>
+    <path d="M39 -3 46 0 39 3z" fill="#14213d"/>
+  </g>
+
+  <!-- esferinhas e placas flutuando -->
+  <circle cx="470" cy="210" r="12" fill="url(#esferaAmarela)"/>
+  <circle cx="64" cy="210" r="9" fill="url(#esferaCoral)"/>
+  <circle cx="300" cy="140" r="8" fill="url(#esferaAzul)"/>
+  <path d="M86 92 108 104 86 116 64 104z" fill="#ffffff"/>
+  <path d="M64 104 86 116v5l-22-12z" fill="#c4d3ee"/>
+  <path d="M108 104 86 116v5l22-12z" fill="#a9bde3"/>
+  <path d="M470 330 488 340 470 350 452 340z" fill="#ffffff"/>
+  <path d="M452 340 470 350v4l-18-10z" fill="#c4d3ee"/>
+  <path d="M488 340 470 350v4l18-10z" fill="#a9bde3"/>
+  <path d="M40 330 56 339 40 348 24 339z" fill="#ffe08a"/>
+  <path d="M24 339 40 348v4l-16-9z" fill="#e8a516"/>
+  <path d="M56 339 40 348v4l16-9z" fill="#c98208"/>
+</svg>

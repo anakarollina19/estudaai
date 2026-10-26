@@ -37,7 +37,7 @@ $('authForm').addEventListener('submit', e => {
 });
 
 const MODES = {
-  login: { title: 'Bem-vindo(a) de volta!', sub: 'Entre para continuar seus estudos 💜', submit: 'Entrar', pass: 'current-password' },
+  login: { title: 'Bem-vindo(a) de volta!', sub: 'Entre para continuar seus estudos 💙', submit: 'Entrar', pass: 'current-password' },
   signup: {
     title: 'Crie sua conta',
     sub: cloudEnabled() ? 'Leva 1 minuto. Suas aulas ficam salvas na nuvem e abrem em qualquer aparelho ☁️' : 'Leva 1 minuto. Suas aulas ficam salvas neste aparelho 🌱',

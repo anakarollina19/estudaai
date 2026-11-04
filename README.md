@@ -1,16 +1,57 @@
-# 📚 EstudaAI
+<p align="center">
+  <img src="docs/banner.png" alt="EstudaAI: grave a aula, fotografe o quadro e estude com IA" width="100%">
+</p>
 
-[![Testes](https://github.com/anakarollina19/estudaai/actions/workflows/tests.yml/badge.svg)](https://github.com/anakarollina19/estudaai/actions/workflows/tests.yml)
-![Python](https://img.shields.io/badge/análise-Python%20%7C%20pandas%20%7C%20scikit--learn-1e6bff)
-![LLM](https://img.shields.io/badge/IA-agente%20com%20tool%20use%20%7C%20RAG-ffb020)
+<p align="center">
+  <a href="https://github.com/anakarollina19/estudaai/actions/workflows/tests.yml"><img src="https://github.com/anakarollina19/estudaai/actions/workflows/tests.yml/badge.svg" alt="Testes"></a>
+  <img src="https://img.shields.io/badge/análise-Python%20·%20pandas%20·%20scikit--learn-1e6bff" alt="Análise em Python">
+  <img src="https://img.shields.io/badge/IA-agente%20com%20tool%20use%20·%20RAG-ffb020" alt="Agente e RAG">
+  <img src="https://img.shields.io/badge/roda%20no-navegador-22b07d" alt="Roda no navegador">
+</p>
 
-**Assistente de estudos com IA** que transforma aulas (anotações, fotos do quadro e áudio) em resumos, slides e flashcards, com um **agente de IA que usa ferramentas** e um **RAG avaliado estatisticamente** para responder dúvidas a partir das próprias aulas do estudante.
+<h3 align="center">
+  <a href="https://anakarollina19.github.io/estudaai/">▶️ Abrir o app</a> ·
+  <a href="analise/analise_rag.ipynb">📊 Ver a análise</a> ·
+  <a href="#avaliar">⏱️ Avaliar em 3 min</a> ·
+  <a href="#resultados">📈 Resultados</a>
+</h3>
 
-**▶️ App online:** https://anakarollina19.github.io/estudaai/ · **📊 Análise:** [`analise/analise_rag.ipynb`](analise/analise_rag.ipynb)
+<table align="center">
+  <tr>
+    <td align="center"><h2>97%</h2>de acerto no top 5<br>com embeddings</td>
+    <td align="center"><h2>+42 p.p.</h2>em perguntas feitas<br>com outras palavras</td>
+    <td align="center"><h2>p &lt; 0,0001</h2>diferença com<br>significância estatística</td>
+    <td align="center"><h2>11</h2>ferramentas<br>do agente de IA</td>
+    <td align="center"><h2>32</h2>testes automáticos<br>a cada push</td>
+  </tr>
+</table>
 
-![Demonstração da interface](docs/demo.gif)
+**Assistente de estudos com IA** que transforma aulas (anotações, fotos do quadro e áudio) em resumos, slides e flashcards, com um **agente de IA que usa ferramentas** e um **RAG avaliado estatisticamente** para responder dúvidas a partir das próprias aulas do estudante. Tudo roda no navegador, sem instalar nada.
+
+<p align="center">
+  <img src="docs/demo.gif" alt="Demonstração: login, tela Início, anotação em folha de caderno, mapa mental, flashcards, slides, busca nas aulas e o agente de IA trabalhando" width="92%">
+</p>
+
+### 🖼️ Telas
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/telas/inicio.png" alt="Tela Início com meta do dia"><p align="center"><b>Início</b> · meta do dia, sequência e atalhos</p></td>
+    <td width="50%"><img src="docs/telas/agente.png" alt="Agente de IA chamando ferramentas"><p align="center"><b>Agente</b> · decide e executa as ferramentas</p></td>
+  </tr>
+  <tr>
+    <td><img src="docs/telas/perguntar.png" alt="Pergunte às aulas com fontes"><p align="center"><b>Pergunte às aulas</b> · RAG com as fontes</p></td>
+    <td><img src="docs/telas/anotacoes.png" alt="Anotação em folha de caderno"><p align="center"><b>Anotações</b> · folha de caderno e captura simultânea</p></td>
+  </tr>
+  <tr>
+    <td><img src="docs/telas/slides.png" alt="Slides interativos"><p align="center"><b>Slides</b> · tópicos revelados um a um, quiz e PDF</p></td>
+    <td><img src="docs/telas/login.png" alt="Tela de login"><p align="center"><b>Login</b> · contas na nuvem com Supabase</p></td>
+  </tr>
+</table>
 
 ---
+
+<a id="avaliar"></a>
 
 ## ⏱️ Para quem vai avaliar (3 minutos)
 
@@ -133,6 +174,8 @@ eval/
   index.html              avaliação rápida no navegador
 tests/                    32 testes + runner do CI (Playwright)
 supabase/setup.sql        tabelas, RLS e funções de admin
+docs/                     banner, GIF e prints do README
+scripts/record_demo.py    regrava o GIF, os prints e o banner (Playwright)
 ```
 
 ## Como rodar

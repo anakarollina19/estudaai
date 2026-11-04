@@ -1,52 +1,81 @@
 # 📚 EstudaAI
 
 [![Testes](https://github.com/anakarollina19/estudaai/actions/workflows/tests.yml/badge.svg)](https://github.com/anakarollina19/estudaai/actions/workflows/tests.yml)
+![Python](https://img.shields.io/badge/análise-Python%20%7C%20pandas%20%7C%20scikit--learn-1e6bff)
+![LLM](https://img.shields.io/badge/IA-agente%20com%20tool%20use%20%7C%20RAG-ffb020)
 
-Assistente de estudos com IA que roda **direto no navegador**: sem etapa de build, sem framework e com plano B offline para quase tudo.
+**Assistente de estudos com IA** que transforma aulas (anotações, fotos do quadro e áudio) em resumos, slides e flashcards, com um **agente de IA que usa ferramentas** e um **RAG avaliado estatisticamente** para responder dúvidas a partir das próprias aulas do estudante.
 
-Transforme aulas (anotações, fotos do quadro, áudio e vídeos) em **resumos, mapas mentais, flashcards, slides e PDFs**, converse com um **agente de IA que usa ferramentas** e pergunte às suas próprias aulas com **RAG**, recebendo as fontes de cada resposta.
-
-- 📝 **Várias anotações por aula**, cada uma vira um tópico do resumo, mapa e slides
-- 🤖 **Agente com tool use** (Claude) que organiza aulas, cria revisões e gera slides
-- 🔎 **RAG nas suas aulas** com BM25, embeddings no navegador ou busca híbrida, com avaliação
-- 🔥 **Gamificação**: XP, níveis, sequência de dias e flashcards que viram em 3D
-- ☁️ **Contas na nuvem** (Supabase) com painel de admin, ou tudo local no aparelho
-
-**▶️ App online:** https://anakarollina19.github.io/estudaai/ (clique em **“✨ Experimentar com aulas de exemplo”**; na aba **🤖 Agente**, **“▶️ Ver uma demonstração”** mostra o agente trabalhando sem precisar de chave)
+**▶️ App online:** https://anakarollina19.github.io/estudaai/ · **📊 Análise:** [`analise/analise_rag.ipynb`](analise/analise_rag.ipynb)
 
 ![Demonstração da interface](docs/demo.gif)
 
-## Sumário
+---
 
-- [Funcionalidades](#funcionalidades)
-- [Arquitetura](#arquitetura)
-- [Avaliação do RAG](#avaliação-do-rag)
-- [Estrutura do projeto](#estrutura-do-projeto)
-- [Como rodar](#como-rodar)
-- [Contas na nuvem e admin](#contas-na-nuvem-e-admin)
-- [Testes](#testes)
-- [Tecnologias](#tecnologias)
-- [Limitações e próximos passos](#limitações-e-próximos-passos)
+## ⏱️ Para quem vai avaliar (3 minutos)
+
+1. **Abra o [app](https://anakarollina19.github.io/estudaai/)** e clique em **“✨ Experimentar com aulas de exemplo”** (não precisa de conta nem de chave).
+2. Na aba **🤖 Agente**, clique em **“▶️ Ver uma demonstração”**: o agente lista as aulas, cria pastas, move aulas, busca no conteúdo e escreve uma revisão, **executando as ferramentas de verdade**.
+3. Na aba **🔎 Pergunte às aulas**, pergunte *“como uma célula vira duas iguais?”* e troque a busca entre **palavras**, **significado** e **híbrida**.
+4. Leia o **[notebook de análise](analise/analise_rag.ipynb)**: avaliação de 127 perguntas com intervalos de confiança, testes de hipótese, experimentos e análise de erros.
+5. Código principal: [loop do agente](src/agent/agent.js) · [ferramentas](src/agent/tools.js) · [busca BM25/RRF](src/rag/search.js) · [embeddings](src/rag/semantic.js) · [testes](tests/).
+
+---
+
+## O problema e a solução
+
+Estudantes juntam material espalhado (caderno, fotos do quadro, áudios) e perdem tempo para revisar. O EstudaAI organiza tudo por aula e usa IA para **resumir, gerar material de estudo e responder dúvidas citando de onde veio cada resposta**.
+
+O ponto crítico é a **recuperação**: se o RAG não encontra o trecho certo nas anotações, o LLM responde errado ou inventa. Por isso a busca foi tratada como um problema de ciência de dados: medida, comparada estatisticamente e ajustada com base em evidência.
+
+## Duas frentes do projeto
+
+| 📊 Base: ciência de dados | 🤖 Em alta: LLMs e agentes |
+|---|---|
+| Conjunto de avaliação com **127 perguntas** (literais, paráfrases e sem resposta) e gabarito com respostas múltiplas | **Agente com tool use** (Claude): 11 ferramentas com JSON Schema, loop com limite de passos e erros devolvidos ao modelo |
+| **Intervalos de confiança por bootstrap**, **McNemar exato** e **permutação pareada** com correção de **Holm** | **RAG** com citação das fontes e três recuperadores: BM25, embeddings no navegador e híbrida (RRF) |
+| Experimentos: granularidade dos trechos × custo de contexto, curva Hit@k, grade de hiperparâmetros do BM25 | LLM com **plano B offline** (resumo extrativo, quiz e slides sem IA) |
+| **Detecção de pergunta sem resposta** com curva ROC (AUC ≈ 0,83) e escolha de limiar | **Whisper** e **OCR** rodando no navegador, sem servidor |
+| Porta em Python **verificada contra o app** (mesmos números) e análise de erros que **encontrou um bug** | Agente testável: o modelo é injetado, então os testes usam um LLM falso |
+
+## Resultados
+
+Avaliação da recuperação em **109 perguntas com resposta** (18 aulas de 9 matérias), com IC de 95% por bootstrap:
+
+| Método | Hit@1 | Hit@5 [IC 95%] | Hit@5 em paráfrases | MRR |
+|---|---:|---:|---:|---:|
+| BM25 (palavras) | 70% | 76% [68–84%] | 53% | 0,72 |
+| Embeddings (significado) | 75% | **97%** [94–100%] | **95%** | 0,85 |
+| Híbrida (RRF) | **78%** | 95% [90–98%] | 89% | **0,86** |
+
+![Hit@5 por tipo de pergunta](analise/figuras/hit5_por_tipo.png)
+
+**O que os dados mostram**
+- Nas perguntas **literais**, os três métodos acertam 100%. A diferença está toda nas **paráfrases**: **45% delas não têm nenhuma palavra em comum** com o trecho certo, e aí a busca por palavras não tem como achar.
+- Embeddings e híbrida ganham do BM25 com **significância estatística** (McNemar exato, p < 0,0001 após Holm). Entre eles a diferença **não é significativa** (p = 0,5).
+- Ajustar k1 e b do BM25 muda o MRR só de 0,718 para 0,724: o problema é de vocabulário, não de calibração.
+- Trechos por **tópico** (o que o app usa) são o melhor equilíbrio: a aula inteira acerta 2 a 3 pontos a mais, mas manda **2,7× mais texto** ao LLM.
+- O score do melhor trecho detecta perguntas **sem resposta** com AUC ≈ 0,83: um limiar de similaridade ~0,41 permite ao app dizer “não encontrei nas suas aulas” em vez de deixar o LLM inventar.
+- A porta em Python revelou um **bug nas stopwords** do app (palavras com acento nunca eram removidas). O efeito medido foi nulo, mas o bug foi corrigido e ganhou teste.
+
+**Decisão tomada a partir dos dados:** a busca híbrida tem o melhor 1º resultado e 95% de top 5, então é a candidata a padrão quando o modelo de embeddings estiver carregado, com o BM25 como plano B offline.
+
+📓 Tudo isso, com gráficos, testes estatísticos, análise de erros e limitações, está em [`analise/analise_rag.ipynb`](analise/analise_rag.ipynb).
+
+---
 
 ## Funcionalidades
 
 | Área | O que faz |
 |---|---|
-| 🤖 **Agente de estudos** | Recebe pedidos em linguagem natural ("organize minhas aulas por matéria e crie slides da aula de hoje") e decide sozinho quais ferramentas chamar, num loop de *tool use* com o Claude. Cada passo aparece na tela. |
-| 🔎 **Pergunte às suas aulas (RAG)** | Divide anotações, transcrições e textos das fotos em trechos, busca por **palavras (BM25)**, por **significado (embeddings)** ou **híbrida**, e envia os melhores ao LLM, que responde **citando as fontes** `[1]`, `[2]`. |
-| 📊 **Avaliação do RAG** | 30 perguntas com respostas esperadas medem Hit@k e MRR de cada método de busca ([resultados abaixo](#avaliação-do-rag)). |
-| 📷 **Fotos do quadro** | Até 100 por aula, guardadas no IndexedDB. OCR no navegador (Tesseract.js, português e inglês, com um worker reaproveitado para lotes) + resumo. Dá para selecionar várias e **juntar numa colagem em 1 slide** com o resumo de todas. |
-| 🎤 **Áudio** | Transcrição ao vivo (Web Speech API), gravação e transcrição de arquivos de qualquer formato comum (mp3, m4a, opus do WhatsApp, wav...) com **Whisper rodando no navegador** (dois modelos grátis, sem chave) ou com o Whisper da OpenAI. As transcrições ficam embaixo do áudio para corrigir, copiar ou colar na anotação. |
-| ⏺ **Captura simultânea** | Barra fixa em todas as abas: gravar a aula, tirar foto, ditar e colar (Ctrl+V de imagens) enquanto escreve. Fotos tiradas durante a gravação ficam marcadas com o minuto do áudio, e o cursor de quem digita não se perde. |
-| 📓 **Folhas** | Cada anotação pode ser folha lisa, de caderno (pautada com margem) ou quadriculada. |
-| 🎙️ **Comandos de voz** | "nova aula", "nova anotação", "resumo", "slides", "pesquisar …", "vídeo sobre …", "renomear para …". Avisa quando o microfone está bloqueado. |
-| ✨ **Resumo, mapa mental e flashcards** | Com LLM, ou offline por resumo extrativo (frequência de palavras-chave). Flashcards em modo estudo: o cartão vira em 3D, você marca "sabia" ou "ainda não" e revisa só os que faltaram. |
-| 🔥 **Gamificação** | XP por estudar (resumo, mapa, flashcards, quiz, anotações), níveis, sequência de dias seguidos e confete nas conquistas. |
-| 🎞️ **Slides interativos** | Tópicos revelados um a um, tela cheia, imagens, "explique este slide", quiz e PDF. |
-| 📝 **Anotações** | Várias anotações por aula (abas), cada uma marcada para entrar ou não no resumo, mapa, slides e PDF. |
-| 🗂️ **Organização** | Pastas, aulas com nome e data editáveis (no título ou pelo ✏️ da barra lateral), mover, excluir, busca, backup e salvar numa pasta do computador. |
-| 👤 **Contas** | Login com "Lembrar de mim", senha salva pelo navegador e "Esqueci a senha". Com Supabase: aulas sincronizadas entre aparelhos, "Esqueci a senha" e painel 🛡️ Admin para bloquear ou excluir contas. |
-| 🖍️ **Quadro branco**, ▶️ **YouTube** (abre um link ou pesquisa vídeos) e 🌐 **Google** ao lado das notas. |
+| 🤖 **Agente de estudos** | Pedidos em linguagem natural (“organize minhas aulas por matéria e crie slides”); o modelo escolhe e encadeia ferramentas. Cada passo aparece na tela. |
+| 🔎 **Pergunte às aulas (RAG)** | Busca por palavras, por significado ou híbrida nos trechos das anotações, transcrições e fotos; a resposta cita as fontes `[1]`, `[2]`. |
+| 📷 **Fotos do quadro** | Até 100 por aula (IndexedDB), OCR no navegador e resumo; dá para juntar várias numa colagem em 1 slide. |
+| 🎤 **Áudio** | Ditado ao vivo, gravação e transcrição de mp3, m4a, opus do WhatsApp... com Whisper no navegador (grátis) ou da OpenAI. |
+| ⏺ **Captura simultânea** | Gravar, fotografar, ditar e colar enquanto escreve; fotos tiradas durante a gravação ficam marcadas com o minuto do áudio. |
+| ✨ **Material de estudo** | Resumo, mapa mental, flashcards em 3D, slides interativos com quiz e PDF, com ou sem IA. |
+| 🏠 **Início e gamificação** | Meta do dia, sequência de dias, XP e níveis. |
+| ☁️ **Contas** | Supabase com Row Level Security e painel de admin, ou tudo local no aparelho. |
 
 ## Arquitetura
 
@@ -57,136 +86,87 @@ flowchart LR
   VOZ[capture/speech<br/>comandos de voz] --> ACT
   ACT --> MOD[Módulos de interface<br/>library, slides, ocr, summary...]
   MOD --> ST[core/store<br/>pastas e aulas]
-  ST --> LS[(localStorage)]
+  ST --> LS[(localStorage / Supabase)]
   AG[agent/agent<br/>loop de tool use] <-->|tool_use / tool_result| C[Claude API]
   AG --> T[agent/tools<br/>11 ferramentas]
   T --> ST
-  T --> RAG[rag/search<br/>chunking + BM25]
-  RAG --> ST
+  T --> RAG[rag/search + semantic<br/>BM25, embeddings, RRF]
   ASK[rag/ask] --> RAG
   ASK -->|trechos + pergunta| C
+  RAG -. mesma lógica .-> PY[analise/rag_eval.py<br/>avaliação em Python]
 ```
 
 **Decisões de projeto**
-- **Uma ação, vários caminhos.** Cada módulo registra suas ações por nome (`slides.build`, `library.newFolder`...). Botões (`data-action`), comandos de voz e o agente chamam exatamente o mesmo código.
-- **Regras separadas da interface.** `core/store.js` (dados), `rag/search.js` (busca) e `text/nlp.js` (texto) são funções puras, sem DOM. É isso que os testes cobrem.
-- **Sem acoplamento entre telas.** Os módulos conversam por eventos (`lesson:open`, `tab:show`) em vez de se importarem uns aos outros.
-- **Sempre há um plano B offline.** Sem chave de IA, resumo, slides e quiz usam processamento de texto local.
+- **Uma ação, vários caminhos:** botões, comandos de voz e o agente chamam o mesmo código, registrado por nome (`slides.build`, `library.newFolder`...).
+- **Regras separadas da interface:** dados, busca e texto são funções puras, cobertas por testes.
+- **Agente testável:** o loop recebe o modelo por injeção (`callModel`); os testes usam um LLM falso e a demonstração usa um roteiro gravado, ambos executando as ferramentas de verdade.
+- **Medir o que roda em produção:** os embeddings da análise são gerados pelo próprio app (Transformers.js, modelo quantizado), e o BM25 em Python reproduz exatamente os números do app.
 
 ### Como o agente funciona ([`src/agent/agent.js`](src/agent/agent.js))
-1. A mensagem do estudante vai para o Claude junto com as ferramentas (nome, descrição e JSON Schema, em [`tools.js`](src/agent/tools.js)).
+1. A mensagem vai ao Claude com as ferramentas (nome, descrição e JSON Schema, em [`tools.js`](src/agent/tools.js)).
 2. O modelo responde com blocos `tool_use`; o app executa cada ferramenta sobre os dados do estudante.
-3. Os resultados voltam como `tool_result` e o loop continua até o modelo responder só com texto (limite de 10 passos). Ferramenta desconhecida ou com erro vira uma mensagem para o modelo, não uma falha.
-
-O loop recebe o modelo por injeção (`callModel`), então os testes usam um modelo falso e a demonstração usa um roteiro gravado, ambos executando as ferramentas de verdade.
+3. Os resultados voltam como `tool_result` até o modelo responder só com texto (máx. 10 passos). Ferramenta desconhecida ou com erro vira mensagem para o modelo, não falha.
 
 ### Como o RAG funciona ([`src/rag/`](src/rag/))
-1. **Chunking:** notas divididas por tópico (`# título`) e parágrafo, em trechos de até 700 caracteres com 100 de sobreposição; cada foto do quadro vira um trecho.
-2. **Recuperação**, em três modos:
-   - **Palavras:** BM25 (k1 = 1,2; b = 0,75) com normalização de acentos e stopwords em português ([`search.js`](src/rag/search.js)).
-   - **Significado:** embeddings do modelo multilíngue `paraphrase-multilingual-MiniLM-L12-v2`, rodando **no próprio navegador** com Transformers.js, e similaridade do cosseno ([`semantic.js`](src/rag/semantic.js)).
-   - **Híbrida:** junta os dois rankings com *Reciprocal Rank Fusion* (c = 60).
-3. **Geração:** os 5 melhores trechos vão numerados ao Claude, que só pode usá-los e deve citar as fontes. Cada fonte na tela abre a aula de origem.
-
-## Avaliação do RAG
-
-Para escolher o método de busca com dados e não no achismo, montei um conjunto de avaliação ([`eval/dataset.js`](eval/dataset.js)): **8 aulas** de Biologia, Química, História e Física e **30 perguntas**, cada uma com a aula e o trecho que contém a resposta.
-- **16 literais** usam as palavras da aula ("Quais são as fases da mitose?").
-- **14 paráfrases** dizem a mesma coisa com outras palavras ("Como uma célula vira duas iguais?").
-
-Métricas: **Hit@k** é a fração das perguntas em que o trecho certo veio entre os *k* primeiros; **MRR** é a média de 1/posição do trecho certo. Como o RAG envia 5 trechos à IA, **Hit@5** é a chance de a IA receber a resposta.
-
-| Método | Hit@1 | Hit@3 | Hit@5 | MRR | Hit@5 nas paráfrases |
-|---|---:|---:|---:|---:|---:|
-| BM25 (palavras) | 77% | 80% | 83% | 0,78 | 64% |
-| Embeddings (significado) | **83%** | **97%** | **100%** | **0,91** | **100%** |
-| Híbrida (RRF) | **83%** | **97%** | 97% | 0,89 | 93% |
-
-**O que os números mostram**
-- O BM25 é perfeito quando o aluno usa as palavras da aula (100% nas literais), mas perde **mais de um terço das paráfrases**: sem palavras em comum, ele não encontra nada.
-- Os embeddings resolvem as paráfrases (64% → 100% de Hit@5), ao custo de baixar um modelo de ~120 MB e de errar um pouco mais a 1ª posição nas literais (87,5% contra 100%).
-- A híbrida mantém 100% nas literais e quase todo o ganho nas paráfrases, mas, **neste conjunto**, não superou os embeddings sozinhos.
-- Por isso o app deixa a busca por palavras como padrão (instantânea e offline) e oferece as outras duas como opção. Com só 30 perguntas a diferença entre embeddings e híbrida (1 pergunta) não é conclusiva; o próximo passo é aumentar o conjunto.
-
-Para reproduzir, rode o servidor e abra http://localhost:8080/eval/. Um teste automatizado trava o BM25 em pelo menos 80% de Hit@5, para nenhuma mudança piorar a busca sem ninguém perceber.
+1. **Chunking** por tópico (`# título`) e parágrafo; cada foto do quadro vira um trecho.
+2. **Recuperação:** BM25 (k1 = 1,2; b = 0,75) com normalização de acentos; embeddings `paraphrase-multilingual-MiniLM-L12-v2` no navegador; ou híbrida com *Reciprocal Rank Fusion* (c = 60).
+3. **Geração:** os 5 melhores trechos vão numerados ao Claude, que só pode usá-los e deve citar as fontes.
 
 ## Estrutura do projeto
 
 ```
-index.html            marcação (sem JavaScript inline)
-css/styles.css        tema claro/escuro e layout responsivo
+index.html, css/          interface (sem framework, sem build)
 src/
-  main.js             ponto de entrada: liga data-action às ações
-  core/               actions, events, store (dados), dom, files, util
-  text/nlp.js         normalização, frases, palavras-chave, tópicos, resumo offline
-  ai/claude.js        cliente da API do Claude
-  agent/              loop do agente + ferramentas
-  rag/                busca BM25, embeddings, híbrida (RRF) + aba "Pergunte às aulas"
-  capture/            OCR das fotos, áudio/Whisper, voz
-  study/              resumo, mapa mental, flashcards, PDF
-  slides/slides.js    slides interativos
-  library.js          pastas, aulas, notas e backup
-  cloud/              Supabase: login, sincronização e painel de admin
-  board.js  web.js  tabs.js  auth.js  demo.js
-supabase/setup.sql    tabelas, RLS e funções de admin
-docs/demo.gif         demonstração do README
-scripts/
-  record_demo.py      grava o docs/demo.gif (Playwright)
-  serve.ps1           servidor local para Windows
-eval/                 conjunto de avaliação, métricas e página de resultados
-tests/                31 testes (texto, RAG, avaliação, store e agente) + runner do CI
-.github/workflows/    testes automáticos a cada push
+  agent/                  loop do agente + 11 ferramentas
+  rag/                    BM25, embeddings, híbrida (RRF) e aba "Pergunte às aulas"
+  ai/                     cliente do Claude e Transformers.js
+  capture/                OCR, áudio/Whisper, voz, colar imagens
+  study/  slides/         resumo, mapa, flashcards, PDF, XP, slides
+  core/  cloud/           estado, eventos, ações; Supabase
+analise/
+  analise_rag.ipynb       📊 notebook de avaliação (Python)
+  rag_eval.py             porta da busca do app + métricas e testes estatísticos
+  figuras/                gráficos usados no README
+  exportar_embeddings.html, servidor_export.py   gera os embeddings com o modelo do app
+eval/
+  dados/                  corpus (18 aulas) e 127 perguntas com gabarito
+  index.html              avaliação rápida no navegador
+tests/                    32 testes + runner do CI (Playwright)
+supabase/setup.sql        tabelas, RLS e funções de admin
 ```
 
 ## Como rodar
 
-Os módulos JavaScript precisam ser servidos por HTTP (abrir o arquivo direto não funciona):
+**App** (os módulos JavaScript precisam ser servidos por HTTP):
 
 ```bash
-# Windows, sem instalar nada
-powershell -ExecutionPolicy Bypass -File scripts/serve.ps1
-# ou, com Python
-python -m http.server 8080
+python -m http.server 8080          # ou, no Windows sem Python: powershell -File scripts/serve.ps1
 ```
 
-Abra http://localhost:8080. Para os recursos de IA, clique em **⚙️ Chave de IA** e cole uma chave da [API do Claude](https://console.anthropic.com/) (e, para transcrever arquivos de áudio, uma da OpenAI). O app testa a chave na hora e diz o motivo se ela não funcionar. As chaves ficam só no seu navegador.
+Abra http://localhost:8080. Para os recursos de IA, clique em **⚙️ Chave de IA** e cole uma chave da [API do Claude](https://console.anthropic.com/); sem chave, o app usa o modo offline.
 
-### Gravar o GIF da demonstração
+**Análise:**
 
 ```bash
-pip install playwright pillow && python -m playwright install chromium
-python -m http.server 8080            # em outro terminal
-python scripts/record_demo.py         # gera docs/demo.gif
+python -m venv .venv && .venv\Scripts\activate      # Linux/macOS: source .venv/bin/activate
+pip install -r analise/requirements.txt
+jupyter nbconvert --to notebook --execute --inplace analise/analise_rag.ipynb
 ```
 
-## Contas na nuvem e admin
+**Testes:** com o servidor rodando, abra http://localhost:8080/tests/. São 32 testes (texto, RAG, métricas de avaliação, dados e agente), que também rodam a cada push no GitHub Actions num Chrome sem janela.
 
-Sem configuração, as contas e aulas ficam só no navegador de cada aparelho. Para ter login de verdade, aulas sincronizadas e painel de admin:
-
-1. Crie um projeto grátis em [supabase.com](https://supabase.com).
-2. No **SQL Editor**, rode [`supabase/setup.sql`](supabase/setup.sql) (tabelas, regras de acesso por linha e funções de admin).
-3. Copie a **Project URL** e a **anon key** (Project Settings → API) para [`src/cloud/config.js`](src/cloud/config.js).
-4. Crie sua conta no app e torne-se admin: `update public.profiles set is_admin = true where email = 'seu-email';`
-
-As permissões são checadas no banco (Row Level Security e funções `admin_*`), não só na interface. A chave de IA nunca vai para a nuvem; fotos e quadro branco continuam no aparelho.
-
-## Testes
-
-Com o servidor rodando, abra http://localhost:8080/tests/. São 31 testes sem dependências, cobrindo:
-- **texto:** acentos, stopwords, divisão em frases, tópicos e resumo offline;
-- **RAG:** chunking com sobreposição, ranking BM25, busca sem acentos, fusão RRF e montagem do prompt com fontes;
-- **avaliação:** Hit@k, MRR, consistência do conjunto de perguntas e uma trava contra piora do BM25;
-- **dados:** criar, mover e excluir aulas e pastas sem duplicar;
-- **agente:** execução de ferramentas, ferramenta desconhecida, limite de passos e formato das especificações.
-
-No GitHub, o workflow [`tests.yml`](.github/workflows/tests.yml) roda os mesmos testes num Chrome sem janela (Playwright) a cada push.
+**Contas na nuvem:** crie um projeto no [Supabase](https://supabase.com), rode [`supabase/setup.sql`](supabase/setup.sql) e coloque a URL e a chave pública em [`src/cloud/config.js`](src/cloud/config.js). As permissões são checadas no banco (Row Level Security), não só na interface.
 
 ## Tecnologias
-JavaScript (ES modules) · Claude API (tool use) · Supabase (Auth + Postgres) · Transformers.js (embeddings) · Tesseract.js · jsPDF · Web Speech API · MediaRecorder · File System Access API · Canvas · Playwright + GitHub Actions
+
+**IA:** Claude API (tool use) · Transformers.js (embeddings e Whisper no navegador) · Tesseract.js (OCR)
+**Dados:** Python · pandas · NumPy · SciPy · scikit-learn · matplotlib · Jupyter
+**App:** JavaScript (ES modules) · Supabase (Auth + Postgres + RLS) · jsPDF · Web Speech API · IndexedDB
+**Qualidade:** testes no navegador · Playwright · GitHub Actions
 
 ## Limitações e próximos passos
-- **Backend em Python (FastAPI)** para guardar a chave da API no servidor e rodar o agente e o RAG lá.
-- **Conjunto de avaliação maior** (com perguntas reais de estudantes) e avaliação também das respostas geradas, não só da recuperação.
-- **Guardar os embeddings** das aulas em IndexedDB, para não recalcular a cada busca.
-- Fotos e quadro branco ainda ficam só no aparelho; próximo passo é guardá-los no Supabase Storage.
-- Sem nuvem configurada, os dados ficam no navegador (`localStorage`, ~5 MB).
+
+- **Avaliação:** as perguntas foram escritas por quem desenvolveu o projeto (risco de viés) e o corpus é limpo. Próximos passos: perguntas reais de estudantes, anotações com erros de OCR e avaliação da **resposta** do LLM (fidelidade às fontes) com um LLM como juiz.
+- **Recuperação:** tornar a híbrida o padrão, aplicar o limiar de “não encontrei” e testar *query rewriting* e um reranker nos erros que sobraram (perguntas que exigem raciocínio, não vocabulário).
+- **Arquitetura:** a chave de IA fica no navegador do estudante; para produção, um backend (FastAPI) guardaria a chave e rodaria o agente.
+- Fotos e quadro branco ficam só no aparelho; o próximo passo é o Supabase Storage.

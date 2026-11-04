@@ -9,6 +9,10 @@ test('tokenize ignora stopwords e palavras curtas', () => {
   equal(tokenize('A célula é a unidade da vida'), ['celula', 'unidade', 'vida']);
 });
 
+test('tokenize remove stopwords acentuadas (são, também, está)', () => {
+  equal(tokenize('Elas são também muito boas e está certo'), ['boas', 'certo']);
+});
+
 test('sentences não duplica ponto em linhas sem pontuação', () => {
   const s = sentences('# Título\nAs plantas convertem luz solar em energia\nO processo ocorre nos cloroplastos das folhas.');
   equal(s, ['As plantas convertem luz solar em energia.', 'O processo ocorre nos cloroplastos das folhas.']);

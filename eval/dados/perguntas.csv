@@ -1,0 +1,128 @@
+id;tipo;pergunta;gabarito
+1;literal;Quais são as fases da mitose?;bio-divisao:prófase
+2;literal;O que a meiose gera?;bio-divisao:gametas
+3;literal;Onde acontece a fotossíntese?;bio-foto:cloroplastos
+4;literal;O que é a clorofila?;bio-foto:clorofila
+5;literal;Onde ocorre a respiração celular?;bio-foto:mitocôndrias
+6;literal;O que é uma ligação iônica?;qui-ligacoes:transferência
+7;literal;Como funciona a ligação covalente?;qui-ligacoes:compartilham
+8;literal;O que mede o pH?;qui-ph:acidez
+9;literal;O que forma a neutralização de um ácido com uma base?;qui-ph:sal e água
+10;literal;Onde começou a Revolução Industrial?;his-industrial:Inglaterra
+11;literal;Quais foram as consequências da Revolução Industrial?;his-industrial:Êxodo rural
+12;literal;Quando foi a queda da Bastilha?;his-francesa:1789
+13;literal;Qual era o lema da Revolução Francesa?;his-francesa:fraternidade
+14;literal;O que diz a segunda lei de Newton?;fis-newton:massa vezes a aceleração
+15;literal;O que é energia cinética?;fis-energia:movimento
+16;literal;Do que depende a energia potencial gravitacional?;fis-energia:altura
+17;parafrase;Como uma célula vira duas iguais?;bio-divisao:idênticas
+18;parafrase;Como se formam os espermatozoides e óvulos?;bio-divisao:gametas
+19;parafrase;Como as plantas fazem comida usando o sol?;bio-foto:luz solar
+20;parafrase;Como o corpo tira energia do açúcar?;bio-foto:ATP
+21;parafrase;Por que o sal de cozinha se forma?;qui-ligacoes:NaCl
+22;parafrase;Por que os metais conduzem eletricidade?;qui-ligacoes:mar de elétrons
+23;parafrase;O estômago é ácido ou básico?;qui-ph:suco gástrico
+24;parafrase;Por que as pessoas saíram do campo para as cidades?;his-industrial:Êxodo rural | geo-populacao:êxodo rural
+25;parafrase;Como surgiram os sindicatos?;his-industrial:sindicais
+26;parafrase;Por que o povo francês estava revoltado com o rei?;his-francesa:privilégios
+27;parafrase;Por que um passageiro é jogado para frente quando o ônibus freia?;fis-newton:inércia
+28;parafrase;O que acontece quando empurro uma parede?;fis-newton:reação
+29;parafrase;Um carro mais rápido tem mais energia?;fis-energia:velocidade
+30;parafrase;A energia pode acabar ou sumir?;fis-energia:não é criada nem destruída
+31;literal;Qual é a primeira lei de Mendel?;bio-genetica:par de fatores
+32;literal;Qual a proporção no cruzamento de dois heterozigotos?;bio-genetica:3 dominantes para 1 recessivo
+33;literal;Com quem a adenina pareia no DNA?;bio-genetica:adenina pareia com a timina
+34;literal;Quando o alelo recessivo aparece?;bio-genetica:dose dupla
+35;parafrase;Que planta Mendel usou nos experimentos?;bio-genetica:ervilhas
+36;parafrase;Por que pais de olhos castanhos podem ter um filho de olhos claros?;bio-genetica:dose dupla
+37;parafrase;Qual é o formato da molécula que guarda a informação genética?;bio-genetica:dupla hélice
+38;literal;Quantas ligações o carbono faz?;qui-organica:quatro ligações
+39;literal;O que são hidrocarbonetos?;qui-organica:apenas carbono e hidrogênio
+40;literal;Qual a diferença entre alcanos e alcenos?;qui-organica:ligação dupla
+41;literal;Que grupo caracteriza os álcoois?;qui-organica:hidroxila
+42;parafrase;Do que é feito o gás que chega pelos canos das casas?;qui-organica:gás natural
+43;parafrase;Por que o vinagre é azedo?;qui-organica:ácido acético
+44;parafrase;Qual substância vinda da cana é usada como combustível nos carros?;qui-organica:etanol
+45;literal;Quem proclamou a independência do Brasil?;his-brasil:Dom Pedro I
+46;literal;Quando foi assinada a Lei Áurea?;his-brasil:13 de maio de 1888
+47;literal;Qual era o principal produto da economia no Segundo Reinado?;his-brasil:café
+48;literal;Que leis vieram antes da abolição?;his-brasil:Ventre Livre
+49;parafrase;Em que data o Brasil deixou de ser colônia de Portugal?;his-brasil:7 de setembro de 1822
+50;parafrase;Quem acabou com a escravidão no país?;his-brasil:princesa Isabel
+51;parafrase;Por quanto tempo o último imperador ficou no poder?;his-brasil:quase cinquenta anos
+52;literal;O que acontece na reflexão da luz?;fis-optica:ângulo de incidência
+53;literal;O que é refração?;fis-optica:desvio da luz
+54;literal;O que um prisma faz com a luz branca?;fis-optica:espectro
+55;parafrase;Por que um canudo parece torto dentro do copo?;fis-optica:lápis parece quebrado
+56;parafrase;Como se forma o arco-íris?;fis-optica:arco-íris
+57;parafrase;Por que eu vejo meu rosto no espelho?;fis-optica:volta
+58;literal;Qual é a forma da função afim?;mat-funcoes:f(x) = ax + b
+59;literal;Qual é o gráfico da função quadrática?;mat-funcoes:parábola
+60;literal;Como encontrar as raízes de uma equação de segundo grau?;mat-funcoes:Bhaskara
+61;literal;Quando a função afim é crescente?;mat-funcoes:crescente
+62;parafrase;Quando a curva em formato de U tem um ponto mais baixo?;mat-funcoes:ponto mínimo
+63;parafrase;Onde o gráfico corta o eixo horizontal?;mat-funcoes:valores de x em que
+64;parafrase;Para que serve o delta?;mat-funcoes:discriminante
+65;literal;O que diz o teorema de Pitágoras?;mat-geometria:hipotenusa
+66;literal;Como calcular a área do triângulo?;mat-geometria:dividido por dois
+67;literal;Qual a soma dos ângulos internos de um triângulo?;mat-geometria:180 graus
+68;literal;Qual a fórmula da área do círculo?;mat-geometria:pi vezes o raio
+69;parafrase;Como descobrir o lado maior de um triângulo com um canto reto?;mat-geometria:hipotenusa
+70;parafrase;Quanto espaço ocupa uma pizza redonda?;mat-geometria:pi vezes o raio
+71;parafrase;Como calcular o tamanho de um terreno retangular?;mat-geometria:base vezes altura
+72;literal;Qual clima predomina na Amazônia?;geo-clima:equatorial
+73;literal;Onde fica a Caatinga?;geo-clima:semiárido
+74;literal;Quanto resta da Mata Atlântica?;geo-clima:12%
+75;literal;O que causa o aquecimento global?;geo-clima:retêm calor
+76;parafrase;Por que as árvores do Cerrado têm casca grossa?;geo-clima:adaptadas ao fogo
+77;parafrase;Em qual região chove pouco e de forma irregular?;geo-clima:chuvas escassas
+78;parafrase;Por que o planeta está esquentando?;geo-clima:aquecimento global
+79;literal;Quando a urbanização acelerou no Brasil?;geo-populacao:1950
+80;literal;O que é transição demográfica?;geo-populacao:queda da natalidade
+81;literal;Para onde foram os migrantes do êxodo rural?;geo-populacao:Sudeste
+82;parafrase;Por que há cada vez mais idosos no Brasil?;geo-populacao:envelhecendo
+83;parafrase;Onde mora a maioria dos brasileiros?;geo-populacao:vive em cidades
+84;parafrase;Por que tanta gente se mudou para São Paulo e Rio?;geo-populacao:em busca de emprego
+85;literal;O que é metáfora?;por-figuras:sem usar conectivo
+86;literal;O que é hipérbole?;por-figuras:exagero
+87;literal;O que é ironia?;por-figuras:contrário
+88;literal;Qual a diferença entre metáfora e comparação?;por-figuras:conectivos
+89;parafrase;Que figura é dizer 'morri de rir'?;por-figuras:exagero
+90;parafrase;Quando alguém fala 'que dia lindo' debaixo de chuva, que recurso está usando?;por-figuras:contrário
+91;parafrase;Que recurso aproxima duas ideias diferentes sem usar 'como'?;por-figuras:sem usar conectivo
+92;literal;O que são fatos sociais?;soc-classicos:fatos sociais
+93;literal;O que Marx analisou?;soc-classicos:luta de classes
+94;literal;O que Weber relacionou ao capitalismo?;soc-classicos:ética protestante
+95;parafrase;Quem falou sobre a exploração do trabalhador pelo patrão?;soc-classicos:mais-valia
+96;parafrase;Qual autor dizia que a sociedade pressiona o indivíduo a agir de certo jeito?;soc-classicos:coerção
+97;parafrase;Que pensador ligou religião e economia?;soc-classicos:ética protestante
+98;parafrase;Qual parte da célula produz energia?;bio-foto:mitocôndrias
+99;parafrase;Por que as folhas são verdes?;bio-foto:pigmento verde
+100;parafrase;O que diferencia as células reprodutivas das outras?;bio-divisao:metade dos cromossomos
+101;parafrase;Por que irmãos não nascem iguais?;bio-divisao:variabilidade genética
+102;parafrase;Como os átomos da água se mantêm unidos?;qui-ligacoes:compartilham
+103;parafrase;Um suco de limão tem pH maior ou menor que 7?;qui-ph:Abaixo de 7
+104;parafrase;Que invenção movia as primeiras fábricas?;his-industrial:máquina a vapor
+105;parafrase;Quem pagava os impostos na França antes da revolução?;his-francesa:terceiro estado
+106;parafrase;Por que a Bastilha era tão importante?;his-francesa:poder absoluto
+107;parafrase;Por que é mais difícil acelerar um caminhão do que uma bicicleta?;fis-newton:massa vezes a aceleração
+108;parafrase;Por que um vaso no alto de um prédio pode ser perigoso?;fis-energia:altura
+109;literal;O que é uma solução neutra?;qui-ph:7 é neutro
+110;sem_resposta;Quem pintou a Mona Lisa?;
+111;sem_resposta;Qual é a capital da Austrália?;
+112;sem_resposta;Como se calcula a derivada de uma função?;
+113;sem_resposta;O que foi a Guerra Fria?;
+114;sem_resposta;Qual a fórmula da velocidade média?;
+115;sem_resposta;O que é uma oração subordinada?;
+116;sem_resposta;Quais são os tipos de rochas?;
+117;sem_resposta;Quem foi Getúlio Vargas?;
+118;sem_resposta;O que é inflação?;
+119;sem_resposta;Como funciona o sistema imunológico?;
+120;sem_resposta;O que é um número primo?;
+121;sem_resposta;Qual a diferença entre vírus e bactéria?;
+122;sem_resposta;Quem escreveu Dom Casmurro?;
+123;sem_resposta;O que é a tabela periódica?;
+124;sem_resposta;O que foi a Revolução Russa?;
+125;sem_resposta;O que diz a lei de Ohm?;
+126;sem_resposta;O que é uma função exponencial?;
+127;sem_resposta;Quais são os biomas da Europa?;

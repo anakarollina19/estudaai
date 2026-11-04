@@ -1,0 +1,135 @@
+{
+  "descricao": "Aulas usadas na avaliação do RAG. As 8 primeiras são as mesmas de eval/dataset.js (usadas nos testes do app).",
+  "pastas": [
+    {
+      "nome": "Biologia",
+      "aulas": [
+        {
+          "id": "bio-divisao",
+          "titulo": "Divisão celular",
+          "notas": "# Mitose\nNa mitose uma célula se divide em duas células filhas idênticas, com o mesmo número de cromossomos.\nAs fases são prófase, metáfase, anáfase e telófase.\n\n# Meiose\nA meiose gera gametas com metade dos cromossomos, ou seja, células haploides.\nAcontece em duas divisões seguidas e aumenta a variabilidade genética pelo crossing-over."
+        },
+        {
+          "id": "bio-foto",
+          "titulo": "Fotossíntese",
+          "notas": "# Fotossíntese\nAs plantas usam luz solar, água e gás carbônico para produzir glicose e liberar oxigênio.\nO processo acontece nos cloroplastos, que contêm clorofila, o pigmento verde que absorve a luz.\n\n# Respiração celular\nA respiração celular quebra a glicose nas mitocôndrias e libera energia na forma de ATP."
+        },
+        {
+          "id": "bio-genetica",
+          "titulo": "Genética mendeliana",
+          "notas": "# Primeira lei de Mendel\nCada característica é determinada por um par de fatores, hoje chamados de alelos, que se separam na formação dos gametas.\nMendel chegou a essa conclusão cruzando ervilhas de sementes amarelas e verdes.\n\n# Dominância\nO alelo dominante se manifesta mesmo em dose única; o recessivo só aparece quando está em dose dupla.\nNo cruzamento de dois heterozigotos (Aa x Aa), a proporção de fenótipos é de 3 dominantes para 1 recessivo.\n\n# DNA\nO DNA é uma dupla hélice formada por nucleotídeos com as bases adenina, timina, citosina e guanina.\nA adenina pareia com a timina e a citosina pareia com a guanina."
+        }
+      ]
+    },
+    {
+      "nome": "Química",
+      "aulas": [
+        {
+          "id": "qui-ligacoes",
+          "titulo": "Ligações químicas",
+          "notas": "# Ligação iônica\nOcorre entre um metal e um ametal, com transferência de elétrons. Exemplo: NaCl, o sal de cozinha.\n\n# Ligação covalente\nOcorre entre ametais, que compartilham pares de elétrons. Exemplo: a molécula de água.\n\n# Ligação metálica\nOs elétrons livres formam um mar de elétrons, o que explica a condução elétrica dos metais."
+        },
+        {
+          "id": "qui-ph",
+          "titulo": "Ácidos e bases",
+          "notas": "# Escala de pH\nO pH mede a acidez de uma solução, de 0 a 14. Abaixo de 7 é ácido, 7 é neutro e acima de 7 é básico.\n\n# Neutralização\nQuando um ácido reage com uma base, formam-se sal e água. O suco gástrico do estômago é bem ácido."
+        },
+        {
+          "id": "qui-organica",
+          "titulo": "Química orgânica",
+          "notas": "# Carbono\nO carbono é tetravalente: faz quatro ligações e forma cadeias longas, base de todos os compostos orgânicos.\n\n# Hidrocarbonetos\nHidrocarbonetos têm apenas carbono e hidrogênio. O metano é o mais simples e é o principal componente do gás natural.\nAlcanos têm só ligações simples; alcenos têm pelo menos uma ligação dupla.\n\n# Funções orgânicas\nÁlcoois têm o grupo hidroxila (OH); o etanol é usado como combustível e em bebidas.\nÁcidos carboxílicos têm o grupo carboxila; o ácido acético dá o sabor do vinagre."
+        }
+      ]
+    },
+    {
+      "nome": "História",
+      "aulas": [
+        {
+          "id": "his-industrial",
+          "titulo": "Revolução Industrial",
+          "notas": "# Contexto\nComeçou na Inglaterra no século XVIII, com a máquina a vapor e a produção têxtil mecanizada.\n\n# Consequências\nÊxodo rural, crescimento das cidades e surgimento da classe operária.\nJornadas de trabalho longas levaram aos primeiros movimentos sindicais."
+        },
+        {
+          "id": "his-francesa",
+          "titulo": "Revolução Francesa",
+          "notas": "# Causas\nA França vivia crise econômica, fome e privilégios do clero e da nobreza, enquanto o terceiro estado pagava os impostos.\n\n# Queda da Bastilha\nEm 14 de julho de 1789 o povo de Paris tomou a Bastilha, prisão que simbolizava o poder absoluto do rei.\nO lema da revolução era liberdade, igualdade e fraternidade."
+        },
+        {
+          "id": "his-brasil",
+          "titulo": "Brasil Império",
+          "notas": "# Independência\nA independência do Brasil foi proclamada por Dom Pedro I em 7 de setembro de 1822, às margens do riacho Ipiranga.\n\n# Segundo Reinado\nDom Pedro II governou por quase cinquenta anos. A economia dependia do café, plantado principalmente no Vale do Paraíba e depois no oeste paulista.\n\n# Abolição\nA Lei Áurea, assinada pela princesa Isabel em 13 de maio de 1888, aboliu a escravidão no Brasil.\nAntes dela vieram a Lei do Ventre Livre (1871) e a Lei dos Sexagenários (1885)."
+        }
+      ]
+    },
+    {
+      "nome": "Física",
+      "aulas": [
+        {
+          "id": "fis-newton",
+          "titulo": "Leis de Newton",
+          "notas": "# Primeira lei\nPela inércia, um corpo continua parado ou em movimento retilíneo uniforme se nenhuma força agir sobre ele.\n\n# Segunda lei\nA força resultante é igual à massa vezes a aceleração: F = m · a.\n\n# Terceira lei\nA toda ação corresponde uma reação de mesma intensidade e sentido oposto."
+        },
+        {
+          "id": "fis-energia",
+          "titulo": "Energia",
+          "notas": "# Energia cinética\nÉ a energia do movimento e depende da massa e da velocidade do corpo.\n\n# Energia potencial\nA energia potencial gravitacional depende da altura em relação ao solo.\n\n# Conservação\nA energia não é criada nem destruída, apenas transformada de uma forma em outra."
+        },
+        {
+          "id": "fis-optica",
+          "titulo": "Óptica",
+          "notas": "# Reflexão\nNa reflexão, a luz bate numa superfície e volta; o ângulo de incidência é igual ao ângulo de reflexão.\n\n# Refração\nA refração é o desvio da luz ao mudar de meio, porque a velocidade da luz muda. É por isso que um lápis parece quebrado dentro de um copo de água.\n\n# Cores\nA luz branca é a mistura de todas as cores. Um prisma separa a luz branca no espectro, como acontece no arco-íris."
+        }
+      ]
+    },
+    {
+      "nome": "Matemática",
+      "aulas": [
+        {
+          "id": "mat-funcoes",
+          "titulo": "Funções",
+          "notas": "# Função afim\nA função afim tem a forma f(x) = ax + b. O coeficiente a é a inclinação da reta: se a é positivo, a função é crescente.\n\n# Função quadrática\nA função quadrática tem a forma f(x) = ax² + bx + c e seu gráfico é uma parábola.\nSe a é positivo, a parábola tem concavidade para cima e o vértice é o ponto mínimo.\n\n# Raízes\nAs raízes são os valores de x em que f(x) = 0. Na função quadrática elas são encontradas pela fórmula de Bhaskara, usando o discriminante delta = b² − 4ac."
+        },
+        {
+          "id": "mat-geometria",
+          "titulo": "Geometria",
+          "notas": "# Teorema de Pitágoras\nEm um triângulo retângulo, o quadrado da hipotenusa é igual à soma dos quadrados dos catetos: a² = b² + c².\n\n# Áreas\nA área do retângulo é base vezes altura. A área do triângulo é base vezes altura dividido por dois.\nA área do círculo é pi vezes o raio ao quadrado.\n\n# Ângulos\nA soma dos ângulos internos de qualquer triângulo é 180 graus."
+        }
+      ]
+    },
+    {
+      "nome": "Geografia",
+      "aulas": [
+        {
+          "id": "geo-clima",
+          "titulo": "Clima e biomas",
+          "notas": "# Climas do Brasil\nO clima equatorial, quente e úmido o ano todo, predomina na Amazônia.\nO semiárido do Nordeste tem chuvas escassas e irregulares, e nele está a Caatinga.\n\n# Biomas\nO Cerrado é a savana brasileira, com árvores de troncos retorcidos e casca grossa, adaptadas ao fogo.\nA Mata Atlântica ocupava o litoral e hoje restam pouco mais de 12% da cobertura original.\n\n# Efeito estufa\nGases como o gás carbônico e o metano retêm calor na atmosfera. O aumento desses gases causa o aquecimento global."
+        },
+        {
+          "id": "geo-populacao",
+          "titulo": "População e urbanização",
+          "notas": "# Urbanização\nA maior parte dos brasileiros vive em cidades. A urbanização acelerou a partir de 1950 com a industrialização.\n\n# Migração\nO êxodo rural levou milhões de pessoas do campo para as cidades do Sudeste em busca de emprego.\n\n# Transição demográfica\nCom a queda da natalidade e o aumento da expectativa de vida, a população brasileira está envelhecendo."
+        }
+      ]
+    },
+    {
+      "nome": "Português",
+      "aulas": [
+        {
+          "id": "por-figuras",
+          "titulo": "Figuras de linguagem",
+          "notas": "# Metáfora e comparação\nA metáfora aproxima dois termos sem usar conectivo, como em 'meu coração é um balde'.\nA comparação usa conectivos como 'como' e 'feito'.\n\n# Hipérbole\nA hipérbole é um exagero intencional, como em 'já te falei um milhão de vezes'.\n\n# Ironia\nA ironia diz o contrário do que se quer dizer, geralmente com tom de crítica ou humor."
+        }
+      ]
+    },
+    {
+      "nome": "Sociologia",
+      "aulas": [
+        {
+          "id": "soc-classicos",
+          "titulo": "Clássicos da sociologia",
+          "notas": "# Durkheim\nÉmile Durkheim estudou os fatos sociais, maneiras de agir que são exteriores ao indivíduo e exercem coerção sobre ele.\n\n# Marx\nKarl Marx analisou a luta de classes entre burguesia e proletariado e o conceito de mais-valia.\n\n# Weber\nMax Weber estudou a ação social e relacionou a ética protestante ao desenvolvimento do capitalismo."
+        }
+      ]
+    }
+  ]
+}

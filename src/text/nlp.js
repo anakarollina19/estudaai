@@ -1,15 +1,17 @@
 // Processamento de texto em português, sem dependências.
 // Usado no modo offline (sem IA) e na busca das aulas (RAG).
 
+/** Minúsculas e sem acentos: "Fotossíntese" -> "fotossintese". */
+export const normalize = text => text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+// A lista também é normalizada: o texto é comparado sem acento, então "são" precisa virar "sao".
+// (Bug encontrado na análise em analise/analise_rag.ipynb; sem efeito medido na busca, mas corrigido.)
 export const STOPWORDS = new Set((
   'a o as os de da do das dos e é em um uma uns umas para por com que no na nos nas se ao aos como ' +
   'mais mas foi são ser tem têm isso esse essa este esta isto também entre sobre muito pelo pela já ' +
   'ou quando seu sua seus suas ele ela eles elas qual quais onde porque pois sem até foram era está ' +
   'the of and to in is it'
-).split(' '));
-
-/** Minúsculas e sem acentos: "Fotossíntese" -> "fotossintese". */
-export const normalize = text => text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+).split(' ').map(normalize));
 
 /** Palavras com 3+ letras, normalizadas e sem stopwords. */
 export const tokenize = text =>
@@ -30,7 +32,7 @@ export function sentences(text) {
 export function keywords(text, n = 10) {
   const counts = {};
   for (const w of text.toLowerCase().match(/[a-zà-ú0-9]{4,}/g) ?? []) {
-    if (!STOPWORDS.has(w)) counts[w] = (counts[w] ?? 0) + 1;
+    if (!STOPWORDS.has(normalize(w))) counts[w] = (counts[w] ?? 0) + 1;
   }
   return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, n).map(([w]) => w);
 }

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Exportar embeddings · EstudaAI</title>
+<style>body { font-family: system-ui, sans-serif; max-width: 640px; margin: 40px auto; padding: 0 16px; }</style>
+</head>
+<body>
+<h1>Exportar embeddings para a análise</h1>
+<p>Gera os vetores das perguntas e dos trechos (aula inteira, tópico e frase) com o <b>mesmo modelo e a mesma
+biblioteca do app</b> (Transformers.js, modelo quantizado) e salva em <code>eval/dados/embeddings.json</code>.</p>
+<p id="status">Iniciando...</p>
+<script type="module">
+  import { loadEmbedder, embed, EMBEDDING_MODEL } from '../src/rag/semantic.js';
+
+  // Granularidades testadas no notebook: a aula inteira, cada tópico (o que o app usa) e cada frase.
+  const GRANULARIDADES = ['aula', 'secao', 'frase'];
+  const status = t => (document.getElementById('status').textContent = t);
+
+  // Mesmo chunking de analise/rag_eval.py (build_chunks); "secao" é idêntico ao app.
+  function chunkTexts(pastas, modo) {
+    const out = [];
+    for (const pasta of pastas) for (const aula of pasta.aulas) {
+      let partes;
+      if (modo === 'aula') partes = [aula.notas.trim()];
+      else {
+        const secoes = aula.notas.split(/\n(?=#)|\n\s*\n/).map(s => s.trim()).filter(s => s.length > 20);
+        partes = modo === 'secao' ? secoes.flatMap(s => { const r = []; for (let i = 0; i < s.length; i += 600) r.push(s.slice(i, i + 700)); return r; })
+          : secoes.flatMap(s => s.split(/(?<=[.!?])\s+|\n/).map(f => f.trim()).filter(f => f.length > 20 && !f.startsWith('#')));
+      }
+      for (const p of partes) out.push(`${aula.titulo}. ${p}`);
+    }
+    return out;
+  }
+
+  const corpus = await (await fetch('../eval/dados/corpus.json')).json();
+  const csv = await (await fetch('../eval/dados/perguntas.csv')).text();
+  const perguntas = csv.trim().split('\n').slice(1).map(l => l.split(';')[2]);
+
+  const textos = [...new Set([...perguntas, ...GRANULARIDADES.flatMap(g => chunkTexts(corpus.pastas, g))])];
+  status(`Carregando o modelo ${EMBEDDING_MODEL}...`);
+  await loadEmbedder(p => status(`Baixando o modelo... ${p}%`));
+  status(`Calculando ${textos.length} embeddings...`);
+  const vetores = await embed(textos);
+
+  const dados = {
+    modelo: EMBEDDING_MODEL,
+    biblioteca: 'Transformers.js 2.17.2 (quantizado, igual ao app)',
+    gerado_em: new Date().toISOString(),
+    vetores: Object.fromEntries(textos.map((t, i) => [t, vetores[i].map(v => Math.round(v * 1e5) / 1e5)])),
+  };
+  const res = await fetch('/salvar', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(dados) });
+  status(res.ok ? `✅ ${await res.text()}` : '⚠️ Erro ao salvar (rode analise/servidor_export.py)');
+  window.exportDone = res.ok;
+</script>
+</body>
+</html>
